@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * Hello world!
+ * iRODS
  *
  */
 public class IrodsConnection 
 {
     public static void main( String[] args ) throws IOException
     {
-        System.out.println( "Hello World!" );
+        System.out.println( "Hello iRODS!" );
         
         System.out.println("Enter 1 to get login window.");
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
