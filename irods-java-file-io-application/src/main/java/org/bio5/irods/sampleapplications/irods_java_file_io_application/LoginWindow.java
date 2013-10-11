@@ -16,6 +16,10 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
+import org.bio5.irods.sampleapplications.irods_connection.IrodsConnection;
+import org.irods.jargon.core.connection.IRODSAccount;
+import java.awt.TextArea;
+
 public class LoginWindow extends JFrame {
 
 	private JPanel contentPane;
@@ -31,6 +35,7 @@ public class LoginWindow extends JFrame {
 				try {
 					LoginWindow frame = new LoginWindow();
 					frame.setVisible(true);
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -62,11 +67,19 @@ public class LoginWindow extends JFrame {
 				String username= textbox_LoginId.getText();
 				String password= passwordField.getSelectedText();
 
-				if(username!=null || password!=null)
-				/*
-				 * Do something*/
+				if(username==null || password==null)
+				{	
+				 
 
 					JOptionPane.showMessageDialog(null, "Invalid Username or Password!", "Login Error", JOptionPane.ERROR_MESSAGE);
+				}
+				else
+				{
+					IRODSAccount irodsAccount = IrodsConnection.irodsConnection(textbox_LoginId.getText(), passwordField.getSelectedText());
+					irodsAccount.getUserName();
+					JOptionPane.showMessageDialog(null, "Connection Established! and your Home directory is" +irodsAccount.getUserName());
+				}
+
 			}
 		});
 
@@ -83,27 +96,33 @@ public class LoginWindow extends JFrame {
 
 		passwordField = new JPasswordField();
 		passwordField.setToolTipText("Password");
+
+		JLabel label_MessageBox = new JLabel("");
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 				gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-						.addGap(164)
-						.addComponent(button_Login)
-						.addGap(18)
-						.addComponent(button_Cancel)
-						.addContainerGap(120, Short.MAX_VALUE))
-						.addGroup(gl_contentPane.createSequentialGroup()
-								.addContainerGap(48, Short.MAX_VALUE)
-								.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+						.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+								.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
+										.addGap(164)
+										.addComponent(button_Login)
+										.addGap(18)
+										.addComponent(button_Cancel)
+										.addPreferredGap(ComponentPlacement.RELATED, 86, Short.MAX_VALUE))
 										.addGroup(gl_contentPane.createSequentialGroup()
-												.addComponent(Label_Password)
-												.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(passwordField, GroupLayout.PREFERRED_SIZE, 268, GroupLayout.PREFERRED_SIZE))
-												.addGroup(gl_contentPane.createSequentialGroup()
-														.addComponent(Label_Username)
-														.addGap(18)
-														.addComponent(textbox_LoginId, GroupLayout.PREFERRED_SIZE, 268, GroupLayout.PREFERRED_SIZE)))
-														.addGap(34))
+												.addContainerGap(48, Short.MAX_VALUE)
+												.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+														.addGroup(gl_contentPane.createSequentialGroup()
+																.addComponent(Label_Username)
+																.addGap(18)
+																.addComponent(textbox_LoginId, GroupLayout.PREFERRED_SIZE, 268, GroupLayout.PREFERRED_SIZE))
+																.addGroup(gl_contentPane.createSequentialGroup()
+																		.addComponent(Label_Password)
+																		.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
+																				.addComponent(label_MessageBox, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																				.addComponent(passwordField, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE))))))
+																				.addGap(34))
 				);
 		gl_contentPane.setVerticalGroup(
 				gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -120,7 +139,9 @@ public class LoginWindow extends JFrame {
 										.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 												.addComponent(button_Cancel)
 												.addComponent(button_Login))
-												.addContainerGap(106, Short.MAX_VALUE))
+												.addGap(36)
+												.addComponent(label_MessageBox, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
+												.addContainerGap(25, Short.MAX_VALUE))
 				);
 		contentPane.setLayout(gl_contentPane);
 	}
