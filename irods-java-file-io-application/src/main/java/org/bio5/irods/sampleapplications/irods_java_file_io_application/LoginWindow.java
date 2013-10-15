@@ -4,6 +4,13 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import ij.IJ;
+import ij.ImagePlus;
+import ij.gui.GenericDialog;
+import ij.io.Opener;
+import ij.plugin.PlugIn;
+import ij.plugin.frame.PlugInFrame;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -18,9 +25,13 @@ import javax.swing.border.EmptyBorder;
 
 import org.bio5.irods.sampleapplications.irods_connection.IrodsConnection;
 import org.irods.jargon.core.connection.IRODSAccount;
-import java.awt.TextArea;
 
-public class LoginWindow extends JFrame {
+public class LoginWindow extends PlugInFrame/*extends JFrame*/ {
+
+	public LoginWindow(String title) {
+		super("LoginWindow");
+		// TODO Auto-generated constructor stub
+	}
 
 	private JPanel contentPane;
 	private JTextField textbox_LoginId;
@@ -33,8 +44,9 @@ public class LoginWindow extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					LoginWindow frame = new LoginWindow();
+/*					LoginWindow frame = new LoginWindow();
 					frame.setVisible(true);
+*/					
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -43,10 +55,33 @@ public class LoginWindow extends JFrame {
 		});
 	}
 
+	public void run(String arg0) {
+		// TODO Auto-generated method stub
+		
+		GenericDialog gd = new GenericDialog("LoginWindow");
+		gd.addNumericField("Frame width:",200.0,3);
+		
+		/*IJ.showMessage("iRODS Application", "Hello iRODS!");
+		
+		String URL  ="http://godatdesign.com/sites/default/files/styles/large/public/Bio5_1.jpg";
+		
+		System.out.println("Result of URL" +IJ.openUrlAsString(URL));
+		
+		IJ.showMessage(IJ.openUrlAsString(URL));
+		
+		PlugInFrame pif = new PlugInFrame(null);
+		pif.getBackground();
+		Opener opener= new Opener();
+		ImagePlus imageplus =opener.openURL("http://godatdesign.com/sites/default/files/styles/large/public/Bio5_1.jpg");
+		*/
+	}
+
+	
+	
 	/**
 	 * Create the frame.
 	 */
-	public LoginWindow() {
+	/*public LoginWindow() {
 		setTitle("iRODS");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -144,5 +179,5 @@ public class LoginWindow extends JFrame {
 												.addContainerGap(25, Short.MAX_VALUE))
 				);
 		contentPane.setLayout(gl_contentPane);
-	}
+	}*/
 }

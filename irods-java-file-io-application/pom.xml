@@ -13,13 +13,59 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jargon.version>3.3.2-SNAPSHOT</jargon.version>
+		<imagej.version>1.45</imagej.version>
+		<imagej.path>C:\Program Files (x86)\ImageJ</imagej.path>
 	</properties>
+
+	<build>
+	<finalName>${project.artifactId}_${project.version}</finalName>
+	<plugins>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-antrun-plugin</artifactId>
+			<executions>
+				<execution>
+					<id>copytoplugins</id>
+					<phase>install</phase>
+					<goals>
+						<goal>run</goal>
+					</goals>
+					<configuration>
+						<tasks>
+							<copy todir="${imagej.path}/plugins/iRODS" file="target/${project.build.finalName}.jar" />
+						</tasks>
+					</configuration>
+				</execution>
+			</executions>
+		</plugin>
+		<plugin>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>exec-maven-plugin</artifactId>
+			<version>1.2</version>
+			<executions>
+				<execution>
+					<goals>
+						<goal>exec</goal>
+					</goals>
+				</execution>
+			</executions>
+			<configuration>
+				<executable>java</executable>
+				<commandlineArgs>-jar
+					-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}
+					"${imagej.path}/ij.jar"</commandlineArgs>
+				<workingDirectory>${imagej.path}</workingDirectory>
+			</configuration>
+		</plugin>
+	</plugins>
+</build>
+  
+  
 
 	<issueManagement>
 		<system>gForge</system>
-		<url>
-https://code.renci.org/gf/project/irods-rest/tracker/
-</url>
+		<url>https://code.renci.org/gf/project/irods-rest/tracker/
+		</url>
 	</issueManagement>
 
 	<dependencies>
@@ -31,11 +77,20 @@ https://code.renci.org/gf/project/irods-rest/tracker/
 		</dependency>
 
 	<!-- JARGON Dependency -->
-		<dependency>
-			<groupId>org.irods.jargon</groupId>
-			<artifactId>jargon-core</artifactId>
-			<version>${jargon.version}</version>
-		</dependency>
+	<dependency>
+		<groupId>org.irods.jargon</groupId>
+		<artifactId>jargon-core</artifactId>
+		<version>${jargon.version}</version>
+	</dependency>
+
+	<!-- ImageJ Dependency -->
+	<dependency>
+		<groupId>gov.nih.imagej</groupId>
+		<artifactId>imagej</artifactId>
+		<version>${imagej.version}</version>
+		<scope>compile</scope>
+	</dependency>
+		
 	</dependencies>
 
 	<repositories>
