@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: org.bio5.irods.sampleapplications.irods_java_file_io_application.AppTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.018 sec
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.027 sec
