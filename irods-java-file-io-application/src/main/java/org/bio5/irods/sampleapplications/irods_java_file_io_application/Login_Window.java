@@ -23,12 +23,12 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
-import org.bio5.irods.sampleapplications.irods_connection.IrodsConnection;
-import org.irods.jargon.core.connection.IRODSAccount;
+//import org.bio5.irods.sampleapplications.irods_connection.IrodsConnection;
+//import org.irods.jargon.core.connection.IRODSAccount;
 
-public class LoginWindow extends PlugInFrame/*extends JFrame*/ {
+public class Login_Window extends JFrame {
 
-        public LoginWindow(String title) {
+        public Login_Window(String title) {
                 super("LoginWindow");
                 // TODO Auto-generated constructor stub
         }
@@ -44,9 +44,9 @@ public class LoginWindow extends PlugInFrame/*extends JFrame*/ {
                 EventQueue.invokeLater(new Runnable() {
                         public void run() {
                                 try {
-/*                                        LoginWindow frame = new LoginWindow();
+                                        Login_Window frame = new Login_Window();
                                         frame.setVisible(true);
-*/                                        
+                                        
 
                                 } catch (Exception e) {
                                         e.printStackTrace();
@@ -81,7 +81,7 @@ public class LoginWindow extends PlugInFrame/*extends JFrame*/ {
         /**
          * Create the frame.
          */
-        /*public LoginWindow() {
+        public Login_Window() {
                 setTitle("iRODS");
                 setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 setBounds(100, 100, 450, 300);
@@ -110,9 +110,9 @@ public class LoginWindow extends PlugInFrame/*extends JFrame*/ {
                                 }
                                 else
                                 {
-                                        IRODSAccount irodsAccount = IrodsConnection.irodsConnection(textbox_LoginId.getText(), passwordField.getSelectedText());
+                                       /* IRODSAccount irodsAccount = IrodsConnection.irodsConnection(textbox_LoginId.getText(), passwordField.getSelectedText());
                                         irodsAccount.getUserName();
-                                        JOptionPane.showMessageDialog(null, "Connection Established! and your Home directory is" +irodsAccount.getUserName());
+                                        JOptionPane.showMessageDialog(null, "Connection Established! and your Home directory is" +irodsAccount.getUserName());*/
                                 }
 
                         }
@@ -179,5 +179,5 @@ public class LoginWindow extends PlugInFrame/*extends JFrame*/ {
                                                                                                 .addContainerGap(25, Short.MAX_VALUE))
                                 );
                 contentPane.setLayout(gl_contentPane);
-        }*/
+        }
 }

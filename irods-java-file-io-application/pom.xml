@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.bio5.irods.sampleapplications</groupId>
-	<artifactId>irods-java-file-io-application</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>irods_java_file_io_application</artifactId>
+	<version>0.0.1_SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>irods-java-file-io-application</name>
+	<name>irods_java_file_io_application</name>
 	<url>https://code.renci.org/gf/project/irods-rest/</url>
 
 	<properties>
@@ -32,6 +32,7 @@
 					</goals>
 					<configuration>
 						<tasks>
+						<!--  Below snippet will drop jar directly into ImageJ's */plugins/irods folder -->
 							<copy todir="${imagej.path}/plugins/iRODS" file="target/${project.build.finalName}.jar" />
 						</tasks>
 					</configuration>
