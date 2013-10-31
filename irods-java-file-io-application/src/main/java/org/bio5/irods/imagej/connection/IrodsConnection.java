@@ -1,4 +1,4 @@
-package org.bio5.irods.sampleapplications.irods_connection;
+package org.bio5.irods.imagej.connection;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

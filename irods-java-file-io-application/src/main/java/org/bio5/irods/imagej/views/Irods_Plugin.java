@@ -1,7 +1,8 @@
-package org.bio5.irods.sampleapplications.irods_java_file_io_application;
+package org.bio5.irods.imagej.views;
 
 import ij.IJ;
 import ij.plugin.PlugIn;
+import ij.plugin.frame.PlugInFrame;
 
 public class Irods_Plugin /*extends PlugInFrame*/ implements PlugIn {
 
@@ -13,24 +14,23 @@ public class Irods_Plugin /*extends PlugInFrame*/ implements PlugIn {
 	/*
 	 * Code specific to PlugInFrame subclass of AWT frame*/
 	/*public Irods_Plugin(String title) {
-		super("iRODS!");
+		super("iRODS");
 		IJ.showMessage("hai!");
+		execute();
 
 	}*/
 
-
-
-		
 	/* Code specific to PlugIn Interface*/
 	public void run(String arg) {
 		IJ.showMessage("iRODS Application", "Hello iRODS!");
-		execute();
+		/*execute();*/
+		MainWindow.main(null);
 	}
 
 
-	public void execute()
+	/*private void execute()
 	{
-		Login_Window.main(null);	
-	}
+		MainWindow.main(null);	
+	}*/
 
 }

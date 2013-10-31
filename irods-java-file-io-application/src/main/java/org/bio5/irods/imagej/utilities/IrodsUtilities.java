@@ -1,4 +1,4 @@
-package org.bio5.irods.sampleapplications.irods_utilities;
+package org.bio5.irods.imagej.utilities;
 
 public class IrodsUtilities {
 	
