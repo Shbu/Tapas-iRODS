@@ -3,6 +3,7 @@ package org.bio5.irods.imagej.views;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import javax.swing.GroupLayout;
@@ -26,10 +27,12 @@ import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.io.IRODSFile;
+
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
@@ -153,7 +156,7 @@ public class MainWindow extends JFrame {
 						/*Pop-up after successful connection with iRODS*/
 						//JOptionPane.showMessageDialog(null,"Login Successful!");
 
-						List<String> dirList= FileOperations.getDirectoryContents(irodsAccount);
+						List<String> dirList= FileOperations.getDirectoryContents(irodsAccount,irodsAccount.getUserName());
 
 						IRODSFile irodsAccountFile =FileOperations.getIrodsAccountFile(irodsAccount);
 						
@@ -167,14 +170,13 @@ public class MainWindow extends JFrame {
 						}
 						JOptionPane.showMessageDialog(null,list);*/
 
-						directoryContents  =new DirectoryContentsPane(dirList,irodsAccountFile);
+						directoryContents  =new DirectoryContentsPane(dirList,irodsAccountFile,irodsAccount);
 						setContentPane(directoryContents);
 						repaint(); // optional
 						revalidate(); 
 						pack();
 
 					}
-
 					/*Exception when username/password is empty*/
 					catch(CatalogSQLException catalogSQLException)
 					{

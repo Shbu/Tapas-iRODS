@@ -9,12 +9,17 @@ import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.bio5.irods.imagej.fileoperations.FileOperations;
+import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.exception.FileNotFoundException;
+import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.io.IRODSFile;
 
 public class DirectoryContentsPane extends JPanel {
@@ -25,11 +30,10 @@ public class DirectoryContentsPane extends JPanel {
 	private static final long serialVersionUID = 722996165620904921L;
 	private JTree userDirectoryTree;
 	private DefaultMutableTreeNode rootNode;
-	private DefaultMutableTreeNode childNode;
 	/**
 	 * Create the panel.
 	 */
-	public DirectoryContentsPane(List<String> ContentsInHome,IRODSFile irodsAccountFile) {
+	public DirectoryContentsPane(List<String> ContentsInHome,IRODSFile irodsAccountFile,final IRODSAccount irodsAccount) {
 
 		rootNode = new DefaultMutableTreeNode("Home");
 		/*Iterator<String> itr=ContentsInHome.iterator();
@@ -56,37 +60,55 @@ public class DirectoryContentsPane extends JPanel {
 			}
 		});
 		
-		JPanel panel = new JPanel();
+		JButton btnHome = new JButton("Home");
+		btnHome.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					List<String> dirList= FileOperations.getDirectoryContents(irodsAccount, null);
+					
+					IRODSFile irodsAccountFile =FileOperations.getIrodsAccountFile(irodsAccount);
+					DirectoryContentsPane directoryContents  =new DirectoryContentsPane(dirList,irodsAccountFile,irodsAccount);
+					MainWindow mw  =new MainWindow();
+					mw.setContentPane(directoryContents);
+				} catch (FileNotFoundException e1) {
+					JOptionPane.showMessageDialog(null, "Directory doesnt exists", "Not Home directory", 1);
+					
+					e1.printStackTrace();
+				} catch (JargonException e1) {
+					JOptionPane.showMessageDialog(null, "Jargon Exception", "Jargon Exception", 1);
+					e1.printStackTrace();
+				}
+				
+			}
+		});
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(userDirectoryTree, GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addGap(18)
 							.addComponent(btnNewButton_OpenImage, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewButton_AddToImageJ)
-							.addContainerGap(163, Short.MAX_VALUE))
+							.addComponent(btnNewButton_AddToImageJ))
 						.addGroup(groupLayout.createSequentialGroup()
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(panel, GroupLayout.PREFERRED_SIZE, 284, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())))
+							.addComponent(btnHome)))
+					.addContainerGap(136, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addGap(22)
 					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(panel, GroupLayout.PREFERRED_SIZE, 395, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btnNewButton_OpenImage)
-								.addComponent(btnNewButton_AddToImageJ)))
-						.addComponent(userDirectoryTree, GroupLayout.PREFERRED_SIZE, 429, GroupLayout.PREFERRED_SIZE))
+						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+							.addComponent(btnNewButton_OpenImage)
+							.addComponent(btnNewButton_AddToImageJ))
+						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+							.addComponent(userDirectoryTree, GroupLayout.PREFERRED_SIZE, 429, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnHome)))
 					.addContainerGap())
 		);
 		setLayout(groupLayout);
@@ -116,12 +138,12 @@ public class DirectoryContentsPane extends JPanel {
 		if(!irodsAccountFile.isDirectory()){
 
 			System.out.println("File name" +irodsAccountFile.getName());
-			DefaultMutableTreeNode child = new DefaultMutableTreeNode(irodsAccountFile);
+			DefaultMutableTreeNode child = new DefaultMutableTreeNode(irodsAccountFile.getName());
 			node.add(child);
 		}
 		else{
 			System.out.println("Direc name" + irodsAccountFile.getName());
-			DefaultMutableTreeNode child = new DefaultMutableTreeNode(irodsAccountFile);
+			DefaultMutableTreeNode child = new DefaultMutableTreeNode(irodsAccountFile.getName());
 			node.add(child);
 			File[] direcFiles=irodsAccountFile.listFiles();
 			for(int i=0;i<direcFiles.length;i++){
@@ -135,5 +157,4 @@ public class DirectoryContentsPane extends JPanel {
 		userDirectoryTree.setEditable(true);
 		add(userDirectoryTree);
 	}
-	
 }
