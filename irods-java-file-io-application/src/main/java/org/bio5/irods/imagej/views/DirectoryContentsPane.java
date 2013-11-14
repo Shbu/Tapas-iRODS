@@ -79,9 +79,18 @@ public class DirectoryContentsPane extends JPanel {
 				
 				IRODSFileFactory iRODSFileFactory = FileOperations.getIrodsAccountFileFactory(irodsAccount);
 				IRODSFileReader iofileReader = new IRODSFileReader(irodsAccountFile, iRODSFileFactory);
-				BufferedReader br= new BufferedReader(iofileReader);
 				
-				BufferedImage bi = ImageIO.read(localFiles);
+				IRODSFile[] direcFiles = (IRODSFile[]) irodsAccountFile.listFiles();
+				/*IRODSFile dirFile =null;
+				for(int i=0; i<direcFiles.length;i++)
+				{
+					dirFile=direcFiles[i];
+					if(dirFile.isFile())
+					break;	
+				}*/
+				IRODSFileInputStream irodsfileistream = iRODSFileFactory.instanceIRODSFileInputStream(direcFiles[2]);
+								
+				BufferedImage bi = ImageIO.read(irodsfileistream);
 
 				JFrame frame = new JFrame();  
 		        JLabel label = new JLabel(new ImageIcon(bi));  
@@ -174,7 +183,7 @@ public class DirectoryContentsPane extends JPanel {
 		
 		if(!irodsAccountFile.isDirectory()){
 
-			System.out.println("File name" +irodsAccountFile.getName());
+			System.out.println("File name" +irodsAccountFile.getName() +irodsAccountFile.getAbsolutePath());
 			DefaultMutableTreeNode child = new DefaultMutableTreeNode(irodsAccountFile.getName());
 			node.add(child);
 		}
@@ -184,6 +193,7 @@ public class DirectoryContentsPane extends JPanel {
 			node.add(child);
 			File[] direcFiles=irodsAccountFile.listFiles();
 			for(int i=0;i<direcFiles.length;i++){
+				System.out.println("File number" +i);
 				parseDirectoryContents(direcFiles[i], child);
 			}
 		}
