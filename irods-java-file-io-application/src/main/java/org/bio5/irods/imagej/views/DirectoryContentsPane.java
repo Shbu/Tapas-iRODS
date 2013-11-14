@@ -1,14 +1,25 @@
 package org.bio5.irods.imagej.views;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -20,7 +31,14 @@ import org.bio5.irods.imagej.fileoperations.FileOperations;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.FileNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.pub.UserAO;
+import org.irods.jargon.core.pub.io.FileIOOperations;
+import org.irods.jargon.core.pub.io.FileIOOperations.SeekWhenceType;
 import org.irods.jargon.core.pub.io.IRODSFile;
+import org.irods.jargon.core.pub.io.IRODSFileFactory;
+import org.irods.jargon.core.pub.io.IRODSFileInputStream;
+import org.irods.jargon.core.pub.io.IRODSFileReader;
 
 public class DirectoryContentsPane extends JPanel {
 
@@ -33,7 +51,7 @@ public class DirectoryContentsPane extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public DirectoryContentsPane(List<String> ContentsInHome,IRODSFile irodsAccountFile,final IRODSAccount irodsAccount) {
+	public DirectoryContentsPane(List<String> ContentsInHome,final IRODSFile irodsAccountFile,final IRODSAccount irodsAccount) {
 
 		rootNode = new DefaultMutableTreeNode("Home");
 		/*Iterator<String> itr=ContentsInHome.iterator();
@@ -43,7 +61,7 @@ public class DirectoryContentsPane extends JPanel {
 			rootNode.add(childNode);
 		}*/
 
-		File localFiles = (File) irodsAccountFile;
+		final File localFiles = (File) irodsAccountFile;
 		parseDirectoryContents(localFiles, rootNode);
 		
 		userDirectoryTree.setToolTipText("Directory list");
@@ -55,8 +73,27 @@ public class DirectoryContentsPane extends JPanel {
 		JButton btnNewButton_OpenImage = new JButton("Open Image");
 		btnNewButton_OpenImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				/*
-				 * Show directory contents if user is authenticated already*/
+				try{
+				IRODSFileSystem irodsFileSystem= IRODSFileSystem.instance();
+				UserAO  userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);
+				
+				IRODSFileFactory iRODSFileFactory = FileOperations.getIrodsAccountFileFactory(irodsAccount);
+				IRODSFileReader iofileReader = new IRODSFileReader(irodsAccountFile, iRODSFileFactory);
+				BufferedReader br= new BufferedReader(iofileReader);
+				
+				BufferedImage bi = ImageIO.read(localFiles);
+
+				JFrame frame = new JFrame();  
+		        JLabel label = new JLabel(new ImageIcon(bi));  
+		        frame.getContentPane().add(label, BorderLayout.CENTER);  
+		        frame.pack();  
+		        frame.setVisible(true); 
+		        
+				}
+				catch (Exception ex){
+					ex.printStackTrace();
+				}
+				 
 			}
 		});
 		

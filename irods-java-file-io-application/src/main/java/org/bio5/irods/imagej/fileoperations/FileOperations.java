@@ -52,7 +52,7 @@ public class FileOperations {
 	 * @return
 	 * @throws JargonException
 	 */
-	private static IRODSFileFactory getIrodsAccountFileFactory(
+	public static IRODSFileFactory getIrodsAccountFileFactory(
 			IRODSAccount iRODSAccount) throws JargonException {
 		IRODSFileSystem irodsFileSystem;
 		irodsFileSystem = IRODSFileSystem.instance();
@@ -66,6 +66,16 @@ public class FileOperations {
 		IRODSFile iRodsFile =iRODSFileFactory.instanceIRODSFile(HOME_DIR +iRODSAccount.getUserName());
 		return iRodsFile;
 
+	}
+	
+	public void readImageFile(IRODSAccount iRODSAccount) throws JargonException
+	{
+		/*
+		 * Irods File Factory*/
+		IRODSFileFactory iRODSFileFactory = getIrodsAccountFileFactory(iRODSAccount);
+		
+		
+		
 	}
 
 	/*	public static IRODSFileFactory getIrodsFileFactory(IRODSAccount iRODSAccount)

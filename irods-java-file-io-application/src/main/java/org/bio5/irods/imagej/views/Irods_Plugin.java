@@ -87,9 +87,13 @@ public class Irods_Plugin extends PlugInFrame /*implements PlugIn*/ {
 		// set the size of this frame to the values specified by the user,
 		// add label and show the frame
 		Panel UserDir=new Panel();
+		UserDir.setSize(PANEL_WIDTH, PANEL_HEIGHT);
+		Button button2=new Button();	
+		UserDir.add(button2);
 		this.add(UserDir);
 		/*this.setSize((int) gd.getNextNumber(),(int) gd.getNextNumber());
 		this.add(new Label("iRODS",Label.CENTER));*/
 		this.show();
+		
 	}
 }
