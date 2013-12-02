@@ -1,5 +1,5 @@
 #surefire
-#Mon Nov 18 15:12:19 MST 2013
+#Wed Nov 27 01:48:32 MST 2013
 testClassesDirectory=C\:\\Users\\cherry\\git\\iRODS-FileIO\\irods-java-file-io-application\\target\\test-classes
 classPathUrl.4=C\:\\Users\\cherry\\.m2\\repository\\commons-logging\\commons-logging\\1.1.1\\commons-logging-1.1.1.jar
 forkMode=once

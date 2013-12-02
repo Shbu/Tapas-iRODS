@@ -57,12 +57,6 @@ public class DirectoryContentsPane extends JPanel {
 		System.out.println("irodsZone" +irodsZone);
 
 		rootNode = new DefaultMutableTreeNode("home");
-		/*Iterator<String> itr=ContentsInHome.iterator();
-		while(itr.hasNext())
-		{
-			childNode = new DefaultMutableTreeNode(itr.next());
-			rootNode.add(childNode);
-		}*/
 
 		final File localFiles = (File) irodsAccountFile;
 		parseDirectoryContents(iRODSFileFactory, localFiles, rootNode, irodsAccount);
@@ -94,10 +88,10 @@ public class DirectoryContentsPane extends JPanel {
 
 					BufferedImage bi = ImageIO.read(irodsfileistream);
 					JFrame frame = new JFrame();  
-					JLabel label = new JLabel(new ImageIcon(bi));  
+					JLabel label = new JLabel(new ImageIcon(bi));
 					frame.getContentPane().add(label, BorderLayout.CENTER);  
-					frame.pack();  
-					frame.setVisible(true); 
+					frame.pack();
+					frame.setVisible(true);
 
 				}
 				catch (Exception ex){
@@ -224,9 +218,10 @@ public class DirectoryContentsPane extends JPanel {
 	{
 		System.out.println("finalTreePath:" +treePath);
 		
-		/*Remove hardCoded iRODSZone*/
+		/*Recheck irodsAccounZone for all accounts*/
 		IRODSFileInputStream irodsfileistream = iRODSFileFactory.instanceIRODSFileInputStream("/" +irodsAccount.getZone() +treePath);
 		BufferedImage bufferImageIrodsFile = ImageIO.read(irodsfileistream);
+		irodsfileistream.close();
 		JFrame frame = new JFrame();
 		JLabel label = new JLabel(new ImageIcon(bufferImageIrodsFile)); 
 		JScrollPane scrollPane = new JScrollPane(label);  
