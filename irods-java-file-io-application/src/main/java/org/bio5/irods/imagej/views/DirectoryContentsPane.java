@@ -235,13 +235,12 @@ public class DirectoryContentsPane extends JPanel {
 		JLabel label = new JLabel(new ImageIcon(bufferImageIrodsFile)); 
 		JScrollPane scrollPane = new JScrollPane(label);  
 		
-		//Get file to local directory. using getDataTransferOperations 
-		
+		//Get file to local directory. using getDataTransferOperations --- Need to check benchmarks
 		DataTransferOperations dataTransferOperationsAO =  irodsFileSystem
 				.getIRODSAccessObjectFactory().
 				getDataTransferOperations(
 						irodsAccount);
-		IRODSFile irodsfile = (IRODSFile)irodsfileistream;
+		IRODSFile irodsfile = iRODSFileFactory.instanceIRODSFile("/" +irodsAccount.getZone() +treePath);
 		File localfile =new File("D:\\iRODS");
 		
 		dataTransferOperationsAO.getOperation(irodsfile, localfile, null, null);
