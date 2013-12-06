@@ -104,7 +104,7 @@ public class Irods_Plugin extends PlugInFrame /*implements PlugIn*/ {
 				
 				/*Establish Connection*/
 				irodsConnection();
-				/*Perform Action after clicking Login button*/
+				
 			}
 		});
 
@@ -158,8 +158,6 @@ public class Irods_Plugin extends PlugInFrame /*implements PlugIn*/ {
 			JOptionPane.showMessageDialog(null, userAccount.getJargonProperties());
 			
 			String parentFileName= iRODSAccount.getUserName();
-			
-
 			/*iRODSFileFactory */
 			/*Change path to HOME_DIR in future to display other folders.
 			 *Pull zone from iRODSAccount*/

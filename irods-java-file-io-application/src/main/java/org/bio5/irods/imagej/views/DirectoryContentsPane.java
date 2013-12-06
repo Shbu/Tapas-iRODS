@@ -31,9 +31,13 @@ import org.bio5.irods.imagej.fileoperations.FileOperations;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.FileNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.pub.DataTransferOperations;
+import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.pub.io.IRODSFileInputStream;
+
 import javax.swing.JScrollBar;
 
 public class DirectoryContentsPane extends JPanel {
@@ -45,11 +49,13 @@ public class DirectoryContentsPane extends JPanel {
 	private JTree userDirectoryTree;
 	private DefaultMutableTreeNode rootNode;
 	private String irodsZone;
+	public IRODSFileSystem irodsFileSystem;
+	public UserAO  userAccount;
 	/**
 	 * Create the panel.
 	 * @throws JargonException 
 	 */
-	
+
 	public DirectoryContentsPane(List<String> ContentsInHome,final IRODSFile irodsAccountFile,final IRODSAccount irodsAccount) throws JargonException {
 
 		final IRODSFileFactory iRODSFileFactory = FileOperations.getIrodsAccountFileFactory(irodsAccount);
@@ -57,6 +63,11 @@ public class DirectoryContentsPane extends JPanel {
 		System.out.println("irodsZone" +irodsZone);
 
 		rootNode = new DefaultMutableTreeNode("home");
+		irodsFileSystem= IRODSFileSystem.instance();
+		userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);
+		DataTransferOperations dataTransferOperationsAO =  irodsFileSystem
+				.getIRODSAccessObjectFactory().getDataTransferOperations(
+						irodsAccount);
 
 		final File localFiles = (File) irodsAccountFile;
 		parseDirectoryContents(iRODSFileFactory, localFiles, rootNode, irodsAccount);
@@ -71,8 +82,7 @@ public class DirectoryContentsPane extends JPanel {
 		btnNewButton_OpenImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
-					//IRODSFileSystem irodsFileSystem= IRODSFileSystem.instance();
-					//UserAO  userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);
+					
 					//IRODSFileReader iofileReader = new IRODSFileReader(irodsAccountFile, iRODSFileFactory);
 
 					IRODSFile[] direcFiles = (IRODSFile[]) irodsAccountFile.listFiles();
@@ -123,35 +133,35 @@ public class DirectoryContentsPane extends JPanel {
 		});
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
+				groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(userDirectoryTree, GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
-					.addGap(10)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(18)
-							.addComponent(btnNewButton_OpenImage, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewButton_AddToImageJ))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnHome)))
-					.addGap(33))
-		);
+						.addContainerGap()
+						.addComponent(userDirectoryTree, GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
+						.addGap(10)
+						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addGroup(groupLayout.createSequentialGroup()
+										.addGap(18)
+										.addComponent(btnNewButton_OpenImage, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addComponent(btnNewButton_AddToImageJ))
+										.addGroup(groupLayout.createSequentialGroup()
+												.addPreferredGap(ComponentPlacement.UNRELATED)
+												.addComponent(btnHome)))
+												.addGap(33))
+				);
 		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
+				groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(22)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-							.addComponent(btnNewButton_OpenImage)
-							.addComponent(btnNewButton_AddToImageJ))
-						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-							.addComponent(userDirectoryTree, GroupLayout.PREFERRED_SIZE, 429, GroupLayout.PREFERRED_SIZE)
-							.addComponent(btnHome)))
-					.addContainerGap())
-		);
+						.addGap(22)
+						.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
+								.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+										.addComponent(btnNewButton_OpenImage)
+										.addComponent(btnNewButton_AddToImageJ))
+										.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+												.addComponent(userDirectoryTree, GroupLayout.PREFERRED_SIZE, 429, GroupLayout.PREFERRED_SIZE)
+												.addComponent(btnHome)))
+												.addContainerGap())
+				);
 		setLayout(groupLayout);
 	}
 
@@ -184,10 +194,8 @@ public class DirectoryContentsPane extends JPanel {
 					try {
 						getImageFile(iRODSFileFactory, treePath,irodsAccount);
 					} catch (JargonException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -217,16 +225,29 @@ public class DirectoryContentsPane extends JPanel {
 	void getImageFile(IRODSFileFactory iRODSFileFactory,String treePath,IRODSAccount irodsAccount) throws JargonException, IOException
 	{
 		System.out.println("finalTreePath:" +treePath);
-		
+
 		/*Recheck irodsAccounZone for all accounts*/
 		IRODSFileInputStream irodsfileistream = iRODSFileFactory.instanceIRODSFileInputStream("/" +irodsAccount.getZone() +treePath);
+		
 		BufferedImage bufferImageIrodsFile = ImageIO.read(irodsfileistream);
 		irodsfileistream.close();
 		JFrame frame = new JFrame();
 		JLabel label = new JLabel(new ImageIcon(bufferImageIrodsFile)); 
 		JScrollPane scrollPane = new JScrollPane(label);  
-		  scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);  
-		  scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED); 
+		
+		//Get file to local directory. using getDataTransferOperations 
+		
+		DataTransferOperations dataTransferOperationsAO =  irodsFileSystem
+				.getIRODSAccessObjectFactory().
+				getDataTransferOperations(
+						irodsAccount);
+		IRODSFile irodsfile = (IRODSFile)irodsfileistream;
+		File localfile =new File("D:\\iRODS");
+		
+		dataTransferOperationsAO.getOperation(irodsfile, localfile, null, null);
+
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);  
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED); 
 		frame.getContentPane().add(scrollPane,BorderLayout.CENTER);
 		frame.getContentPane().add(label, BorderLayout.CENTER); 
 		frame.pack();
