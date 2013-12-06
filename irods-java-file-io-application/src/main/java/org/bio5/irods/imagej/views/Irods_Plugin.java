@@ -14,6 +14,7 @@ import java.awt.Panel;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JOptionPane;
 
@@ -56,6 +57,14 @@ public class Irods_Plugin extends PlugInFrame /*implements PlugIn*/ {
 		super("iRODS");
 		// TODO Auto-generated constructor stub
 	}
+	
+	public void processWindowEvent(WindowEvent e) {
+		super.processWindowEvent(e);
+		if (e.getID()==WindowEvent.WINDOW_CLOSING) {
+			instance = null;	
+		}
+	}
+	
 
 	public void run(String arg) {
 
@@ -76,9 +85,7 @@ public class Irods_Plugin extends PlugInFrame /*implements PlugIn*/ {
 		label_Host= new Label("Host :");
 		textFieldHost= new TextField(30);
 		textFieldHost.setText("data.iplantcollaborative.org");
-
-		char c=0;
-		testFieldPassword.setEchoChar(c);
+		testFieldPassword.setEchoChar('*');
 
 		Button button_Login=new Button();
 		button_Login.setLabel("Login");
@@ -102,7 +109,7 @@ public class Irods_Plugin extends PlugInFrame /*implements PlugIn*/ {
 		});
 
 		Button button_Cancel=new Button();
-		button_Cancel.setLabel("Close");
+		button_Cancel.setLabel("Close Application");
 		button_Cancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				System.exit(0);
@@ -135,7 +142,7 @@ public class Irods_Plugin extends PlugInFrame /*implements PlugIn*/ {
 		
 	}
 	
-	private void irodsConnection(){
+	void irodsConnection(){
 		IRODSFile iRodsFile;
 
 		iRODSAccount = new IRODSAccount (host, Integer.parseInt(port), username, password, Constants.HOME_DIR, zone, Constants.DEFAULT_STORAGE_RESOURCE);
@@ -151,6 +158,7 @@ public class Irods_Plugin extends PlugInFrame /*implements PlugIn*/ {
 			JOptionPane.showMessageDialog(null, userAccount.getJargonProperties());
 			
 			String parentFileName= iRODSAccount.getUserName();
+			
 
 			/*iRODSFileFactory */
 			/*Change path to HOME_DIR in future to display other folders.
