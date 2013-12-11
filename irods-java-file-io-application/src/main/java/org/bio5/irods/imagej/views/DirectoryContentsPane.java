@@ -241,10 +241,10 @@ public class DirectoryContentsPane extends JPanel {
 				getDataTransferOperations(
 						irodsAccount);
 		IRODSFile irodsfile = iRODSFileFactory.instanceIRODSFile("/" +irodsAccount.getZone() +treePath);
-		File localfile =new File("D:\\iRODS");
 		
+		/*Change directory address*/
+		File localfile =new File("D:\\iRODS");
 		dataTransferOperationsAO.getOperation(irodsfile, localfile, null, null);
-
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);  
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED); 
 		frame.getContentPane().add(scrollPane,BorderLayout.CENTER);
