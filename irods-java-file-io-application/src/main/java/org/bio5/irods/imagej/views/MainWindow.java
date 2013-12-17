@@ -153,8 +153,6 @@ public class MainWindow extends JFrame {
 
 						UserAO  userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);
 
-						/*Pop-up after successful connection with iRODS*/
-						//JOptionPane.showMessageDialog(null,"Login Successful!");
 
 						List<String> dirList= FileOperations.getDirectoryContents(irodsAccount,irodsAccount.getUserName());
 
