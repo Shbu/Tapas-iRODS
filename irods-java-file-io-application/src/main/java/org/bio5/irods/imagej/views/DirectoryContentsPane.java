@@ -90,7 +90,7 @@ public class DirectoryContentsPane extends JPanel {
 					IRODSFileInputStream irodsfileistream = iRODSFileFactory.instanceIRODSFileInputStream(irodsAccountFile.getAbsolutePath() +"/TestImages/SpitzerTelescope_PinWheelGalaxy.jpg");
 
 					BufferedImage bi = ImageIO.read(irodsfileistream);
-					JFrame frame = new JFrame();  
+					JFrame frame = new JFrame();
 					JLabel label = new JLabel(new ImageIcon(bi));
 					frame.getContentPane().add(label, BorderLayout.CENTER);  
 					frame.pack();
@@ -222,11 +222,11 @@ public class DirectoryContentsPane extends JPanel {
 		/*Recheck irodsAccounZone for all accounts*/
 		IRODSFileInputStream irodsfileistream = iRODSFileFactory.instanceIRODSFileInputStream("/" +irodsAccount.getZone() +treePath);
 		
-		BufferedImage bufferImageIrodsFile = ImageIO.read(irodsfileistream);
+		/*BufferedImage bufferImageIrodsFile = ImageIO.read(irodsfileistream);
 		irodsfileistream.close();
 		JFrame frame = new JFrame();
 		JLabel label = new JLabel(new ImageIcon(bufferImageIrodsFile));
-		JScrollPane scrollPane = new JScrollPane(label);
+		JScrollPane scrollPane = new JScrollPane(label);*/
 		
 		//Get file to local directory using getDataTransferOperations --- Need to check benchmarks
 		DataTransferOperations dataTransferOperationsAO =  irodsFileSystem
@@ -238,11 +238,16 @@ public class DirectoryContentsPane extends JPanel {
 		/*Change directory address*/
 		File localfile =new File("D:\\iRODS");
 		dataTransferOperationsAO.getOperation(irodsfile, localfile, null, null);
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);  
+		
+		/*scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);  
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED); 
 		frame.getContentPane().add(scrollPane,BorderLayout.CENTER);
 		frame.getContentPane().add(label, BorderLayout.CENTER);
 		frame.pack();
-		frame.setVisible(true); 
+		frame.setVisible(true); */
+		
+		
+		
 	}
+	
 }

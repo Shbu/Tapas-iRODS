@@ -58,6 +58,7 @@ public class MiddlewareiRODS extends JFrame{
 		setContentPane(contentPane);
 		JOptionPane.showMessageDialog(null, username);
 		IRODSAccount irodsAccount= IrodsConnection.irodsConnection(username, password, zone, host, Integer.parseInt(port));
+		
 	}
 
 }

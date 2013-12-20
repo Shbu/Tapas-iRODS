@@ -5,6 +5,7 @@ import ij.gui.GUI;
 import ij.plugin.frame.PlugInFrame;
 
 import java.awt.Button;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Label;
@@ -16,6 +17,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
@@ -31,19 +33,21 @@ import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 
+import sun.rmi.runtime.Log;
+
 public class Irods_Plugin extends PlugInFrame {
 
 
 	/*Declare static variables*/
-	private static final int PANEL_HEIGHT = 500;
-	private static final int PANEL_WIDTH = 500;
+	private static final int PANEL_HEIGHT = 1000;
+	private static final int PANEL_WIDTH = 1000;
 	private static Frame instance;
 	private Panel panel;
 	private TextField textFieldUsername, textFieldPort,textFieldZone,textFieldHost, testFieldPassword;
-	private Label label_username, label_password,label_port, label_Zone,label_Host;
+	private Label label_username, label_password,label_port, label_Zone,label_Host,label_DirectoryList;
 	private String username=""; 
 	private String password="";
-	private String port="";
+	public String port="";
 	private String zone="";
 	private String host="";
 
@@ -54,10 +58,11 @@ public class Irods_Plugin extends PlugInFrame {
 	private IRODSFileFactory iRODSFileFactory;
 	private IRODSFileSystemAOImpl iRODSFileSystemAOImpl;
 	private List<String> listInDir;
-	private JTree userDirectoryTree;
 	private DefaultMutableTreeNode rootNode;
 	private IRODSFile iRodsFile;
 	//private IRODSFile iRodsFile;
+	private JTree userDirectoryTree;
+	private MiddlewareiRODS middleware;
 
 	private static final long serialVersionUID = 3225639715931294038L;
 
@@ -108,10 +113,17 @@ public class Irods_Plugin extends PlugInFrame {
 				zone=textFieldZone.getText();
 				host=textFieldHost.getText();
 
-				JOptionPane.showMessageDialog(null, username +password);
-
 				/*Establish Connection*/
-				irodsConnection();
+				//irodsConnection();
+				
+				/*setting values*/
+				middleware.setUsername(username);
+				middleware.setPassword(password);
+				middleware.setPort(port);
+				middleware.setZone(zone);
+				middleware.setHost(host);
+				
+				middleware.connection();
 			}
 		});
 
@@ -148,27 +160,64 @@ public class Irods_Plugin extends PlugInFrame {
 		setVisible(true);
 	}
 
-	void irodsConnection(){
+	/*public void irodsConnection(){
 
-		JOptionPane.showMessageDialog(this,"outside try block");
-		JOptionPane.showMessageDialog(this,host +Integer.parseInt(port) +username +password +Constants.HOME_DIR +zone +Constants.DEFAULT_STORAGE_RESOURCE);
+		panel.removeAll();
+		Dimension d= new Dimension();
+		d.setSize(PANEL_WIDTH, PANEL_HEIGHT);
+		panel.setSize(d);
+		label_DirectoryList= new Label("Directory List:");
+		panel.add(label_DirectoryList);
+		try {
+		iRODSAccount = new IRODSAccount (host, Integer.parseInt(port), username, password, Constants.HOME_DIR, zone, Constants.DEFAULT_STORAGE_RESOURCE);
+		irodsFileSystem= IRODSFileSystem.instance();
+		iRODSFileFactory=irodsFileSystem.getIRODSFileFactory(iRODSAccount);
+		iRODSSession=IrodsConnection.createDefaultiRodsSession();
+		
+		String parentFileName= iRODSAccount.getUserName();
+		IJ.log(parentFileName);
+		iRodsFile=iRODSFileFactory.instanceIRODSFile(Constants.HOME_DIR_IPLANT_HOME +parentFileName);
+		
+		IRODSFileSystemAOImpl IRODSFileSystemAOImpl  =new IRODSFileSystemAOImpl(iRODSSession, iRODSAccount);
+		listInDir  = IRODSFileSystemAOImpl.getListInDir(iRodsFile);
+		
+		Iterator<String> listInDirectory =listInDir.iterator();
+		int count = 1;
+		while(listInDirectory.hasNext())
+		{
+			IJ.log(listInDirectory.next());
+			count++;
+		}
+		}
+
+		catch(Exception e1)
+		{
+			IJ.log(e1.getMessage());
+		}
+		add(panel);
+		panel.repaint();
+		
+		pack();
+		setVisible(true);
+		*/
+		/*
 		iRODSAccount = new IRODSAccount (host, Integer.parseInt(port), username, password, Constants.HOME_DIR, zone, Constants.DEFAULT_STORAGE_RESOURCE);
 		try {
 			
 			irodsFileSystem= IRODSFileSystem.instance();
-			/*userAccount not required*/
+			userAccount not required
 			userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(iRODSAccount);
 			iRODSFileFactory=irodsFileSystem.getIRODSFileFactory(iRODSAccount);
 			iRODSSession=IrodsConnection.createDefaultiRodsSession();
 			String parentFileName= iRODSAccount.getUserName();
 
-			/*iRODSFileFactory */
-			/*Change path to HOME_DIR in future to display other folders.
-			 *Pull zone from iRODSAccount*/
+			iRODSFileFactory 
+			Change path to HOME_DIR in future to display other folders.
+			 *Pull zone from iRODSAccount
 			iRodsFile=iRODSFileFactory.instanceIRODSFile(Constants.HOME_DIR_IPLANT_HOME +parentFileName);
 
-			/*
-			 * Directory List*/
+			
+			 * Directory List
 			IRODSFileSystemAOImpl IRODSFileSystemAOImpl  =new IRODSFileSystemAOImpl(iRODSSession, iRODSAccount);
 			listInDir  = IRODSFileSystemAOImpl.getListInDir(iRodsFile);
 
@@ -190,7 +239,7 @@ public class Irods_Plugin extends PlugInFrame {
 		{
 			e1.printStackTrace();
 		}
-	}
+	}*/
 
 	
 	/*Un-commenting this block of code is giving ClassNotFound error*/
