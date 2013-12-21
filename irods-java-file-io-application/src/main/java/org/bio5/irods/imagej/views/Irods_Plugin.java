@@ -1,6 +1,8 @@
 package org.bio5.irods.imagej.views;
 
 import ij.IJ;
+import ij.ImageJ;
+import ij.ImagePlus;
 import ij.gui.GUI;
 import ij.plugin.frame.PlugInFrame;
 
@@ -10,30 +12,33 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.Panel;
+import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-import java.io.File;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.connection.IrodsConnection;
 import org.bio5.irods.imagej.utilities.Constants;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.IRODSSession;
+import org.irods.jargon.core.exception.AuthenticationException;
+import org.irods.jargon.core.exception.CatalogSQLException;
+import org.irods.jargon.core.exception.FileNotFoundException;
+import org.irods.jargon.core.exception.InvalidUserException;
+import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.IRODSFileSystemAOImpl;
 import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
-
-import sun.rmi.runtime.Log;
 
 public class Irods_Plugin extends PlugInFrame {
 
@@ -45,29 +50,29 @@ public class Irods_Plugin extends PlugInFrame {
 	private Panel panel;
 	private TextField textFieldUsername, textFieldPort,textFieldZone,textFieldHost, testFieldPassword;
 	private Label label_username, label_password,label_port, label_Zone,label_Host,label_DirectoryList;
+	private TextArea textarea;
 	private String username=""; 
 	private String password="";
-	public String port="";
+	private String port="";
 	private String zone="";
 	private String host="";
 
 	private IRODSAccount iRODSAccount;
-	private IRODSFileSystem irodsFileSystem;
+
 	private UserAO  userAccount;
-	private IRODSSession iRODSSession;
-	private IRODSFileFactory iRODSFileFactory;
 	private IRODSFileSystemAOImpl iRODSFileSystemAOImpl;
-	private List<String> listInDir;
 	private DefaultMutableTreeNode rootNode;
-	private IRODSFile iRodsFile;
 	//private IRODSFile iRodsFile;
 	private JTree userDirectoryTree;
 	private MiddlewareiRODS middleware;
+
+	private Logger log;
 
 	private static final long serialVersionUID = 3225639715931294038L;
 
 	public Irods_Plugin() {
 		super("iRODS");
+		log =Logger.getLogger(Irods_Plugin.class);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -114,16 +119,17 @@ public class Irods_Plugin extends PlugInFrame {
 				host=textFieldHost.getText();
 
 				/*Establish Connection*/
-				//irodsConnection();
-				
+				irodsConnection();
+
+
 				/*setting values*/
-				middleware.setUsername(username);
+				/*middleware.setUsername(username);
 				middleware.setPassword(password);
 				middleware.setPort(port);
 				middleware.setZone(zone);
 				middleware.setHost(host);
-				
-				middleware.connection();
+
+				middleware.connection();*/
 			}
 		});
 
@@ -160,7 +166,7 @@ public class Irods_Plugin extends PlugInFrame {
 		setVisible(true);
 	}
 
-	/*public void irodsConnection(){
+	public void irodsConnection() {
 
 		panel.removeAll();
 		Dimension d= new Dimension();
@@ -168,42 +174,88 @@ public class Irods_Plugin extends PlugInFrame {
 		panel.setSize(d);
 		label_DirectoryList= new Label("Directory List:");
 		panel.add(label_DirectoryList);
-		try {
 		iRODSAccount = new IRODSAccount (host, Integer.parseInt(port), username, password, Constants.HOME_DIR, zone, Constants.DEFAULT_STORAGE_RESOURCE);
-		irodsFileSystem= IRODSFileSystem.instance();
-		iRODSFileFactory=irodsFileSystem.getIRODSFileFactory(iRODSAccount);
-		iRODSSession=IrodsConnection.createDefaultiRodsSession();
-		
-		String parentFileName= iRODSAccount.getUserName();
-		IJ.log(parentFileName);
-		iRodsFile=iRODSFileFactory.instanceIRODSFile(Constants.HOME_DIR_IPLANT_HOME +parentFileName);
-		
-		IRODSFileSystemAOImpl IRODSFileSystemAOImpl  =new IRODSFileSystemAOImpl(iRODSSession, iRODSAccount);
-		listInDir  = IRODSFileSystemAOImpl.getListInDir(iRodsFile);
-		
-		Iterator<String> listInDirectory =listInDir.iterator();
-		int count = 1;
-		while(listInDirectory.hasNext())
-		{
-			IJ.log(listInDirectory.next());
-			count++;
-		}
+
+		IRODSFileSystem irodsFileSystem = null;
+		try {
+			irodsFileSystem = IRODSFileSystem.instance();
+		} catch (JargonException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
+		IRODSFileFactory iRODSFileFactory = null;
+		try {
+			iRODSFileFactory = irodsFileSystem.getIRODSFileFactory(iRODSAccount);
+		}
+		/*Exception when username/password is empty*/
+		catch(CatalogSQLException catalogSQLException)
+		{
+			JOptionPane.showMessageDialog(null, "Invalid Username or password!");
+			catalogSQLException.printStackTrace();
+			run("Invalid Username or password!");
+		}
+		/*Exception when username is invalid*/
+		catch (InvalidUserException invalidUserException)
+		{
+			JOptionPane.showMessageDialog(null, "Invalid Username!");
+			run("Invalid Username or password!");
+			invalidUserException.printStackTrace();
+			
+		}
+
+		/*Exception when password is invalid*/
+		catch(AuthenticationException authenticationException)
+		{
+			JOptionPane.showMessageDialog(null, "Invalid password!");
+			authenticationException.printStackTrace();
+		}
 		catch(Exception e1)
 		{
-			IJ.log(e1.getMessage());
+			e1.printStackTrace();
 		}
+
+		IRODSSession iRODSSession =IrodsConnection.createDefaultiRodsSession();
+		String parentFileName= iRODSAccount.getUserName();
+
+		IRODSFile iRodsFile = null;
+		try {
+			iRodsFile = iRODSFileFactory.instanceIRODSFile(Constants.HOME_DIR_IPLANT_HOME +parentFileName);
+		} catch (JargonException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		IRODSFileSystemAOImpl IRODSFileSystemAOImpl = null;
+		try {
+			IRODSFileSystemAOImpl = new IRODSFileSystemAOImpl(iRODSSession, iRODSAccount);
+		} catch (JargonException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		try {
+			//listInDir= IRODSFileSystemAOImpl.getListInDir(iRodsFile);
+			List<String> listInDir  = IRODSFileSystemAOImpl.getListInDir(iRodsFile);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JargonException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
 		add(panel);
 		panel.repaint();
-		
 		pack();
 		setVisible(true);
-		*/
+
 		/*
 		iRODSAccount = new IRODSAccount (host, Integer.parseInt(port), username, password, Constants.HOME_DIR, zone, Constants.DEFAULT_STORAGE_RESOURCE);
 		try {
-			
+
 			irodsFileSystem= IRODSFileSystem.instance();
 			userAccount not required
 			userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(iRODSAccount);
@@ -213,11 +265,11 @@ public class Irods_Plugin extends PlugInFrame {
 
 			iRODSFileFactory 
 			Change path to HOME_DIR in future to display other folders.
-			 *Pull zone from iRODSAccount
+		 *Pull zone from iRODSAccount
 			iRodsFile=iRODSFileFactory.instanceIRODSFile(Constants.HOME_DIR_IPLANT_HOME +parentFileName);
 
-			
-			 * Directory List
+
+		 * Directory List
 			IRODSFileSystemAOImpl IRODSFileSystemAOImpl  =new IRODSFileSystemAOImpl(iRODSSession, iRODSAccount);
 			listInDir  = IRODSFileSystemAOImpl.getListInDir(iRodsFile);
 
@@ -232,19 +284,19 @@ public class Irods_Plugin extends PlugInFrame {
 			final File localFiles = (File) iRodsFile;
 			rootNode = new DefaultMutableTreeNode("home");
 			//parseDirectoryContents(iRODSFileFactory, localFiles, rootNode, iRODSAccount);
-			
+
 		}
 
 		catch(Exception e1)
 		{
 			e1.printStackTrace();
-		}
-	}*/
+		}*/
+	}
 
-	
+
 	/*Un-commenting this block of code is giving ClassNotFound error*/
 
-/*	void parseDirectoryContents(final IRODSFileFactory iRODSFileFactory,final File irodsAccountFile, DefaultMutableTreeNode node, final IRODSAccount irodsAccount)
+	/*	void parseDirectoryContents(final IRODSFileFactory iRODSFileFactory,final File irodsAccountFile, DefaultMutableTreeNode node, final IRODSAccount irodsAccount)
 	{
 		if(!irodsAccountFile.isDirectory()){
 			System.out.println("File name" +irodsAccountFile.getName() +":" +irodsAccountFile.getAbsolutePath());
@@ -331,4 +383,23 @@ public class Irods_Plugin extends PlugInFrame {
 		frame.pack();
 		frame.setVisible(true);
 	}*/
+
+
+	public static void main(String[] args) {
+		// set the plugins.dir property to make the plugin appear in the Plugins menu
+		Class<?> clazz = Irods_Plugin.class;
+		String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
+		String pluginsDir = url.substring(5, url.length() - clazz.getName().length() - 6);
+		System.setProperty("plugins.dir", pluginsDir);
+
+		// start ImageJ
+		new ImageJ();
+
+		// open the Clown sample
+		/*ImagePlus image = IJ.openImage("http://imagej.net/images/clown.jpg");
+        image.show();*/
+
+		// run the plugin
+		IJ.runPlugIn(clazz.getName(), "");
+	}
 }

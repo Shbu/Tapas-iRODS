@@ -73,9 +73,6 @@ public class FileOperations {
 		/*
 		 * Irods File Factory*/
 		IRODSFileFactory iRODSFileFactory = getIrodsAccountFileFactory(iRODSAccount);
-		
-		
-		
 	}
 
 	/*	public static IRODSFileFactory getIrodsFileFactory(IRODSAccount iRODSAccount)

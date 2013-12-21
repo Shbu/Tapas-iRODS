@@ -2,6 +2,8 @@ package org.bio5.irods.imagej.views;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -37,6 +39,9 @@ import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.pub.io.IRODSFileInputStream;
+import org.irods.jargon.core.transfer.DefaultTransferControlBlock;
+import org.irods.jargon.core.transfer.ParallelGetFileTransferStrategy;
+import org.irods.jargon.core.transfer.TransferControlBlock;
 
 import javax.swing.JScrollBar;
 
@@ -51,6 +56,8 @@ public class DirectoryContentsPane extends JPanel {
 	private String irodsZone;
 	public IRODSFileSystem irodsFileSystem;
 	public UserAO  userAccount;
+	private DataTransferOperations dataTransferOperationsAO;
+	final IRODSFileFactory iRODSFileFactory;
 	/**
 	 * Create the panel.
 	 * @throws JargonException 
@@ -58,14 +65,14 @@ public class DirectoryContentsPane extends JPanel {
 
 	public DirectoryContentsPane(List<String> ContentsInHome,final IRODSFile irodsAccountFile,final IRODSAccount irodsAccount) throws JargonException {
 
-		final IRODSFileFactory iRODSFileFactory = FileOperations.getIrodsAccountFileFactory(irodsAccount);
+		iRODSFileFactory= FileOperations.getIrodsAccountFileFactory(irodsAccount);
 		String irodsZone =irodsAccount.getZone();
 		System.out.println("irodsZone" +irodsZone);
 
 		rootNode = new DefaultMutableTreeNode("home");
 		irodsFileSystem= IRODSFileSystem.instance();
 		userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);
-		DataTransferOperations dataTransferOperationsAO =  irodsFileSystem
+		dataTransferOperationsAO =  irodsFileSystem
 				.getIRODSAccessObjectFactory().getDataTransferOperations(
 						irodsAccount);
 
@@ -76,13 +83,27 @@ public class DirectoryContentsPane extends JPanel {
 		userDirectoryTree.setVisibleRowCount(50);
 		userDirectoryTree.setBorder(new LineBorder(new Color(0, 0, 0)));
 
-		JButton btnNewButton_AddToImageJ = new JButton("Add to ImageJ");
+		JButton btnNewButton_AddToImageJ = new JButton("Put to iRODS Server");
+		btnNewButton_AddToImageJ.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					
+					File sourceLocalfile =new File("D:\\iRODS\\Images\\bio5_header.jpeg");
+					IRODSFile destinaitonIrodsFile = iRODSFileFactory.instanceIRODSFile("//iplant//home//sharanbabuk//Images_10mb_32mb//");
+					dataTransferOperationsAO.putOperation(sourceLocalfile, destinaitonIrodsFile, null, null);
+				} catch (JargonException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+			}
+		});
 
 		JButton btnNewButton_OpenImage = new JButton("Open Image");
 		btnNewButton_OpenImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
-					
+
 					//IRODSFileReader iofileReader = new IRODSFileReader(irodsAccountFile, iRODSFileFactory);
 
 					IRODSFile[] direcFiles = (IRODSFile[]) irodsAccountFile.listFiles();
@@ -221,33 +242,57 @@ public class DirectoryContentsPane extends JPanel {
 
 		/*Recheck irodsAccounZone for all accounts*/
 		IRODSFileInputStream irodsfileistream = iRODSFileFactory.instanceIRODSFileInputStream("/" +irodsAccount.getZone() +treePath);
-		
+
 		/*BufferedImage bufferImageIrodsFile = ImageIO.read(irodsfileistream);
 		irodsfileistream.close();
 		JFrame frame = new JFrame();
 		JLabel label = new JLabel(new ImageIcon(bufferImageIrodsFile));
 		JScrollPane scrollPane = new JScrollPane(label);*/
-		
+
 		//Get file to local directory using getDataTransferOperations --- Need to check benchmarks
-		DataTransferOperations dataTransferOperationsAO =  irodsFileSystem
+		dataTransferOperationsAO =  irodsFileSystem
 				.getIRODSAccessObjectFactory().
 				getDataTransferOperations(
 						irodsAccount);
 		IRODSFile irodsfile = iRODSFileFactory.instanceIRODSFile("/" +irodsAccount.getZone() +treePath);
-		
+
+
+
 		/*Change directory address*/
 		File localfile =new File("D:\\iRODS");
 		dataTransferOperationsAO.getOperation(irodsfile, localfile, null, null);
-		
-		/*scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);  
+
+		/*scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED); 
 		frame.getContentPane().add(scrollPane,BorderLayout.CENTER);
 		frame.getContentPane().add(label, BorderLayout.CENTER);
 		frame.pack();
 		frame.setVisible(true); */
-		
-		
-		
+
+
+
 	}
-	
+
+
+	/*Put file to iRODS server*/
+	void putFile(IRODSAccount irodsAccount)
+	{
+		
+		try {
+			dataTransferOperationsAO =  irodsFileSystem
+					.getIRODSAccessObjectFactory().
+					getDataTransferOperations(
+							irodsAccount);
+			
+			File sourceLocalfile =new File("D:\\iRODS\\Images\\bio5_header.jpeg");
+			IRODSFile irodsfile = iRODSFileFactory.instanceIRODSFile("/iplant/home/sharanbabuk/Analysis");
+			dataTransferOperationsAO.putOperation(sourceLocalfile, irodsfile, null, null);
+		} catch (JargonException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+
 }
