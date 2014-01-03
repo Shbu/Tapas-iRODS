@@ -63,7 +63,7 @@ public class MainWindow extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -75,7 +75,7 @@ public class MainWindow extends JFrame {
 			}
 		});
 	}
-
+*/
 /*	public void run(String arg0) {
 		// TODO Auto-generated method stub
 	}*/
@@ -149,14 +149,13 @@ public class MainWindow extends JFrame {
 					try{
 						IRODSAccount irodsAccount =IrodsConnection.irodsConnection(username, password_full, zone, host, port);
 
-						IRODSFileSystem irodsFileSystem= IRODSFileSystem.instance();
+						/*IRODSFileSystem irodsFileSystem= IRODSFileSystem.instance();
 
-						UserAO  userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);
+						UserAO  userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);*/
 
+						List<String> dirList= FileOperations.getDirectoryContents(irodsAccount);
 
-						List<String> dirList= FileOperations.getDirectoryContents(irodsAccount,irodsAccount.getUserName());
-
-						IRODSFile irodsAccountFile =FileOperations.getIrodsAccountFile(irodsAccount);
+						IRODSFile irodsAccountFile =FileOperations.getiRodsFile();
 						
 						/*Display Directory contents*/
 						/*Iterator itr =dirList.iterator();

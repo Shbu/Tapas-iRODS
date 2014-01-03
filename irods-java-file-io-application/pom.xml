@@ -1,14 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<groupId>org.bio5.irods.sampleapplications</groupId>
-	<artifactId>irods_java_file_io_application</artifactId>
-	<version>0.0.1_SNAPSHOT</version>
+	<artifactId>irods_fileIO</artifactId>
+	<version>0.0.1Snapshot</version>
 	<packaging>jar</packaging>
 
 	<name>irods_java_file_io_application</name>
-	<url>https://code.renci.org/gf/project/irods-rest/</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,60 +14,6 @@
 		<imagej.version>1.45</imagej.version>
 		<imagej.path>C:\Program Files (x86)\ImageJ</imagej.path>
 	</properties>
-
-	<build>
-		<finalName>${project.artifactId}_${project.version}</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copytoplugins</id>
-						<phase>install</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<!-- Below snippet will drop jar directly into ImageJ's */plugins/irods 
-									folder -->
-								<copy todir="${imagej.path}/plugins/iRODS" file="target/${project.build.finalName}.jar" />
-							</tasks>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<executable>java</executable>
-					<commandlineArgs>-jar
-						-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}
-						"${imagej.path}/ij.jar"</commandlineArgs>
-					<workingDirectory>${imagej.path}</workingDirectory>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-
-
-
-	<issueManagement>
-		<system>gForge</system>
-		<url>https://code.renci.org/gf/project/irods-rest/tracker/
-		</url>
-	</issueManagement>
-
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -90,7 +34,6 @@
 			<groupId>gov.nih.imagej</groupId>
 			<artifactId>imagej</artifactId>
 			<version>${imagej.version}</version>
-			<scope>compile</scope>
 		</dependency>
 
 		<!-- Swing Dependency -->
@@ -100,15 +43,88 @@
 			<version>1.0.3</version>
 		</dependency>
 
+		<!-- log4j Dependency -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+
+		<!-- Extra Dependency to test -->
+		<dependency>
+			<groupId>org.irods.jargon</groupId>
+			<artifactId>jargon-data-utils</artifactId>
+			<version>${jargon.version}</version>
+		</dependency>
+		<!-- <dependency> <groupId>commons-io</groupId> <artifactId>commons-io</artifactId> 
+			<scope>compile</scope> </dependency> -->
+		<dependency>
+			<groupId>org.irods.jargon</groupId>
+			<artifactId>jargon-user-tagging</artifactId>
+			<version>${jargon.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.irods.jargon.transfer</groupId>
+			<artifactId>jargon-transfer-dao-spring</artifactId>
+			<version>${jargon.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.irods.jargon.transfer</groupId>
+			<artifactId>jargon-transfer-engine</artifactId>
+			<version>${jargon.version}</version>
+		</dependency>
 
 	</dependencies>
 
-	<repositories>
-		<!-- <repository> <id>ibiblio.repository</id> <name>ibiblio.repository</name> 
-			<url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url> <releases> <enabled>true</enabled> 
-			</releases> <snapshots> <enabled>true</enabled> <updatePolicy>never</updatePolicy> 
-			<checksumPolicy>fail</checksumPolicy> </snapshots> </repository> -->
+	<build>
+		<plugins>
 
+			<!-- jar with dependencies -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<finalName>${artifactId}-${version}-jar-with-dependencies</finalName>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copytoplugins</id>
+						<phase>install</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<!-- Below snippet will drop jar directly into ImageJ's */plugins/irods 
+									folder -->
+								<copy todir="${imagej.path}/plugins/iRODS"
+									file="target/${project.build.finalName}-jar-with-dependencies.jar" />
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+		</plugins>
+	</build>
+
+	<repositories>
 		<!-- Added RENCI repository -->
 		<repository>
 			<id>renci.repository</id>
@@ -125,6 +141,5 @@
 			</snapshots>
 		</repository>
 		<!-- End of RENCI repository -->
-
 	</repositories>
 </project>
