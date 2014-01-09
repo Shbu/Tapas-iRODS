@@ -1,7 +1,10 @@
 package org.bio5.irods.imagej.fileoperations;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.swing.JOptionPane;
 
 import org.bio5.irods.imagej.connection.IrodsConnection;
 import org.irods.jargon.core.connection.IRODSAccount;
@@ -42,24 +45,25 @@ public class FileOperations {
 	public static List<String> getDirectoryContents(
 			IRODSAccount iRODSAccount) throws JargonException, FileNotFoundException {
 
-
 		/*Getting default iRods Session*/
 		IRODSSession iRODSSession =IrodsConnection.createDefaultiRodsSession();
-		
 		/*Setting jargon properties*/
 		SettableJargonProperties jp= new SettableJargonProperties();
 		System.out.println(" Threads before updating -" +jp.getMaxParallelThreads());
 		jp.setMaxParallelThreads(10);
 		System.out.println(" Threads after updating-" +jp.getMaxParallelThreads());
+	
 		
 		/*
 		 * Irods File Factory*/
 		IRODSFileFactory iRODSFileFactory = getIrodsAccountFileFactory(iRODSAccount);
-
+		JOptionPane.showMessageDialog(null, "Hello - got irodsfileFactory");
+		
 		String parentFileName  =iRODSAccount.getUserName();
 		/*irods file */
 		iRodsFile =iRODSFileFactory.instanceIRODSFile(HOME_DIR +parentFileName);
-
+		
+		
 		/*
 		 * Directory List*/
 		IRODSFileSystemAOImpl IRODSFileSystemAOImpl  =new IRODSFileSystemAOImpl(iRODSSession, iRODSAccount);

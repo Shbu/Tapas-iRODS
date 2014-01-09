@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.bio5.irods.sampleapplications</groupId>
+  <artifactId>irods_fileIO</artifactId>
+  <name>irods_java_file_io_application</name>
+  <version>0.0.1Snapshot</version>
+  <url>https://code.renci.org/gf/project/irods-rest/</url>
+  <build>
+    <finalName>${project.artifactId}_${project.version}</finalName>
+    <plugins>
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <executable>java</executable>
+          <commandlineArgs>-jar
+						-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}
+						"${imagej.path}/ij.jar"</commandlineArgs>
+          <workingDirectory>${imagej.path}</workingDirectory>
+          <tasks>
+            <copy />
+          </tasks>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <repositories>
+    <repository>
+      <releases />
+      <snapshots>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </snapshots>
+      <id>renci.repository</id>
+      <name>renci.repository</name>
+      <url>http://ci-dev.renci.org/nexus/content/repositories/public</url>
+    </repository>
+  </repositories>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <properties>
+    <imagej.version>1.45</imagej.version>
+    <jargon.version>3.3.2-SNAPSHOT</jargon.version>
+    <imagej.path>C:\Program Files (x86)\ImageJ</imagej.path>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+</project>
+

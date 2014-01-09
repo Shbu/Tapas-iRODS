@@ -10,8 +10,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jargon.version>3.3.2-SNAPSHOT</jargon.version>
-		<imagej.version>1.45</imagej.version>
+		<jargon.version>3.3.3-SNAPSHOT</jargon.version>
+		<imagej.version>1.47</imagej.version>
 		<imagej.path>C:\Program Files (x86)\ImageJ</imagej.path>
 	</properties>
 	<dependencies>
@@ -37,11 +37,11 @@
 		</dependency>
 
 		<!-- Swing Dependency -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.swinglabs</groupId>
 			<artifactId>swing-layout</artifactId>
 			<version>1.0.3</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- log4j Dependency -->
 		<dependency>
@@ -51,14 +51,14 @@
 		</dependency>
 
 		<!-- Extra Dependency to test -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.irods.jargon</groupId>
 			<artifactId>jargon-data-utils</artifactId>
 			<version>${jargon.version}</version>
-		</dependency>
+		</dependency> -->
 		<!-- <dependency> <groupId>commons-io</groupId> <artifactId>commons-io</artifactId> 
 			<scope>compile</scope> </dependency> -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.irods.jargon</groupId>
 			<artifactId>jargon-user-tagging</artifactId>
 			<version>${jargon.version}</version>
@@ -73,7 +73,7 @@
 			<groupId>org.irods.jargon.transfer</groupId>
 			<artifactId>jargon-transfer-engine</artifactId>
 			<version>${jargon.version}</version>
-		</dependency>
+		</dependency> -->
 
 	</dependencies>
 
@@ -119,8 +119,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-
 		</plugins>
 	</build>
 

@@ -447,9 +447,6 @@ public class DirectoryContentsPane extends JPanel {
 		public Void doInBackground() throws Exception {
 
 			//getImageFile(iRODSFileFactory,treePath,irodsAccount );
-
-
-
 			System.out.println("finalTreePath:" +treePath);
 
 			/*Recheck irodsAccounZone for all accounts*/
@@ -461,7 +458,6 @@ public class DirectoryContentsPane extends JPanel {
 					getDataTransferOperations(
 							irodsAccount);
 			IRODSFile sourceIrodsFilePath = iRODSFileFactory.instanceIRODSFile("/" +irodsAccount.getZone() +treePath);
-
 
 			/*Change directory address*/
 			File destinationLocalFilePath =new File("D:\\iRODS");
@@ -486,7 +482,6 @@ public class DirectoryContentsPane extends JPanel {
 			{
 				IJ.showMessage("Opening file Failed.");
 			}
-
 			return null;
 		}
 

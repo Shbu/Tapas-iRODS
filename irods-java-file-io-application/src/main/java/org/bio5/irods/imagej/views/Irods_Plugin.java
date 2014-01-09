@@ -2,45 +2,29 @@ package org.bio5.irods.imagej.views;
 
 import ij.IJ;
 import ij.ImageJ;
-import ij.ImagePlus;
-import ij.gui.GUI;
 import ij.plugin.frame.PlugInFrame;
 
-import java.awt.Button;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.Panel;
 import java.awt.TextArea;
 import java.awt.TextField;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JOptionPane;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.connection.IrodsConnection;
 import org.bio5.irods.imagej.fileoperations.FileOperations;
-import org.bio5.irods.imagej.utilities.Constants;
 import org.irods.jargon.core.connection.IRODSAccount;
-import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.exception.AuthenticationException;
 import org.irods.jargon.core.exception.CatalogSQLException;
-import org.irods.jargon.core.exception.FileNotFoundException;
 import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSFileSystem;
-import org.irods.jargon.core.pub.IRODSFileSystemAOImpl;
-import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.io.IRODSFile;
-import org.irods.jargon.core.pub.io.IRODSFileFactory;
 
 public class Irods_Plugin extends PlugInFrame {
 
@@ -64,8 +48,10 @@ public class Irods_Plugin extends PlugInFrame {
 	private DirectoryContentsPane directoryContents;
 
 
+	/*Logger instantiation*/
+	static Logger log = Logger.getLogger(
+			Irods_Plugin.class.getName());
 
-	private Logger log;
 
 	private static final long serialVersionUID = 3225639715931294038L;
 
@@ -200,6 +186,7 @@ public class Irods_Plugin extends PlugInFrame {
 		{
 			JOptionPane.showMessageDialog(null, "Invalid Username or password!");
 			catalogSQLException.printStackTrace();
+			
 		}
 		/*Exception when username is invalid*/
 		catch (InvalidUserException invalidUserException)
