@@ -36,44 +36,17 @@
 			<version>${imagej.version}</version>
 		</dependency>
 
-		<!-- Swing Dependency -->
-		<!-- <dependency>
-			<groupId>org.swinglabs</groupId>
-			<artifactId>swing-layout</artifactId>
-			<version>1.0.3</version>
-		</dependency> -->
-
-		<!-- log4j Dependency -->
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
-		</dependency>
-
-		<!-- Extra Dependency to test -->
-		<!-- <dependency>
-			<groupId>org.irods.jargon</groupId>
-			<artifactId>jargon-data-utils</artifactId>
-			<version>${jargon.version}</version>
-		</dependency> -->
-		<!-- <dependency> <groupId>commons-io</groupId> <artifactId>commons-io</artifactId> 
-			<scope>compile</scope> </dependency> -->
-		<!-- <dependency>
-			<groupId>org.irods.jargon</groupId>
-			<artifactId>jargon-user-tagging</artifactId>
-			<version>${jargon.version}</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.5</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.irods.jargon.transfer</groupId>
-			<artifactId>jargon-transfer-dao-spring</artifactId>
-			<version>${jargon.version}</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.5</version>
 		</dependency>
-		<dependency>
-			<groupId>org.irods.jargon.transfer</groupId>
-			<artifactId>jargon-transfer-engine</artifactId>
-			<version>${jargon.version}</version>
-		</dependency> -->
 
 	</dependencies>
 
@@ -115,6 +88,17 @@
 								<copy todir="${imagej.path}/plugins/iRODS"
 									file="target/${project.build.finalName}-jar-with-dependencies.jar" />
 							</tasks>
+							<archive>
+								<manifest>
+									<addDefaultImplementationEntries>false</addDefaultImplementationEntries>
+									<addClasspath>true</addClasspath>
+									<mainClass>org.bio5.irods.imagej.views.Irods_Plugin</mainClass>
+									<classpathPrefix>../org/</classpathPrefix>
+								</manifest>
+								<manifestEntries>
+									<Class-Path>../org/</Class-Path>
+								</manifestEntries>
+							</archive>
 						</configuration>
 					</execution>
 				</executions>

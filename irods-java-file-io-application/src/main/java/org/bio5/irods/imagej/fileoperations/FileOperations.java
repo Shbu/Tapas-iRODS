@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.connection.IrodsConnection;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.IRODSSession;
@@ -25,6 +26,11 @@ public class FileOperations {
 	private IRODSFileFactory iRODSFileFactory;
 	private static IRODSFileSystem irodsFileSystem;
 	private static IRODSFile iRodsFile ;
+
+	/*Logger instantiation*/
+	static Logger log = Logger.getLogger(
+			FileOperations.class.getName());
+
 
 	public IRODSFileSystem getIrodsFileSystem() {
 		return irodsFileSystem;
@@ -49,31 +55,34 @@ public class FileOperations {
 		IRODSSession iRODSSession =IrodsConnection.createDefaultiRodsSession();
 		/*Setting jargon properties*/
 		SettableJargonProperties jp= new SettableJargonProperties();
+		log.info("Default threads: "  +jp.getMaxParallelThreads());
 		System.out.println(" Threads before updating -" +jp.getMaxParallelThreads());
 		jp.setMaxParallelThreads(10);
+		log.info("Threads upgraded to : "  +jp.getMaxParallelThreads());
 		System.out.println(" Threads after updating-" +jp.getMaxParallelThreads());
-	
-		
+
+
 		/*
 		 * Irods File Factory*/
 		IRODSFileFactory iRODSFileFactory = getIrodsAccountFileFactory(iRODSAccount);
-		JOptionPane.showMessageDialog(null, "Hello - got irodsfileFactory");
-		
+
 		String parentFileName  =iRODSAccount.getUserName();
 		/*irods file */
 		iRodsFile =iRODSFileFactory.instanceIRODSFile(HOME_DIR +parentFileName);
-		
-		
+
+
 		/*
 		 * Directory List*/
 		IRODSFileSystemAOImpl IRODSFileSystemAOImpl  =new IRODSFileSystemAOImpl(iRODSSession, iRODSAccount);
 		System.out.println("irods file path" +iRodsFile);
+		log.info("irods file path" +iRodsFile);
 		List<String> listInDir  = IRODSFileSystemAOImpl.getListInDir(iRodsFile);
 
 		Iterator<String> listInDirectory =listInDir.iterator();
 		int count = 1;
 		while(listInDirectory.hasNext())
 		{
+			//log.info("Files in Dir:" +count +" " +listInDirectory.next());
 			System.out.println("Files in Dir:" +count +" " +listInDirectory.next());
 			count++;
 		}
@@ -95,13 +104,13 @@ public class FileOperations {
 	 */
 	public static IRODSFileFactory getIrodsAccountFileFactory(
 			IRODSAccount iRODSAccount) throws JargonException {
-		
+
 		irodsFileSystem = IRODSFileSystem.instance();
 		IRODSFileFactory iRODSFileFactory =irodsFileSystem.getIRODSFileFactory(iRODSAccount);
 		return iRODSFileFactory;
 	}
 
-	
+
 	public void readImageFile(IRODSAccount iRODSAccount) throws JargonException
 	{
 		/*

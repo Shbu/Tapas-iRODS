@@ -159,6 +159,7 @@ public class Irods_Plugin extends PlugInFrame {
 		setVisible(true);*/
 	}
 
+	//Not using as of now
 	public void irodsConnection() throws JargonException {
 		try
 		{
@@ -184,6 +185,7 @@ public class Irods_Plugin extends PlugInFrame {
 		/*Exception when username/password is empty*/
 		catch(CatalogSQLException catalogSQLException)
 		{
+			log.error(catalogSQLException.getMessage());
 			JOptionPane.showMessageDialog(null, "Invalid Username or password!");
 			catalogSQLException.printStackTrace();
 			
@@ -191,6 +193,7 @@ public class Irods_Plugin extends PlugInFrame {
 		/*Exception when username is invalid*/
 		catch (InvalidUserException invalidUserException)
 		{
+			log.error(invalidUserException.getMessage());
 			JOptionPane.showMessageDialog(null, "Invalid Username!");
 			invalidUserException.printStackTrace();
 		}
@@ -198,11 +201,13 @@ public class Irods_Plugin extends PlugInFrame {
 		/*Exception when password is invalid*/
 		catch(AuthenticationException authenticationException)
 		{
+			log.error(authenticationException.getMessage());
 			JOptionPane.showMessageDialog(null, "Invalid password!");
 			authenticationException.printStackTrace();
 		}
 		catch(Exception e1)
 		{
+			log.error(e1.getMessage());
 			JOptionPane.showMessageDialog(null, "Unknown Exception!");
 			e1.printStackTrace();
 		}
@@ -211,13 +216,12 @@ public class Irods_Plugin extends PlugInFrame {
 	
 	public void createDirectoryTree(List<String> ContentsInHome,IRODSFile irodsAccountFile ){
 		
-		//rootNode = new DefaultMutableTreeNode("home");
-		
 		try {
 			directoryContents= new DirectoryContentsPane(ContentsInHome, irodsAccountFile, irodsAccount);
-		} catch (JargonException e) {
+		} catch (JargonException jargonException) {
+			log.error(jargonException.getMessage());
 			JOptionPane.showMessageDialog(null, "Unknown Exception in createDirectoryTree!");
-			e.printStackTrace();
+			jargonException.printStackTrace();
 		}
 	}
 	
