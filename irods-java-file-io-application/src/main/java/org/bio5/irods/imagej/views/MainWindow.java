@@ -32,6 +32,8 @@ import org.irods.jargon.core.exception.AuthenticationException;
 import org.irods.jargon.core.exception.CatalogSQLException;
 import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.pub.io.IRODSFile;
+import javax.swing.border.TitledBorder;
+import javax.swing.SwingConstants;
 
 public class MainWindow extends JFrame {
 
@@ -129,10 +131,11 @@ public class MainWindow extends JFrame {
 		});
 		mnHelp.add(mntm_About);
 		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		setContentPane(contentPane);
 
 		textbox_LoginId = new JTextField();
+		textbox_LoginId.setHorizontalAlignment(SwingConstants.LEFT);
 		textbox_LoginId.setToolTipText("User Id");
 		textbox_LoginId.setColumns(13);
 
@@ -175,9 +178,11 @@ public class MainWindow extends JFrame {
 
 						directoryContents  =new DirectoryContentsPane(dirList,irodsAccountFile,irodsAccount);
 						setContentPane(directoryContents);
-						revalidate(); 
+						validate(); 
 						repaint(); // optional
 						pack();
+						setVisible(true);
+						show();
 					}
 					/*Exception when username/password is empty*/
 					catch(CatalogSQLException catalogSQLException)
@@ -204,12 +209,10 @@ public class MainWindow extends JFrame {
 					catch(Exception e1)
 					{
 						log.error(e1.getMessage(), e1);
-						JOptionPane.showMessageDialog(null, e1.getMessage());
+						JOptionPane.showMessageDialog(null, "Error!");
 						e1.printStackTrace();
 					}
-
 				}
-
 			}
 		});
 
@@ -222,41 +225,47 @@ public class MainWindow extends JFrame {
 		});
 
 		JLabel Label_Username = new JLabel("User Name:");
-
+		Label_Username.setHorizontalAlignment(SwingConstants.CENTER);
 		JLabel Label_Password = new JLabel("Password:");
+		Label_Password.setHorizontalAlignment(SwingConstants.CENTER);
 
 		textField_passwordField = new JPasswordField();
+		textField_passwordField.setHorizontalAlignment(SwingConstants.LEFT);
 		textField_passwordField.setToolTipText("Password");
 
 		textField_Port = new JTextField();
-		textField_Port.setText("1247");
+		textField_Port.setText(Constants.PORT);
 		textField_Port.setToolTipText("Port No.");
 		textField_Port.setColumns(10);
 
 		JLabel Label_Port = new JLabel("Port:");
+		Label_Port.setHorizontalAlignment(SwingConstants.CENTER);
 
 		JLabel label_Zone = new JLabel("Zone:");
+		label_Zone.setHorizontalAlignment(SwingConstants.CENTER);
 
 		textField_Zone = new JTextField();
-		textField_Zone.setText("iplant");
+		textField_Zone.setText(Constants.ZONE);
 		textField_Zone.setToolTipText("Zone");
 		textField_Zone.setColumns(10);
 
 		textField_Host = new JTextField();
+		textField_Host.setHorizontalAlignment(SwingConstants.LEFT);
 		textField_Host.setToolTipText("Host Address");
-		textField_Host.setText("data.iplantcollaborative.org");
+		textField_Host.setText(Constants.HOST);
 		textField_Host.setColumns(10);
 
 		JLabel label_Host = new JLabel("Host:");
+		label_Host.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		JLabel lblImagejFolder_label = new JLabel("Imagej Folder:");
+		lblImagejFolder_label.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		
 		JButton button_SelectFolder = new JButton("Select Folder");
 		textField_LocalImagejPath = new JTextField();
+		textField_LocalImagejPath.setHorizontalAlignment(SwingConstants.LEFT);
 				
-		//boolean success = new java.io.File(System.getProperty("user.home"), "irods_images").mkdirs();
-		
 		button_SelectFolder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				log.info("ImageJ local folder button clicked");
@@ -271,7 +280,7 @@ public class MainWindow extends JFrame {
 					button_Login.setEnabled(true);
 				}
 				else {
-					log.info("Folder Selection is canceled");
+					log.info(Constants.FOLDER_SELECTION_CANCELED);
 					textField_LocalImagejPath.setName("You canceled.");
 				}
 			}
@@ -282,43 +291,49 @@ public class MainWindow extends JFrame {
 		textField_LocalImagejPath.setColumns(10);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
-			gl_contentPane.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
-					.addGap(267)
-					.addComponent(button_Login)
-					.addGap(18)
-					.addComponent(button_Cancel)
-					.addContainerGap(223, Short.MAX_VALUE))
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGap(81)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addComponent(lblImagejFolder_label)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(button_SelectFolder)
+							.addGap(267)
+							.addComponent(button_Login)
 							.addGap(18)
-							.addComponent(textField_LocalImagejPath))
+							.addComponent(button_Cancel))
 						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(81)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addComponent(Label_Password)
-								.addComponent(Label_Username)
-								.addComponent(Label_Port)
-								.addComponent(label_Host)
-								.addComponent(label_Zone))
-							.addGap(26)
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addComponent(textField_Host, GroupLayout.PREFERRED_SIZE, 382, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_passwordField, GroupLayout.PREFERRED_SIZE, 382, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textbox_LoginId, GroupLayout.PREFERRED_SIZE, 382, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_Port, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_Zone, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(lblImagejFolder_label)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(button_SelectFolder)
+									.addGap(18)
+									.addComponent(textField_LocalImagejPath))
+								.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
+									.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+										.addComponent(Label_Password)
+										.addComponent(Label_Username)
+										.addComponent(Label_Port)
+										.addComponent(label_Host)
+										.addComponent(label_Zone))
+									.addGap(26)
+									.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+										.addComponent(textField_Host, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
+										.addComponent(textField_passwordField, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
+										.addComponent(textbox_LoginId, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
+										.addGroup(gl_contentPane.createSequentialGroup()
+											.addComponent(textField_Port)
+											.addGap(296))
+										.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
+											.addComponent(textField_Zone)
+											.addGap(296)))))
+							.addGap(10)))
 					.addGap(85))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addGap(54)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE, false)
 						.addComponent(Label_Username)
 						.addComponent(textbox_LoginId, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(17)
@@ -346,7 +361,7 @@ public class MainWindow extends JFrame {
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(button_Login)
 						.addComponent(button_Cancel))
-					.addGap(100))
+					.addGap(101))
 		);
 		contentPane.setLayout(gl_contentPane);
 	}

@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.connection.IrodsConnection;
 import org.bio5.irods.imagej.fileoperations.FileOperations;
+import org.bio5.irods.imagej.utilities.IrodsUtilities;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.AuthenticationException;
 import org.irods.jargon.core.exception.CatalogSQLException;
@@ -43,7 +44,6 @@ public class Irods_Plugin extends PlugInFrame {
 	private String zone="";
 	private String host="";
 	private static IRODSFileSystem irodsFileSystem;
-	private static String HOME_DIR ="/iplant/home/";
 	public IRODSAccount irodsAccount;
 	private DirectoryContentsPane directoryContents;
 
@@ -226,6 +226,7 @@ public class Irods_Plugin extends PlugInFrame {
 	}
 	
 
+	/*Main method to Debug the code - Remove it once app is done!*/
 	public static void main(String[] args) {
 		// set the plugins.dir property to make the plugin appear in the Plugins menu
 		Class<?> clazz = Irods_Plugin.class;

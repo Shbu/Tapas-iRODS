@@ -1,56 +1,42 @@
 package org.bio5.irods.imagej.views;
 
 import ij.IJ;
-import ij.ImageJ;
 import ij.ImagePlus;
-import ij.gui.ImageCanvas;
-import ij.gui.ImageWindow;
 import ij.io.Opener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.security.MessageDigest;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.SwingWorker;
+import javax.swing.JViewport;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingWorker;
 import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.fileoperations.FileOperations;
 import org.bio5.irods.imagej.utilities.Constants;
 import org.bio5.irods.imagej.utilities.IrodsUtilities;
+import org.eclipse.wb.swing.FocusTraversalOnArray;
 import org.irods.jargon.core.connection.IRODSAccount;
-import org.irods.jargon.core.exception.FileNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.exception.OverwriteException;
 import org.irods.jargon.core.pub.DataObjectAO;
@@ -60,13 +46,11 @@ import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.pub.io.IRODSFileInputStream;
-
-
-import org.eclipse.wb.swing.FocusTraversalOnArray;
-
-import java.awt.Component;
-
-import javax.swing.JProgressBar;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.ScrollPaneConstants;
 
 public class DirectoryContentsPane extends JPanel {
 
@@ -86,14 +70,13 @@ public class DirectoryContentsPane extends JPanel {
 	private JFileChooser chooser;
 	private DirectoryContentsPane directoryContentsPane;
 	private DataObjectAO dataObjectAO;
-	private MainWindow mainwindow;
-	
-	private DefaultTreeModel dataRoot;
+
+	private DefaultTreeModel treeModel;
 	private JTree userDirectoryTree;
 	private DefaultMutableTreeNode rootNode;
-	
-	private JScrollPane jScrollPane1;
 
+	private JScrollPane jScrollPane2;
+	private JScrollPane scrollPane;
 
 	/*Logger instantiation*/
 	static Logger log = Logger.getLogger(
@@ -106,38 +89,42 @@ public class DirectoryContentsPane extends JPanel {
 
 	public DirectoryContentsPane(List<String> ContentsInHome,final IRODSFile irodsAccountFile,final IRODSAccount irodsAccount) throws JargonException {
 		log.info("Local path before refactoring: " +Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
-		//Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY.replaceAll("/", "//");
+		//Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY.replaceAll(IrodsUtilities.pathSeperator(), "//");
 		log.info("Local directory to store ImageJ files: " +Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
-		
+
 		iRODSFileFactory= FileOperations.getIrodsAccountFileFactory(irodsAccount);
 		String irodsZone =irodsAccount.getZone();
 		System.out.println("irodsZone" +irodsZone);
+		rootNode = new DefaultMutableTreeNode(Constants.HOME);
+		treeModel = new DefaultTreeModel(rootNode);
 
-		
-		
-		rootNode = new DefaultMutableTreeNode("home");
-		dataRoot = new DefaultTreeModel(rootNode);
-
-		
 		irodsFileSystem= IRODSFileSystem.instance();
 		userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);
 		dataTransferOperationsAO =  irodsFileSystem
 				.getIRODSAccessObjectFactory().getDataTransferOperations(
 						irodsAccount);
-		
 
+		scrollPane = new JScrollPane();
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setToolTipText("scroll");
+		
 		final File localFiles = (File) irodsAccountFile;
 		parseDirectoryContents(iRODSFileFactory, localFiles, rootNode, irodsAccount);
 
 		userDirectoryTree.setToolTipText("Directory list");
-		userDirectoryTree.setVisibleRowCount(50);
+		userDirectoryTree.setVisibleRowCount(100);
 		userDirectoryTree.setBorder(new LineBorder(new Color(0, 0, 0)));
+		
+		
 
 		final JButton button_saveToIrodsServer = new JButton("Save to iRODS Server");
 		button_saveToIrodsServer.setEnabled(false);
 		final JLabel label_localFilePath = new JLabel("Local file");
 		label_localFilePath.setText(Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
 		JButton btnSelectLocalFile = new JButton("Select local file");
+
+
 		btnSelectLocalFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -146,7 +133,7 @@ public class DirectoryContentsPane extends JPanel {
 				int option = chooser.showOpenDialog(DirectoryContentsPane.this);
 				if (option == JFileChooser.APPROVE_OPTION) {
 					label_localFilePath.setText("You opened " + ((chooser.getSelectedFile()!=null)?
-							chooser.getSelectedFile().getAbsolutePath():"nothing"));
+							chooser.getSelectedFile().getAbsolutePath():"nothing is selected"));
 				}
 				else {
 					label_localFilePath.setName("You canceled.");
@@ -159,7 +146,7 @@ public class DirectoryContentsPane extends JPanel {
 		label_destinationFilePath.setEnabled(false);
 		JButton btnSelectDestination = new JButton("Select Destination");
 		btnSelectDestination.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent destinationButtonActionEvent) {
 
 				String destinationFolderPath = selectedNodeInTreeForSingleClick;
 				if(selectedNodeInTreeForSingleClick.contains("."))
@@ -174,6 +161,64 @@ public class DirectoryContentsPane extends JPanel {
 			}
 		});
 
+		progressBar = new JProgressBar();
+		progressBar.setStringPainted(true);
+		progressBar.setToolTipText("Progress of action");
+		
+		
+
+		GroupLayout groupLayout = new GroupLayout(this);
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(userDirectoryTree, GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGap(10)
+							.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addGroup(groupLayout.createSequentialGroup()
+									.addComponent(btnSelectDestination)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(label_destinationFilePath))
+								.addGroup(groupLayout.createSequentialGroup()
+									.addComponent(btnSelectLocalFile)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(label_localFilePath))
+								.addComponent(button_saveToIrodsServer)))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+					.addGap(33))
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(24)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(userDirectoryTree, GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addGap(35)
+							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addGap(84)
+							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+								.addComponent(btnSelectLocalFile)
+								.addComponent(label_localFilePath))
+							.addGap(10)
+							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+								.addComponent(btnSelectDestination)
+								.addComponent(label_destinationFilePath))
+							.addGap(11)
+							.addComponent(button_saveToIrodsServer)))
+					.addGap(9))
+		);
+		setLayout(groupLayout);
+		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{button_saveToIrodsServer, userDirectoryTree}));
 
 		/*Put to iRODS server*/
 		button_saveToIrodsServer.addActionListener(new ActionListener() {
@@ -190,11 +235,13 @@ public class DirectoryContentsPane extends JPanel {
 						sourceLocalfile=new File(sourceFilePath);
 						if(selectedNodeInTreeForSingleClick!=null && selectedNodeInTreeForSingleClick!=""){
 							System.out.println("destination path || selectedNodeInTreeForSingleClick" +selectedNodeInTreeForSingleClick);
-							destinationFilePath="/" +irodsAccount.getZone()+"/"+label_destinationFilePath.getText();
+							destinationFilePath=IrodsUtilities.pathSeperator() +irodsAccount.getZone()+IrodsUtilities.pathSeperator()+label_destinationFilePath.getText();
 							destinaitonIrodsFile = iRODSFileFactory.instanceIRODSFile(destinationFilePath);
 							System.out.println("sourceLocalfile absolute path: " +sourceLocalfile.getAbsolutePath() +"\n"  +"destinaitonIrodsFile absolutepath: " +destinaitonIrodsFile.getAbsoluteFile());
 							dataTransferOperationsAO.putOperation(sourceLocalfile.getAbsolutePath(),destinaitonIrodsFile.getAbsolutePath(),targetResourceName,null,null);
 							JOptionPane.showMessageDialog(null, "File Transfer done successfully");
+
+							/*refresh the page once transfer is done! - Pending*/
 							directoryContentsPane   =  new DirectoryContentsPane(null, irodsAccountFile, irodsAccount);
 						}
 					}
@@ -209,61 +256,10 @@ public class DirectoryContentsPane extends JPanel {
 				}
 			}
 		});
-
-		progressBar = new JProgressBar();
-		progressBar.setStringPainted(true);
-
-		progressBar.setToolTipText("Progress of action");
-		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(
-				groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-						.addContainerGap()
-						.addComponent(userDirectoryTree, GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE)
-						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-								.addGroup(groupLayout.createSequentialGroup()
-										.addGap(10)
-										.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-										.addGroup(groupLayout.createSequentialGroup()
-												.addPreferredGap(ComponentPlacement.RELATED)
-												.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-														.addGroup(groupLayout.createSequentialGroup()
-																.addComponent(btnSelectDestination)
-																.addPreferredGap(ComponentPlacement.UNRELATED)
-																.addComponent(label_destinationFilePath))
-																.addGroup(groupLayout.createSequentialGroup()
-																		.addComponent(btnSelectLocalFile)
-																		.addPreferredGap(ComponentPlacement.UNRELATED)
-																		.addComponent(label_localFilePath))
-																		.addComponent(button_saveToIrodsServer))))
-																		.addGap(33))
-				);
-		groupLayout.setVerticalGroup(
-				groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup()
-						.addGap(24)
-						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-								.addComponent(userDirectoryTree, GroupLayout.PREFERRED_SIZE, 429, GroupLayout.PREFERRED_SIZE)
-								.addGroup(groupLayout.createSequentialGroup()
-										.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addGap(121)
-										.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-												.addComponent(btnSelectLocalFile)
-												.addComponent(label_localFilePath))
-												.addGap(10)
-												.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-														.addComponent(btnSelectDestination)
-														.addComponent(label_destinationFilePath))
-														.addGap(11)
-														.addComponent(button_saveToIrodsServer)))
-														.addContainerGap())
-				);
-		setLayout(groupLayout);
-		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{button_saveToIrodsServer, userDirectoryTree}));
 	}
-	
 
-	void parseDirectoryContents(final IRODSFileFactory iRODSFileFactory,final File irodsAccountFile, DefaultMutableTreeNode node, final IRODSAccount irodsAccount)
+
+	public void parseDirectoryContents(final IRODSFileFactory iRODSFileFactory,final File irodsAccountFile, DefaultMutableTreeNode node, final IRODSAccount irodsAccount)
 	{
 		if(!irodsAccountFile.isDirectory()){
 			System.out.println("File name" +irodsAccountFile.getName() +":" +irodsAccountFile.getAbsolutePath());
@@ -282,27 +278,27 @@ public class DirectoryContentsPane extends JPanel {
 			}
 		}
 
-		userDirectoryTree= new JTree(rootNode);
-		userDirectoryTree.setModel(dataRoot);
+		userDirectoryTree= new JTree(treeModel);
+		//userDirectoryTree.setModel(treeModel);
 		userDirectoryTree.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(MouseEvent mouseEvent) {
 
-				if(e.getClickCount()==2){
-					//resetting progress bar to 0 if a double click is detected
+				if(mouseEvent.getClickCount()==2){
+					/*resetting progress bar to 0 if a double click is detected*/
 					progressBar.setValue(0);
 					log.info("tree path after double click" +selectedNodeInTreeForDoubleClick);
 					System.out.println("double click selection: " +selectedNodeInTreeForDoubleClick);
 
-					selectedNodeInTreeForDoubleClick=getJtreeSelection(e);
+					selectedNodeInTreeForDoubleClick=IrodsUtilities.getJtreeSelection(mouseEvent,userDirectoryTree );
 					//getImageFile(iRODSFileFactory, selectedNodeInTreeForDoubleClick,irodsAccount);
 					getFile= new GetFile(iRODSFileFactory, selectedNodeInTreeForDoubleClick,irodsAccount);
 					getFile.execute();
 				}
-				else if(e.getClickCount()==1){
+				else if(mouseEvent.getClickCount()==1){
 					//resetting progress bar to 0 if a single click is detected
 					progressBar.setValue(0);
-					selectedNodeInTreeForSingleClick=getJtreeSelection(e);
+					selectedNodeInTreeForSingleClick=IrodsUtilities.getJtreeSelection(mouseEvent,userDirectoryTree);
 					//log.info("Single click selection: " +selectedNodeInTreeForSingleClick);
 				}
 			}
@@ -310,105 +306,23 @@ public class DirectoryContentsPane extends JPanel {
 
 		userDirectoryTree.setShowsRootHandles(true);
 		userDirectoryTree.setEditable(true);
-		add(userDirectoryTree);
+		userDirectoryTree.setVisible(true);
+		//jScrollPane2 = new JScrollPane(userDirectoryTree);
+		//jScrollPane2 = new JScrollPane();
+		JViewport viewport1 = scrollPane.getViewport(); 
+		viewport1.removeAll();
+		viewport1.add(userDirectoryTree);
+		viewport1.setVisible(true);
+		viewport1.repaint();  
+		viewport1.revalidate();
+
+		//jScrollPane2.add(userDirectoryTree);
+		//add(userDirectoryTree);
+		add(scrollPane,BorderLayout.CENTER);
+		setVisible(true);
+		revalidate();
+		repaint();
 	}
-
-	String getJtreeSelection(MouseEvent me)
-	{
-		String fullTreePath="";
-		TreePath tp =userDirectoryTree.getPathForLocation(me.getX(), me.getY());
-		if(tp!=null)
-		{
-			Object treepath[] =tp.getPath();
-			for(int i=0;i<treepath.length;i++)
-			{
-				fullTreePath  += "/" +treepath[i].toString();
-			}
-		}
-		return fullTreePath;
-	}
-
-	/*void getImageFile(IRODSFileFactory iRODSFileFactory,String treePath,IRODSAccount irodsAccount) throws JargonException, IOException
-	{
-
-		System.out.println("finalTreePath:" +treePath);
-
-		Recheck irodsAccounZone for all accounts
-		IRODSFileInputStream irodsfileistream = iRODSFileFactory.instanceIRODSFileInputStream("/" +irodsAccount.getZone() +treePath);
-
-		//Get file to local directory using getDataTransferOperations --- Need to check benchmarks
-		dataTransferOperationsAO =  irodsFileSystem
-				.getIRODSAccessObjectFactory().
-				getDataTransferOperations(
-						irodsAccount);
-		IRODSFile sourceIrodsFilePath = iRODSFileFactory.instanceIRODSFile("/" +irodsAccount.getZone() +treePath);
-
-
-		Change directory address
-		File destinationLocalFilePath =new File("D:\\a");
-		try
-		{
-			//totalLengthOfFile = sourceIrodsFilePath.length();
-			dataTransferOperationsAO.getOperation(sourceIrodsFilePath, destinationLocalFilePath, null, null);
-		}
-		catch (OverwriteException oe)
-		{
-			JOptionPane.showMessageDialog(null, "file already exist in specified directory!");
-			oe.printStackTrace();
-		}
-
-		Image processing
-		Opener opener = new Opener(); 
-		String imageFilePath = "D:\\a\\"+sourceIrodsFilePath.getName();
-		ImagePlus imp = opener.openImage(imageFilePath);
-		if(imp!=null){
-			imp.show();
-		}
-		else
-		{
-			IJ.showMessage("Opening file Failed.");
-		}
-		ImagePlus imp = open(directory, file);
-		if (imp != null ) {
-			imp.show();
-		} else {
-			IJ.showMessage("Open SPE...", "Failed.");
-		}
-
-
-		Displaying images in Frame 
-		BufferedImage bufferImageIrodsFile = ImageIO.read(irodsfileistream);
-		irodsfileistream.close();
-		JFrame frame = new JFrame();
-		JLabel label = new JLabel(new ImageIcon(bufferImageIrodsFile));
-		JScrollPane scrollPane = new JScrollPane(label);
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED); 
-		frame.getContentPane().add(scrollPane,BorderLayout.CENTER);
-		frame.getContentPane().add(label, BorderLayout.CENTER);
-		frame.pack();
-		frame.setVisible(true); 
-
-	}*/
-
-	/*Put file to iRODS server - Not using as of now*/
-	/*void putFile(IRODSAccount irodsAccount)
-	{
-		try {
-			dataTransferOperationsAO =  irodsFileSystem
-					.getIRODSAccessObjectFactory().
-					getDataTransferOperations(
-							irodsAccount);
-
-			File sourceLocalfile =new File("D:\\iRODS\\Images\\bio5_header.jpeg");
-			IRODSFile irodsfile = iRODSFileFactory.instanceIRODSFile("/iplant/home/sharanbabuk/Analysis");
-			dataTransferOperationsAO.putOperation(sourceLocalfile, irodsfile, null, null);
-		} catch (JargonException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}*/
-
 
 
 	class GetFile extends SwingWorker<Void, Integer>
@@ -437,62 +351,62 @@ public class DirectoryContentsPane extends JPanel {
 			System.out.println("finalTreePath:" +treePath);
 
 			/*Recheck irodsAccounZone for all accounts*/
-			IRODSFileInputStream irodsfileistream = iRODSFileFactory.instanceIRODSFileInputStream("/" +irodsAccount.getZone() +treePath);
-		
-		
+			IRODSFileInputStream irodsfileistream = iRODSFileFactory.instanceIRODSFileInputStream(IrodsUtilities.pathSeperator() +irodsAccount.getZone() +treePath);
+
+
 
 			//Get file to local directory using getDataTransferOperations --- Need to check benchmarks
 			dataTransferOperationsAO =  irodsFileSystem
 					.getIRODSAccessObjectFactory().
 					getDataTransferOperations(
 							irodsAccount);
-			IRODSFile sourceIrodsFilePath = iRODSFileFactory.instanceIRODSFile("/" +irodsAccount.getZone() +treePath);
+			IRODSFile sourceIrodsFilePath = iRODSFileFactory.instanceIRODSFile(IrodsUtilities.pathSeperator() +irodsAccount.getZone() +treePath);
 
 			dataObjectAO=  irodsFileSystem.getIRODSAccessObjectFactory().getDataObjectAO(irodsAccount);
-			
+
 			/*Getting MD5 checksum of the current file from iRODS*/
 			String md5ChecksumLocalFile =null;
 			String md5ChecksumServerFile=null;
-			
+
 			try{
 				md5ChecksumServerFile = dataObjectAO.computeMD5ChecksumOnDataObject(sourceIrodsFilePath);
-			log.info("MD5checksum of iRODS server file: " +md5ChecksumServerFile);
+				log.info("MD5checksum of iRODS server file: " +md5ChecksumServerFile);
 			}
 			catch(Exception e){
 				System.out.println("Error while reading MD5 checksum");
 				e.printStackTrace();
 			}
-			
+
 			File destinationLocalFilePath =new File(Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
-			
+
 			try
 			{
 				if(null!=sourceIrodsFilePath){
-				totalLengthOfFile = sourceIrodsFilePath.length();
-				dataTransferOperationsAO.getOperation(sourceIrodsFilePath, destinationLocalFilePath, null, null);
+					totalLengthOfFile = sourceIrodsFilePath.length();
+					dataTransferOperationsAO.getOperation(sourceIrodsFilePath, destinationLocalFilePath, null, null);
 				}
 			}
 			catch (OverwriteException oe)
 			{
 				log.error("File with same name already exist in local directory! " +oe.getMessage());
 				JOptionPane.showMessageDialog(null, "File with same name already exist in local directory!");
-				
+
 				/*Getting MD5 checksum of local file, if exists*/
-				File localFile= new File(destinationLocalFilePath.getAbsolutePath()+"\\" +sourceIrodsFilePath.getName());
+				File localFile= new File(destinationLocalFilePath.getAbsolutePath()+ IrodsUtilities.pathSeperator() +sourceIrodsFilePath.getName());
 				md5ChecksumLocalFile= IrodsUtilities.calculateMD5CheckSum(localFile);
 				log.info("MD5checksum of local file: " +md5ChecksumLocalFile);
-				
+
 				log.info("MD5 checksum compared - Similar files:" +md5ChecksumLocalFile.equals(md5ChecksumServerFile));
-				
+
 				if(!md5ChecksumLocalFile.equals(md5ChecksumServerFile))
-				JOptionPane.showMessageDialog(null, "File names are same but MD5 checksum is different!");
-				
+					JOptionPane.showMessageDialog(null, "File names are same but MD5 checksum is different!");
+
 				oe.printStackTrace();
 			}
 
 			/*Opening the selected ImageJ*/
 			Opener imageOpener = new Opener(); 
-			String imageFilePath = Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY +"\\" +sourceIrodsFilePath.getName();
+			String imageFilePath = Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY + IrodsUtilities.pathSeperator() +sourceIrodsFilePath.getName();
 			log.info("Current file path: " +sourceIrodsFilePath.getName());
 			log.info("Current file opened by user: " +imageFilePath);
 			ImagePlus imp = imageOpener.openImage(imageFilePath);
