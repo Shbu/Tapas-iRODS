@@ -6,7 +6,9 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
 
+import javax.swing.ImageIcon;
 import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 public final class IrodsUtilities {
@@ -61,4 +63,42 @@ public final class IrodsUtilities {
 		}
 		return fullTreePath;
 	}
+	
+	public static File createFileFromTreePath(TreePath treePath) {
+	    StringBuilder sb = new StringBuilder();
+	    Object[] nodes = treePath.getPath();
+	    for(int i=0;i<nodes.length;i++) {
+	        sb.append(File.separatorChar).append(nodes[i].toString()); 
+	    } 
+	    return new File(sb.toString());
+	}
+	
+	public static String createFilePathFromTreePath(TreePath treePath) {
+	    StringBuilder sb = new StringBuilder();
+	    Object[] nodes = treePath.getPath();
+	    for(int i=0;i<nodes.length;i++) {
+	        sb.append(File.separatorChar).append(nodes[i].toString()); 
+	    } 
+	    return sb.toString();
+	}
+	
+	public static String getJtreeSelectionForSingleClick(MouseEvent me, JTree userDirectoryTree)
+	{
+		String fullTreePath="";
+		TreePath tp =userDirectoryTree.getPathForLocation(me.getX(), me.getY());
+		if(tp!=null)
+		{
+			DefaultMutableTreeNode lastPathComponentNode =(DefaultMutableTreeNode) tp.getLastPathComponent();
+			if(lastPathComponentNode.isLeaf()){
+				tp= tp.getParentPath();
+			}
+			Object treepath[] =tp.getPath();
+			for(int i=0;i<treepath.length;i++)
+			{
+				fullTreePath  += IrodsUtilities.pathSeperator() +treepath[i].toString();
+			}
+		}
+		return fullTreePath;
+	}
+
 }

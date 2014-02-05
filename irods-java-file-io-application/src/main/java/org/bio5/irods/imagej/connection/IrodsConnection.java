@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 
+import org.bio5.irods.imagej.utilities.Constants;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.pub.IRODSFileSystem;
@@ -14,13 +15,13 @@ public class IrodsConnection {
 	private static final String HOME_DIRECTORY = "homeDirectory";
 	public static String HOME_DIR = "/iplant";
 	public static String ZONE = "iplant";
-	public static final String DEFAULT_STORAGE_RESOURCE = null;
+	
 
 	public static IRODSAccount irodsConnection(String userName,
 			String password, String zone, String host, int port) {
 
 		IRODSAccount iRODSAccount = new IRODSAccount(host, port, userName,
-				password, HOME_DIR, zone, DEFAULT_STORAGE_RESOURCE);
+				password, HOME_DIR, zone, Constants.DEFAULT_STORAGE_RESOURCE);
 		return iRODSAccount;
 	}
 

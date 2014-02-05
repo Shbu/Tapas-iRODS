@@ -42,7 +42,7 @@ public class FileOperations {
 		this.iRODSFileFactory = iRODSFileFactory;
 	}
 
-	public static List<String> getDirectoryContents(IRODSAccount iRODSAccount)
+	public static List<String> getDirectoryContents(IRODSAccount iRODSAccount,String pathForInternalFiles)
 			throws JargonException, FileNotFoundException {
 
 		/* Getting default iRods Session */
@@ -63,10 +63,15 @@ public class FileOperations {
 		IRODSFileFactory iRODSFileFactory = getIrodsAccountFileFactory(iRODSAccount);
 
 		String parentFileName = iRODSAccount.getUserName();
+		
 		/* irods file */
+		if(null!= pathForInternalFiles){
+			iRodsFile = iRODSFileFactory.instanceIRODSFile(pathForInternalFiles);
+		}
+		else{
 		iRodsFile = iRODSFileFactory.instanceIRODSFile(HOME_DIR
 				+ parentFileName);
-
+		}
 		/*
 		 * Directory List
 		 */

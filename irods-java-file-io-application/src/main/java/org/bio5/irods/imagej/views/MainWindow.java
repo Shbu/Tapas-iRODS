@@ -24,6 +24,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
+import org.bio5.irods.imagej.bean.IrodsImageJ;
 import org.bio5.irods.imagej.connection.IrodsConnection;
 import org.bio5.irods.imagej.fileoperations.FileOperations;
 import org.bio5.irods.imagej.utilities.Constants;
@@ -32,6 +33,7 @@ import org.irods.jargon.core.exception.AuthenticationException;
 import org.irods.jargon.core.exception.CatalogSQLException;
 import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.pub.io.IRODSFile;
+
 import javax.swing.border.TitledBorder;
 import javax.swing.SwingConstants;
 
@@ -60,38 +62,14 @@ public class MainWindow extends JFrame {
 	private JTextField textField_Zone;
 	private JTextField textField_Host;
 	private DirectoryContentsPane directoryContents;
-	public JTextField textField_LocalImagejPath;
+	private IrodsImageJ irodsImagej;
 	
-	public JTextField getTextField_LocalImagejPath() {
-		return textField_LocalImagejPath;
-	}
-
-	public void setTextField_LocalImagejPath(JTextField textField_LocalImagejPath) {
-		this.textField_LocalImagejPath = textField_LocalImagejPath;
-	}
 
 	public JFileChooser localImageJFileChooser;
 
 	/**
 	 * Launch the application.
 	 */
-	/*public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainWindow frame = new MainWindow();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	 */
-	/*	public void run(String arg0) {
-		// TODO Auto-generated method stub
-	}*/
-
 	/**
 	 * Create the frame.
 	 */
@@ -141,7 +119,7 @@ public class MainWindow extends JFrame {
 
 		final JButton button_Login = new JButton("Login");
 		button_Login.setToolTipText("Click to Login");
-		button_Login.setEnabled(false);
+		button_Login.setEnabled(true);
 
 		button_Login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -158,11 +136,12 @@ public class MainWindow extends JFrame {
 				{
 					try{
 						IRODSAccount irodsAccount =IrodsConnection.irodsConnection(username, password_full, zone, host, port);
-
+						irodsImagej = new IrodsImageJ();
+						irodsImagej.setIrodsAccount(irodsAccount);
 						/*IRODSFileSystem irodsFileSystem= IRODSFileSystem.instance();
 						UserAO  userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);*/
 
-						List<String> dirList= FileOperations.getDirectoryContents(irodsAccount);
+						List<String> dirList= FileOperations.getDirectoryContents(irodsAccount, null);
 						//JOptionPane.showMessageDialog(null, dirList);
 						IRODSFile irodsAccountFile =FileOperations.getiRodsFile();
 
@@ -176,7 +155,7 @@ public class MainWindow extends JFrame {
 						}
 						JOptionPane.showMessageDialog(null,list);*/
 
-						directoryContents  =new DirectoryContentsPane(dirList,irodsAccountFile,irodsAccount);
+						directoryContents  =new DirectoryContentsPane(dirList,irodsAccountFile, irodsImagej);
 						setContentPane(directoryContents);
 						validate(); 
 						repaint(); // optional
@@ -257,38 +236,6 @@ public class MainWindow extends JFrame {
 
 		JLabel label_Host = new JLabel("Host:");
 		label_Host.setHorizontalAlignment(SwingConstants.CENTER);
-		
-		JLabel lblImagejFolder_label = new JLabel("Imagej Folder:");
-		lblImagejFolder_label.setHorizontalAlignment(SwingConstants.CENTER);
-		
-		
-		JButton button_SelectFolder = new JButton("Select Folder");
-		textField_LocalImagejPath = new JTextField();
-		textField_LocalImagejPath.setHorizontalAlignment(SwingConstants.LEFT);
-				
-		button_SelectFolder.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				log.info("ImageJ local folder button clicked");
-				localImageJFileChooser = new JFileChooser();
-				localImageJFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				int option = localImageJFileChooser.showOpenDialog(MainWindow.this);
-				if (option == JFileChooser.APPROVE_OPTION) {
-					textField_LocalImagejPath.setText(((localImageJFileChooser.getSelectedFile()!=null)?
-							localImageJFileChooser.getSelectedFile().getAbsolutePath():"nothing"));
-					Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY =textField_LocalImagejPath.getText();
-					setTextField_LocalImagejPath(textField_LocalImagejPath);
-					button_Login.setEnabled(true);
-				}
-				else {
-					log.info(Constants.FOLDER_SELECTION_CANCELED);
-					textField_LocalImagejPath.setName("You canceled.");
-				}
-			}
-		});
-		
-		
-		textField_LocalImagejPath.setEditable(false);
-		textField_LocalImagejPath.setColumns(10);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -302,30 +249,22 @@ public class MainWindow extends JFrame {
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addGap(81)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(Label_Password)
+								.addComponent(Label_Username)
+								.addComponent(Label_Port)
+								.addComponent(label_Host)
+								.addComponent(label_Zone))
+							.addGap(26)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+								.addComponent(textField_Host, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
+								.addComponent(textField_passwordField, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
+								.addComponent(textbox_LoginId, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
 								.addGroup(gl_contentPane.createSequentialGroup()
-									.addComponent(lblImagejFolder_label)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(button_SelectFolder)
-									.addGap(18)
-									.addComponent(textField_LocalImagejPath))
-								.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
-									.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-										.addComponent(Label_Password)
-										.addComponent(Label_Username)
-										.addComponent(Label_Port)
-										.addComponent(label_Host)
-										.addComponent(label_Zone))
-									.addGap(26)
-									.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-										.addComponent(textField_Host, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
-										.addComponent(textField_passwordField, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
-										.addComponent(textbox_LoginId, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
-										.addGroup(gl_contentPane.createSequentialGroup()
-											.addComponent(textField_Port)
-											.addGap(296))
-										.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
-											.addComponent(textField_Zone)
-											.addGap(296)))))
+									.addComponent(textField_Port)
+									.addGap(296))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(textField_Zone)
+									.addGap(296)))
 							.addGap(10)))
 					.addGap(85))
 		);
@@ -352,12 +291,7 @@ public class MainWindow extends JFrame {
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_Host)
 						.addComponent(textField_Host, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblImagejFolder_label)
-						.addComponent(button_SelectFolder)
-						.addComponent(textField_LocalImagejPath, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(20)
+					.addGap(52)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(button_Login)
 						.addComponent(button_Cancel))
