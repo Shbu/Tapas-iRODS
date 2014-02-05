@@ -88,9 +88,7 @@ public class DirectoryContentsPane extends JPanel {
 		String irodsZone =irodsAccount.getZone();
 		System.out.println("irodsZone" +irodsZone);
 		rootNode = new DefaultMutableTreeNode(Constants.HOME);
-		treeModel = new DefaultTreeModel(rootNode,true);
-		treeModel.addTreeModelListener(new MyTreeModelListener());
-
+		
 		/*Setting iRODS file system*/
 		irodsFileSystem= IRODSFileSystem.instance();
 		irodsImagej.setIrodsFileSystem(irodsFileSystem);
@@ -108,6 +106,8 @@ public class DirectoryContentsPane extends JPanel {
 
 		final File localFiles = (File) irodsAccountFile;
 		parseDirectoryContents(iRODSFileFactory, localFiles, rootNode, irodsAccount);
+		treeModel = new DefaultTreeModel(rootNode,true);
+		treeModel.addTreeModelListener(new MyTreeModelListener());
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 
@@ -336,11 +336,13 @@ public class DirectoryContentsPane extends JPanel {
 
 		if(irodsAccountFile.isDirectory()){
 			System.out.println("Direc name" + irodsAccountFile.getName());
+			log.info("Direc name" + irodsAccountFile.getName());
 			DefaultMutableTreeNode child = new DefaultMutableTreeNode(irodsAccountFile.getName(),true);
 			node.add(child);
 			File[] direcFiles=irodsAccountFile.listFiles();
 			for(int i=0;i<direcFiles.length;i++){
 				System.out.println("File number" +i +"\n depth:" +direcFiles.length);
+				log.info("File number" +i +"\n depth:" +direcFiles.length);
 				parseDirectoryContents(iRODSFileFactory, direcFiles[i], child, irodsAccount);
 			}
 		}
