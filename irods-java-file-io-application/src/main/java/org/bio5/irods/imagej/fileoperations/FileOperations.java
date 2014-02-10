@@ -4,7 +4,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.bio5.irods.imagej.bean.IrodsImageJ;
 import org.bio5.irods.imagej.connection.IrodsConnection;
+import org.bio5.irods.imagej.utilities.Constants;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.connection.SettableJargonProperties;
@@ -17,8 +19,6 @@ import org.irods.jargon.core.pub.io.IRODSFileFactory;
 
 public class FileOperations {
 
-	private static String HOME_DIR = "/iplant/home/";
-
 	private IRODSFileFactory iRODSFileFactory;
 	private static IRODSFileSystem irodsFileSystem;
 	private static IRODSFile iRodsFile;
@@ -26,36 +26,16 @@ public class FileOperations {
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(FileOperations.class.getName());
 
-	public IRODSFileSystem getIrodsFileSystem() {
-		return irodsFileSystem;
-	}
-
-	public void setIrodsFileSystem(IRODSFileSystem irodsFileSystem) {
-		this.irodsFileSystem = irodsFileSystem;
-	}
-
-	public IRODSFileFactory getiRODSFileFactory() {
-		return iRODSFileFactory;
-	}
-
-	public void setiRODSFileFactory(IRODSFileFactory iRODSFileFactory) {
-		this.iRODSFileFactory = iRODSFileFactory;
-	}
-
-	public static List<String> getDirectoryContents(IRODSAccount iRODSAccount,String pathForInternalFiles)
+	public static List<String> getDirectoryContents(IRODSAccount iRODSAccount,String pathForInternalFiles, IrodsImageJ irodsImagej)
 			throws JargonException, FileNotFoundException {
 
 		/* Getting default iRods Session */
 		IRODSSession iRODSSession = IrodsConnection.createDefaultiRodsSession();
 		/* Setting jargon properties */
 		SettableJargonProperties jp = new SettableJargonProperties();
-		log.info("Default threads: " + jp.getMaxParallelThreads());
-		System.out.println(" Threads before updating -"
-				+ jp.getMaxParallelThreads());
+		log.info("Default threads : " + jp.getMaxParallelThreads());
 		jp.setMaxParallelThreads(10);
 		log.info("Threads upgraded to : " + jp.getMaxParallelThreads());
-		System.out.println(" Threads after updating-"
-				+ jp.getMaxParallelThreads());
 
 		/*
 		 * Irods File Factory
@@ -69,37 +49,29 @@ public class FileOperations {
 			iRodsFile = iRODSFileFactory.instanceIRODSFile(pathForInternalFiles);
 		}
 		else{
-		iRodsFile = iRODSFileFactory.instanceIRODSFile(HOME_DIR
+		iRodsFile = iRODSFileFactory.instanceIRODSFile(Constants.HOME_DIR_IPLANT_HOME
 				+ parentFileName);
+		
 		}
+		irodsImagej.setiRodsFile(iRodsFile);
+		
 		/*
 		 * Directory List
 		 */
 		IRODSFileSystemAOImpl IRODSFileSystemAOImpl = new IRODSFileSystemAOImpl(
 				iRODSSession, iRODSAccount);
-		System.out.println("irods file path" + iRodsFile);
 		log.info("irods file path" + iRodsFile);
+        
 		List<String> listInDir = IRODSFileSystemAOImpl.getListInDir(iRodsFile);
 
 		Iterator<String> listInDirectory = listInDir.iterator();
 		int count = 1;
 		while (listInDirectory.hasNext()) {
-			// log.info("Files in Dir:" +count +" " +listInDirectory.next());
-			System.out.println("Files in Dir:" + count + " "
-					+ listInDirectory.next());
+			log.info("Files in Dir:" +count +" " +listInDirectory.next());
 			count++;
 		}
 		return listInDir;
 	}
-
-	public static IRODSFile getiRodsFile() {
-		return iRodsFile;
-	}
-
-	public static void setiRodsFile(IRODSFile iRodsFile) {
-		FileOperations.iRodsFile = iRodsFile;
-	}
-
 	/**
 	 * @param iRODSAccount
 	 * @return
@@ -112,13 +84,6 @@ public class FileOperations {
 		IRODSFileFactory iRODSFileFactory = irodsFileSystem
 				.getIRODSFileFactory(iRODSAccount);
 		return iRODSFileFactory;
-	}
-
-	public void readImageFile(IRODSAccount iRODSAccount) throws JargonException {
-		/*
-		 * Irods File Factory
-		 */
-		IRODSFileFactory iRODSFileFactory = getIrodsAccountFileFactory(iRODSAccount);
 	}
 
 }

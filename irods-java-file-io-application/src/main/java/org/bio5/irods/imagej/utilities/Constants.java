@@ -13,6 +13,7 @@ public class Constants {
 	public static final String HOST = "data.iplantcollaborative.org";
 	public static String PORT = "1247";
 	public static String HOME = "home";
+	public static int MAX_THREADS = 10;
 	
 	public static String FOLDER_SELECTION_CANCELED= "Folder Selection is canceled";
 	

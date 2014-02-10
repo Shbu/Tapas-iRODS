@@ -14,16 +14,20 @@ import javax.swing.SwingWorker;
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.bean.IrodsImageJ;
 import org.bio5.irods.imagej.utilities.Constants;
+import org.bio5.irods.imagej.utilities.IrodsTransferStatusCallbackListener;
 import org.bio5.irods.imagej.utilities.IrodsUtilities;
 import org.bio5.irods.imagej.views.DirectoryContentsPane;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.OverwriteException;
+import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
 import org.irods.jargon.core.pub.DataObjectAO;
 import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.pub.io.IRODSFileInputStream;
+import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
+import org.irods.jargon.core.transfer.TransferControlBlock;
 
 public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 
@@ -36,6 +40,7 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 	private IrodsImageJ irodsImagej;
 	private DataObjectAO dataObjectAO;
 	private JProgressBar jprogressbar;
+	private TransferControlBlock transferControlBlock;
 	
 	/*Logger instantiation*/
 	static Logger log = Logger.getLogger(
@@ -49,6 +54,7 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 		this.irodsAccount = irodsImagej.getIrodsAccount();
 		this.irodsImagej  =irodsImagej;
 		this.jprogressbar  =progressbar;
+		
 	}
 
 	/*Using SwingWorker-doInBackGround() function to do processing in background*/
@@ -58,7 +64,17 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 
 		//getImageFile(iRODSFileFactory,treePath,irodsAccount );
 		System.out.println("finalTreePath:" +treePath);
-
+		transferControlBlock =  irodsImagej.getIrodsFileSystem().getIRODSAccessObjectFactory().buildDefaultTransferControlBlockBasedOnJargonProperties();
+		transferControlBlock.getTransferOptions().setIntraFileStatusCallbacks(true);
+		transferControlBlock.getTransferOptions().setMaxThreads(Constants.MAX_THREADS);
+		
+		if(null!=irodsImagej){
+		irodsImagej.setTransferControlBlock(transferControlBlock);}
+		
+		irodsImagej.setTransferOptions(transferControlBlock.getTransferOptions());
+		
+		irodsImagej.getTransferOptions().setMaxThreads(10);
+		
 		/*Recheck irodsAccounZone for all accounts*/
 		//IRODSFileInputStream irodsfileistream = iRODSFileFactory.instanceIRODSFileInputStream(IrodsUtilities.pathSeperator() +irodsAccount.getZone() +treePath);
 
@@ -89,8 +105,18 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 		try
 		{
 			if(null!=sourceIrodsFilePath){
+				if(null!= irodsImagej){
+					IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener= new IrodsTransferStatusCallbackListener(iRODSFileFactory, md5ChecksumServerFile, irodsImagej, jprogressbar);
+					irodsImagej.setIrodsTransferStatusCallbackListener(irodsTransferStatusCallbackListener);					
 				totalLengthOfFile = sourceIrodsFilePath.length();
-				dataTransferOperationsAO.getOperation(sourceIrodsFilePath, destinationLocalFilePath, null, null);
+				System.out.println("IntraFileStatusCallBack" +transferControlBlock.getTransferOptions().isIntraFileStatusCallbacks());
+				dataTransferOperationsAO.getOperation(sourceIrodsFilePath, destinationLocalFilePath, irodsImagej.getIrodsTransferStatusCallbackListener(), transferControlBlock);
+				
+				
+				/*Getting CollectionAndDataObjectListAndSearchAO - Experiment
+				CollectionAndDataObjectListAndSearchAO collectionAO = irodsImagej.getIrodsFileSystem().getIRODSAccessObjectFactory().getCollectionAndDataObjectListAndSearchAO(irodsImagej.getIrodsAccount());
+		        List<CollectionAndDataObjectListingEntry> childCache = collectionAO.listDataObjectsAndCollectionsUnderPath(destinationLocalFilePath.toString());*/
+				}
 			}
 		}
 		catch (OverwriteException oe)
@@ -114,7 +140,6 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 		/*Opening the selected ImageJ*/
 		Opener imageOpener = new Opener(); 
 		String imageFilePath = Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY + IrodsUtilities.pathSeperator() +sourceIrodsFilePath.getName();
-		log.info("Current file path: " +sourceIrodsFilePath.getName());
 		log.info("Current file opened by user: " +imageFilePath);
 		ImagePlus imp = imageOpener.openImage(imageFilePath);
 		//ImagePlus imp = IJ.openImage(imageFilePath);

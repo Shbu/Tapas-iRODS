@@ -88,7 +88,9 @@ public class DirectoryContentsPane extends JPanel {
 		String irodsZone =irodsAccount.getZone();
 		System.out.println("irodsZone" +irodsZone);
 		rootNode = new DefaultMutableTreeNode(Constants.HOME);
-		
+		treeModel = new DefaultTreeModel(rootNode,true);
+		treeModel.addTreeModelListener(new MyTreeModelListener());
+
 		/*Setting iRODS file system*/
 		irodsFileSystem= IRODSFileSystem.instance();
 		irodsImagej.setIrodsFileSystem(irodsFileSystem);
@@ -106,8 +108,6 @@ public class DirectoryContentsPane extends JPanel {
 
 		final File localFiles = (File) irodsAccountFile;
 		parseDirectoryContents(iRODSFileFactory, localFiles, rootNode, irodsAccount);
-		treeModel = new DefaultTreeModel(rootNode,true);
-		treeModel.addTreeModelListener(new MyTreeModelListener());
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 
@@ -205,14 +205,14 @@ public class DirectoryContentsPane extends JPanel {
 								JOptionPane.showMessageDialog(null, "File Transfer done successfully");
 
 								DefaultMutableTreeNode parentNode = null;
-								
+
 								/*Destination selection - Fetching parent path if leaf node is selected*/
 								parentNode = (DefaultMutableTreeNode)
 										userDirectoryTree.getLastSelectedPathComponent();
 								 if (parentNode.isLeaf()) {
 									 parentNode= (DefaultMutableTreeNode) parentNode.getParent();
 								    } 
-								 
+
 							/*	String filePath= IrodsUtilities.createFilePathFromTreePath(parentPath);
 								if(filePath.contains(".")){
 									parentPath=parentPath.getParentPath();
@@ -246,39 +246,39 @@ public class DirectoryContentsPane extends JPanel {
 		});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
-				gl_panel.createParallelGroup(Alignment.LEADING)
+			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addGroup(gl_panel.createSequentialGroup()
-										.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-												.addComponent(jButton_selectLocalFile)
-												.addComponent(jButton_selectDestination))
-												.addGap(27)
-												.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-														.addComponent(jTextField_destinationPath)
-														.addComponent(jTextField_sourceFile)))
-														.addComponent(jButton_saveToIrodsServer))
-														.addContainerGap(83, Short.MAX_VALUE))
-				);
-		gl_panel.setVerticalGroup(
-				gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel.createSequentialGroup()
-						.addContainerGap()
-						.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGap(59)
-						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+					.addContainerGap()
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addComponent(jButton_selectLocalFile)
-								.addComponent(jTextField_sourceFile))
-								.addGap(18)
-								.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-										.addComponent(jButton_selectDestination)
-										.addComponent(jTextField_destinationPath))
-										.addGap(18)
-										.addComponent(jButton_saveToIrodsServer)
-										.addContainerGap(134, Short.MAX_VALUE))
-				);
+								.addComponent(jButton_selectDestination))
+							.addGap(27)
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addComponent(jTextField_destinationPath)
+								.addComponent(jTextField_sourceFile)))
+						.addComponent(jButton_saveToIrodsServer))
+					.addContainerGap())
+		);
+		gl_panel.setVerticalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(59)
+					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(jButton_selectLocalFile)
+						.addComponent(jTextField_sourceFile))
+					.addGap(18)
+					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(jButton_selectDestination)
+						.addComponent(jTextField_destinationPath))
+					.addGap(18)
+					.addComponent(jButton_saveToIrodsServer)
+					.addContainerGap(220, Short.MAX_VALUE))
+		);
 		panel.setLayout(gl_panel);
 
 		JPanel panel_1 = new JPanel();
@@ -309,7 +309,6 @@ public class DirectoryContentsPane extends JPanel {
 				}
 				else if(mouseEvent.getClickCount()==1){
 					//resetting progress bar to 0 if a single click is detected
-					progressBar.setValue(0);
 					selectedNodeInTreeForSingleClick=IrodsUtilities.getJtreeSelectionForSingleClick(mouseEvent,userDirectoryTree);
 					//log.info("Single click selection: " +selectedNodeInTreeForSingleClick);
 				}
@@ -336,13 +335,11 @@ public class DirectoryContentsPane extends JPanel {
 
 		if(irodsAccountFile.isDirectory()){
 			System.out.println("Direc name" + irodsAccountFile.getName());
-			log.info("Direc name" + irodsAccountFile.getName());
 			DefaultMutableTreeNode child = new DefaultMutableTreeNode(irodsAccountFile.getName(),true);
 			node.add(child);
 			File[] direcFiles=irodsAccountFile.listFiles();
 			for(int i=0;i<direcFiles.length;i++){
 				System.out.println("File number" +i +"\n depth:" +direcFiles.length);
-				log.info("File number" +i +"\n depth:" +direcFiles.length);
 				parseDirectoryContents(iRODSFileFactory, direcFiles[i], child, irodsAccount);
 			}
 		}

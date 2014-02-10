@@ -40,14 +40,14 @@ public final class IrodsUtilities {
 			return null;
 		}
 	}
-	
+
 	/*Pull pathSeperator of the Operating System*/
 	public static String pathSeperator() {
 		String pathSeperator = Constants.DEFAULT_PATH_SEPERATOR;
 		pathSeperator = System.getProperty("file.separator");
 		return pathSeperator;
 	}
-	
+
 	/*Get JTree node path depending on the Mouse selection*/
 	public static String getJtreeSelection(MouseEvent me, JTree userDirectoryTree)
 	{
@@ -63,25 +63,25 @@ public final class IrodsUtilities {
 		}
 		return fullTreePath;
 	}
-	
+
 	public static File createFileFromTreePath(TreePath treePath) {
-	    StringBuilder sb = new StringBuilder();
-	    Object[] nodes = treePath.getPath();
-	    for(int i=0;i<nodes.length;i++) {
-	        sb.append(File.separatorChar).append(nodes[i].toString()); 
-	    } 
-	    return new File(sb.toString());
+		StringBuilder sb = new StringBuilder();
+		Object[] nodes = treePath.getPath();
+		for(int i=0;i<nodes.length;i++) {
+			sb.append(File.separatorChar).append(nodes[i].toString()); 
+		} 
+		return new File(sb.toString());
 	}
-	
+
 	public static String createFilePathFromTreePath(TreePath treePath) {
-	    StringBuilder sb = new StringBuilder();
-	    Object[] nodes = treePath.getPath();
-	    for(int i=0;i<nodes.length;i++) {
-	        sb.append(File.separatorChar).append(nodes[i].toString()); 
-	    } 
-	    return sb.toString();
+		StringBuilder sb = new StringBuilder();
+		Object[] nodes = treePath.getPath();
+		for(int i=0;i<nodes.length;i++) {
+			sb.append(File.separatorChar).append(nodes[i].toString()); 
+		} 
+		return sb.toString();
 	}
-	
+
 	public static String getJtreeSelectionForSingleClick(MouseEvent me, JTree userDirectoryTree)
 	{
 		String fullTreePath="";
@@ -100,5 +100,4 @@ public final class IrodsUtilities {
 		}
 		return fullTreePath;
 	}
-
 }

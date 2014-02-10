@@ -13,17 +13,16 @@ import org.irods.jargon.core.connection.IRODSAccount;
 public class Irods_Plugin extends PlugInFrame {
 
 
+	private static final long serialVersionUID = 3225639715931294038L;
+	
 	/*Declare static variables*/
 	private static Frame instance;
-	public IRODSAccount irodsAccount;
-
 
 	/*Logger instantiation*/
 	static Logger log = Logger.getLogger(
 			Irods_Plugin.class.getName());
 
 
-	private static final long serialVersionUID = 3225639715931294038L;
 
 	public Irods_Plugin() {
 		super("iRODS");
