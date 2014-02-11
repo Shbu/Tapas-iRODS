@@ -4,7 +4,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 
 import org.apache.log4j.Logger;
-import org.bio5.irods.imagej.bean.IrodsImageJ;
+import org.bio5.irods.imagej.bean.IrodsImageJBean;
 import org.bio5.irods.imagej.fileoperations.GetFileFromIrods;
 import org.bio5.irods.imagej.views.DirectoryContentsPane;
 import org.irods.jargon.core.exception.JargonException;
@@ -22,7 +22,7 @@ public class IrodsTransferStatusCallbackListener extends GetFileFromIrods implem
 	
 	public IrodsTransferStatusCallbackListener(
 			IRODSFileFactory iRODSFileFactory, String treePath,
-			IrodsImageJ irodsImagej, JProgressBar progressbar) {
+			IrodsImageJBean irodsImagej, JProgressBar progressbar) {
 		super(iRODSFileFactory, treePath, irodsImagej, jprogressbar =progressbar);
 	}
 

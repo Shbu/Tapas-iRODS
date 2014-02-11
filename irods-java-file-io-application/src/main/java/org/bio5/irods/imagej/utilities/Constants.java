@@ -7,7 +7,7 @@ public class Constants {
 	public static final String HOME_DIR ="/iplant/";
 	public static final String DEFAULT_STORAGE_RESOURCE = "";
 	public static final String HOME_DIR_IPLANT_HOME ="/iplant/home/";
-	public static String IMAGEJ_LOCAL_WORKING_DIRECTORY = System.getProperty("user.home") +IrodsUtilities.pathSeperator() +"irods_plugin";
+	public static String IMAGEJ_LOCAL_WORKING_DIRECTORY = System.getProperty("user.home") +IrodsUtilities.getPathSeperator() +"irods_plugin";
 	public static String DEFAULT_PATH_SEPERATOR= "/";
 	public static String ZONE = "iplant";
 	public static final String HOST = "data.iplantcollaborative.org";

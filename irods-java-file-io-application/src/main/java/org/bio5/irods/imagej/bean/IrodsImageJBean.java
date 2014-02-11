@@ -4,19 +4,21 @@ import java.io.Serializable;
 
 import org.bio5.irods.imagej.utilities.IrodsTransferStatusCallbackListener;
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.packinstr.TransferOptions;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.io.IRODSFile;
+import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.transfer.TransferControlBlock;
 
-public class IrodsImageJ implements Serializable {
+public class IrodsImageJBean implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public IrodsImageJ() {
+	public IrodsImageJBean() {
 		super();
 	}
 
@@ -30,7 +32,27 @@ public class IrodsImageJ implements Serializable {
     
     private TransferOptions transferOptions= null;
     
-    public TransferOptions getTransferOptions() {
+    private IRODSSession iRODSSession= null;
+    
+    private IRODSFileFactory iRODSFileFactory = null;
+    
+    public IRODSFileFactory getiRODSFileFactory() {
+		return iRODSFileFactory;
+	}
+
+	public void setiRODSFileFactory(IRODSFileFactory iRODSFileFactory) {
+		this.iRODSFileFactory = iRODSFileFactory;
+	}
+
+	public IRODSSession getiRODSSession() {
+		return iRODSSession;
+	}
+
+	public void setiRODSSession(IRODSSession iRODSSession) {
+		this.iRODSSession = iRODSSession;
+	}
+
+	public TransferOptions getTransferOptions() {
 		return transferOptions;
 	}
 
@@ -62,7 +84,7 @@ public class IrodsImageJ implements Serializable {
 	}
 
 	public static void setiRodsFile(IRODSFile iRodsFile) {
-		IrodsImageJ.iRodsFile = iRodsFile;
+		IrodsImageJBean.iRodsFile = iRodsFile;
 	}
 
 	public IRODSAccount getIrodsAccount() {

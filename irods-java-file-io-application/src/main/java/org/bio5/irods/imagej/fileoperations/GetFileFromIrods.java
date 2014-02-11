@@ -12,7 +12,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import org.apache.log4j.Logger;
-import org.bio5.irods.imagej.bean.IrodsImageJ;
+import org.bio5.irods.imagej.bean.IrodsImageJBean;
 import org.bio5.irods.imagej.utilities.Constants;
 import org.bio5.irods.imagej.utilities.IrodsTransferStatusCallbackListener;
 import org.bio5.irods.imagej.utilities.IrodsUtilities;
@@ -37,7 +37,7 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 	private long totalLengthOfFile = 0L;
 	private long copiedLengthOfFile = 0L;
 	private DataTransferOperations dataTransferOperationsAO;
-	private IrodsImageJ irodsImagej;
+	private IrodsImageJBean irodsImagej;
 	private DataObjectAO dataObjectAO;
 	private JProgressBar jprogressbar;
 	private TransferControlBlock transferControlBlock;
@@ -48,7 +48,7 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 
 	/*Get files from iRODS Server*/
 	public GetFileFromIrods(IRODSFileFactory iRODSFileFactory, String treePath,
-			IrodsImageJ irodsImagej, JProgressBar progressbar) {
+			IrodsImageJBean irodsImagej, JProgressBar progressbar) {
 		this.iRODSFileFactory = iRODSFileFactory;
 		this.treePath = treePath;
 		this.irodsAccount = irodsImagej.getIrodsAccount();
@@ -83,7 +83,7 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 				getIRODSAccessObjectFactory().
 				getDataTransferOperations(
 						irodsAccount);
-		IRODSFile sourceIrodsFilePath = iRODSFileFactory.instanceIRODSFile(IrodsUtilities.pathSeperator() +irodsAccount.getZone() +treePath);
+		IRODSFile sourceIrodsFilePath = iRODSFileFactory.instanceIRODSFile(IrodsUtilities.getPathSeperator() +irodsAccount.getZone() +treePath);
 
 		dataObjectAO=  irodsImagej.getIrodsFileSystem().getIRODSAccessObjectFactory().getDataObjectAO(irodsAccount);
 
@@ -125,7 +125,7 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 			JOptionPane.showMessageDialog(null, "File with same name already exist in local directory!");
 
 			/*Getting MD5 checksum of local file, if exists*/
-			File localFile= new File(destinationLocalFilePath.getAbsolutePath()+ IrodsUtilities.pathSeperator() +sourceIrodsFilePath.getName());
+			File localFile= new File(destinationLocalFilePath.getAbsolutePath()+ IrodsUtilities.getPathSeperator() +sourceIrodsFilePath.getName());
 			md5ChecksumLocalFile= IrodsUtilities.calculateMD5CheckSum(localFile);
 			log.info("MD5checksum of local file: " +md5ChecksumLocalFile);
 
@@ -139,7 +139,7 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 
 		/*Opening the selected ImageJ*/
 		Opener imageOpener = new Opener(); 
-		String imageFilePath = Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY + IrodsUtilities.pathSeperator() +sourceIrodsFilePath.getName();
+		String imageFilePath = Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY + IrodsUtilities.getPathSeperator() +sourceIrodsFilePath.getName();
 		log.info("Current file opened by user: " +imageFilePath);
 		ImagePlus imp = imageOpener.openImage(imageFilePath);
 		//ImagePlus imp = IJ.openImage(imageFilePath);

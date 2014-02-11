@@ -27,7 +27,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
-import org.bio5.irods.imagej.bean.IrodsImageJ;
+import org.bio5.irods.imagej.bean.IrodsImageJBean;
 import org.bio5.irods.imagej.fileoperations.FileOperations;
 import org.bio5.irods.imagej.fileoperations.GetFileFromIrods;
 import org.bio5.irods.imagej.listeners.MyTreeModelListener;
@@ -79,14 +79,14 @@ public class DirectoryContentsPane extends JPanel {
 	 * @throws JargonException 
 	 */
 
-	public DirectoryContentsPane(List<String> ContentsInHome,final IRODSFile irodsAccountFile, final IrodsImageJ irodsImagej) throws JargonException {
+	public DirectoryContentsPane( final IrodsImageJBean irodsImagej) throws JargonException {
 		log.info("Local path before refactoring: " +Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
 		//Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY.replaceAll(IrodsUtilities.pathSeperator(), "//");
 		log.info("Local directory to store ImageJ files: " +Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
 		irodsAccount= irodsImagej.getIrodsAccount();
 		iRODSFileFactory= FileOperations.getIrodsAccountFileFactory(irodsImagej.getIrodsAccount());
-		String irodsZone =irodsAccount.getZone();
-		System.out.println("irodsZone" +irodsZone);
+		//String irodsZone =irodsAccount.getZone();
+		//System.out.println("irodsZone" +irodsZone);
 		rootNode = new DefaultMutableTreeNode(Constants.HOME);
 		treeModel = new DefaultTreeModel(rootNode,true);
 		treeModel.addTreeModelListener(new MyTreeModelListener());
@@ -95,7 +95,7 @@ public class DirectoryContentsPane extends JPanel {
 		irodsFileSystem= IRODSFileSystem.instance();
 		irodsImagej.setIrodsFileSystem(irodsFileSystem);
 
-		userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);
+		//userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);
 		dataTransferOperationsAO =  irodsFileSystem
 				.getIRODSAccessObjectFactory().getDataTransferOperations(
 						irodsAccount);
@@ -105,8 +105,11 @@ public class DirectoryContentsPane extends JPanel {
 		final JLabel jTextField_sourceFile = new JLabel("Local file");
 		final JLabel jTextField_destinationPath = new JLabel("Destination");
 		final JButton jButton_saveToIrodsServer = new JButton("Save to iRODS Server");
-
-		final File localFiles = (File) irodsAccountFile;
+		
+		File localFiles=null;
+		if(null!= IrodsImageJBean.getiRodsFile()){
+		localFiles= (File) IrodsImageJBean.getiRodsFile();
+		}
 		parseDirectoryContents(iRODSFileFactory, localFiles, rootNode, irodsAccount);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -197,7 +200,7 @@ public class DirectoryContentsPane extends JPanel {
 						sourceLocalfile=new File(sourceFilePath);
 						if(selectedNodeInTreeForSingleClick!=null && selectedNodeInTreeForSingleClick!=""){
 							System.out.println("destination path || selectedNodeInTreeForSingleClick" +selectedNodeInTreeForSingleClick);
-							destinationFilePath=IrodsUtilities.pathSeperator() +irodsAccount.getZone()+IrodsUtilities.pathSeperator()+jTextField_destinationPath.getText();
+							destinationFilePath=IrodsUtilities.getPathSeperator() +irodsAccount.getZone()+IrodsUtilities.getPathSeperator()+jTextField_destinationPath.getText();
 							destinaitonIrodsFile = iRODSFileFactory.instanceIRODSFile(destinationFilePath);
 							System.out.println("sourceLocalfile absolute path: " +sourceLocalfile.getAbsolutePath() +"\n"  +"destinaitonIrodsFile absolutepath: " +destinaitonIrodsFile.getAbsoluteFile());
 							try{
@@ -320,7 +323,6 @@ public class DirectoryContentsPane extends JPanel {
 		userDirectoryTree.setVisible(true);
 		viewport.add(userDirectoryTree);
 		setLayout(groupLayout);
-
 	}
 
 
@@ -328,18 +330,21 @@ public class DirectoryContentsPane extends JPanel {
 	{
 
 		if(!irodsAccountFile.isDirectory()){
-			System.out.println("File name" +irodsAccountFile.getName() +":" +irodsAccountFile.getAbsolutePath());
+			//System.out.println("File name" +irodsAccountFile.getName() +":" +irodsAccountFile.getAbsolutePath());
+			log.info("File name:" +irodsAccountFile.getName() +":" +irodsAccountFile.getAbsolutePath());
 			DefaultMutableTreeNode child = new DefaultMutableTreeNode(irodsAccountFile.getName(),false);
 			node.add(child);
 		}
 
 		if(irodsAccountFile.isDirectory()){
-			System.out.println("Direc name" + irodsAccountFile.getName());
+			//System.out.println("Direc name" + irodsAccountFile.getName());
+			log.info("Direc name:" + irodsAccountFile.getName());
 			DefaultMutableTreeNode child = new DefaultMutableTreeNode(irodsAccountFile.getName(),true);
 			node.add(child);
 			File[] direcFiles=irodsAccountFile.listFiles();
 			for(int i=0;i<direcFiles.length;i++){
-				System.out.println("File number" +i +"\n depth:" +direcFiles.length);
+				//System.out.println("File number" +i +"\n depth:" +direcFiles.length);
+				log.info("File number:" +i +"\t depth:" +direcFiles.length);
 				parseDirectoryContents(iRODSFileFactory, direcFiles[i], child, irodsAccount);
 			}
 		}

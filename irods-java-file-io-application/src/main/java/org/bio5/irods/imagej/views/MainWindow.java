@@ -26,7 +26,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
-import org.bio5.irods.imagej.bean.IrodsImageJ;
+import org.bio5.irods.imagej.bean.IrodsImageJBean;
 import org.bio5.irods.imagej.connection.IrodsConnection;
 import org.bio5.irods.imagej.fileoperations.FileOperations;
 import org.bio5.irods.imagej.utilities.Constants;
@@ -64,7 +64,7 @@ public class MainWindow extends JFrame {
 	private JTextField textField_Zone;
 	private JTextField textField_Host;
 	private DirectoryContentsPane directoryContents;
-	private IrodsImageJ irodsImagej;
+	private IrodsImageJBean irodsImagej;
 
 
 	public JFileChooser localImageJFileChooser;
@@ -146,26 +146,15 @@ public class MainWindow extends JFrame {
 				{
 					try{
 						IRODSAccount irodsAccount =IrodsConnection.irodsConnection(username, password_full, zone, host, port);
-						irodsImagej = new IrodsImageJ();
+						irodsImagej = new IrodsImageJBean();
 						irodsImagej.setIrodsAccount(irodsAccount);
 						/*IRODSFileSystem irodsFileSystem= IRODSFileSystem.instance();
 						UserAO  userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);*/
 
-						List<String> dirList= FileOperations.getDirectoryContents(irodsAccount, null, irodsImagej);
-						//JOptionPane.showMessageDialog(null, dirList);
-						IRODSFile irodsAccountFile =irodsImagej.getiRodsFile();
+						//List<String> dirList= 
+						FileOperations.setIrodsFile(irodsAccount, null, irodsImagej);
 
-						/*Display Directory contents*/
-						/*Iterator itr =dirList.iterator();
-						String list = "Directory List: \n";
-						while(itr.hasNext())
-						{
-							list +=(String) itr.next();
-							list+="\n";
-						}
-						JOptionPane.showMessageDialog(null,list);*/
-
-						directoryContents  =new DirectoryContentsPane(dirList,irodsAccountFile, irodsImagej);
+						directoryContents  =new DirectoryContentsPane(irodsImagej);
 						setContentPane(directoryContents);
 						validate(); 
 						repaint(); // optional

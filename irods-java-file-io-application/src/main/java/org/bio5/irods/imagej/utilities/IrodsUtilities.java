@@ -42,7 +42,7 @@ public final class IrodsUtilities {
 	}
 
 	/*Pull pathSeperator of the Operating System*/
-	public static String pathSeperator() {
+	public static String getPathSeperator() {
 		String pathSeperator = Constants.DEFAULT_PATH_SEPERATOR;
 		pathSeperator = System.getProperty("file.separator");
 		return pathSeperator;
@@ -58,7 +58,7 @@ public final class IrodsUtilities {
 			Object treepath[] =tp.getPath();
 			for(int i=0;i<treepath.length;i++)
 			{
-				fullTreePath  += IrodsUtilities.pathSeperator() +treepath[i].toString();
+				fullTreePath  += IrodsUtilities.getPathSeperator() +treepath[i].toString();
 			}
 		}
 		return fullTreePath;
@@ -95,7 +95,7 @@ public final class IrodsUtilities {
 			Object treepath[] =tp.getPath();
 			for(int i=0;i<treepath.length;i++)
 			{
-				fullTreePath  += IrodsUtilities.pathSeperator() +treepath[i].toString();
+				fullTreePath  += IrodsUtilities.getPathSeperator() +treepath[i].toString();
 			}
 		}
 		return fullTreePath;
