@@ -5,7 +5,6 @@ import ij.ImagePlus;
 import ij.io.Opener;
 
 import java.io.File;
-import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
@@ -14,19 +13,17 @@ import javax.swing.SwingWorker;
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.bean.IrodsImageJBean;
 import org.bio5.irods.imagej.utilities.Constants;
+import org.bio5.irods.imagej.utilities.IrodsPropertiesConstruction;
 import org.bio5.irods.imagej.utilities.IrodsTransferStatusCallbackListener;
 import org.bio5.irods.imagej.utilities.IrodsUtilities;
 import org.bio5.irods.imagej.views.DirectoryContentsPane;
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.exception.OverwriteException;
-import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
 import org.irods.jargon.core.pub.DataObjectAO;
 import org.irods.jargon.core.pub.DataTransferOperations;
-import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
-import org.irods.jargon.core.pub.io.IRODSFileInputStream;
-import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 import org.irods.jargon.core.transfer.TransferControlBlock;
 
 public class GetFileFromIrods extends SwingWorker<Void, Integer> {
@@ -34,8 +31,6 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 	private IRODSFileFactory iRODSFileFactory;
 	private String treePath;
 	private IRODSAccount irodsAccount;
-	private long totalLengthOfFile = 0L;
-	private long copiedLengthOfFile = 0L;
 	private DataTransferOperations dataTransferOperationsAO;
 	private IrodsImageJBean irodsImagej;
 	private DataObjectAO dataObjectAO;
@@ -64,9 +59,8 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 
 		//getImageFile(iRODSFileFactory,treePath,irodsAccount );
 		System.out.println("finalTreePath:" +treePath);
-		transferControlBlock =  irodsImagej.getIrodsFileSystem().getIRODSAccessObjectFactory().buildDefaultTransferControlBlockBasedOnJargonProperties();
-		transferControlBlock.getTransferOptions().setIntraFileStatusCallbacks(true);
-		transferControlBlock.getTransferOptions().setMaxThreads(Constants.MAX_THREADS);
+		
+		transferControlBlock= irodsImagej.getTransferControlBlock();
 		
 		if(null!=irodsImagej){
 		irodsImagej.setTransferControlBlock(transferControlBlock);}
@@ -96,7 +90,7 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 			log.info("MD5checksum of iRODS server file: " +md5ChecksumServerFile);
 		}
 		catch(Exception e){
-			System.out.println("Error while reading MD5 checksum");
+			log.info("Error while reading MD5 checksum");
 			e.printStackTrace();
 		}
 
@@ -106,16 +100,33 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 		{
 			if(null!=sourceIrodsFilePath){
 				if(null!= irodsImagej){
-					IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener= new IrodsTransferStatusCallbackListener(iRODSFileFactory, md5ChecksumServerFile, irodsImagej, jprogressbar);
+					IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener= new IrodsTransferStatusCallbackListener(iRODSFileFactory,null, irodsImagej, jprogressbar);
 					irodsImagej.setIrodsTransferStatusCallbackListener(irodsTransferStatusCallbackListener);					
-				totalLengthOfFile = sourceIrodsFilePath.length();
-				System.out.println("IntraFileStatusCallBack" +transferControlBlock.getTransferOptions().isIntraFileStatusCallbacks());
+				log.info("IntraFileStatusCallBack: " +transferControlBlock.getTransferOptions().isIntraFileStatusCallbacks());
 				dataTransferOperationsAO.getOperation(sourceIrodsFilePath, destinationLocalFilePath, irodsImagej.getIrodsTransferStatusCallbackListener(), transferControlBlock);
 				
 				
 				/*Getting CollectionAndDataObjectListAndSearchAO - Experiment
 				CollectionAndDataObjectListAndSearchAO collectionAO = irodsImagej.getIrodsFileSystem().getIRODSAccessObjectFactory().getCollectionAndDataObjectListAndSearchAO(irodsImagej.getIrodsAccount());
 		        List<CollectionAndDataObjectListingEntry> childCache = collectionAO.listDataObjectsAndCollectionsUnderPath(destinationLocalFilePath.toString());*/
+				
+				/*Opening the selected ImageJ*/
+				Opener imageOpener = new Opener(); 
+				String imageFilePath = Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY + IrodsUtilities.getPathSeperator() +sourceIrodsFilePath.getName();
+				log.info("Current file opened by user: " +imageFilePath);
+				ImagePlus imp = imageOpener.openImage(imageFilePath);
+				//ImagePlus imp = IJ.openImage(imageFilePath);
+
+				if(imp!=null){
+					log.info("ImagePlus is not null and before calling show() function of ImagePlus class");
+					imp.show();
+				}
+				else
+				{
+					IJ.showMessage("Opening file Failed.");
+					IJ.showStatus("Opening file Failed.");
+					log.error("ImagePlus instance is null and opening file Failed.");
+				}
 				}
 			}
 		}
@@ -136,39 +147,26 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 
 			oe.printStackTrace();
 		}
-
-		/*Opening the selected ImageJ*/
-		Opener imageOpener = new Opener(); 
-		String imageFilePath = Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY + IrodsUtilities.getPathSeperator() +sourceIrodsFilePath.getName();
-		log.info("Current file opened by user: " +imageFilePath);
-		ImagePlus imp = imageOpener.openImage(imageFilePath);
-		//ImagePlus imp = IJ.openImage(imageFilePath);
-
-		if(imp!=null){
-			log.info("ImagePlus is not null and before calling show() function of ImagePlus class");
-			imp.show();
+		catch(JargonException je){
+			JOptionPane.showMessageDialog(null, "Error while pulling files!");
+			log.info("Error while pulling files!");
 		}
-		else
-		{
-			IJ.showMessage("Opening file Failed.");
-			IJ.showStatus("Opening file Failed.");
-			log.error("ImagePlus instance is null and opening file Failed.");
-		}
+
 		return null;
 	}
 
-	@Override
+	/*@Override
 	public void process(List<Integer> chunks)
 	{
 		for(int i : chunks)
 		{
 			jprogressbar.setValue(i);
 		}
-	}
+	}*/
 
-	@Override
+	/*@Override
 	public void done()
 	{
 		publish(100);
-	}
+	}*/
 }

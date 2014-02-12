@@ -13,9 +13,6 @@ import org.irods.jargon.core.transfer.TransferControlBlock;
 
 public class IrodsImageJBean implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public IrodsImageJBean() {
@@ -24,19 +21,19 @@ public class IrodsImageJBean implements Serializable {
 
 	private IRODSAccount irodsAccount = null;
 
-    private IRODSFileSystem irodsFileSystem = null;
-    
-    private static IRODSFile iRodsFile = null;
-    
-    private TransferControlBlock transferControlBlock= null;
-    
-    private TransferOptions transferOptions= null;
-    
-    private IRODSSession iRODSSession= null;
-    
-    private IRODSFileFactory iRODSFileFactory = null;
-    
-    public IRODSFileFactory getiRODSFileFactory() {
+	private IRODSFileSystem irodsFileSystem = null;
+
+	private static IRODSFile iRodsFile = null;
+
+	private TransferControlBlock transferControlBlock = null;
+
+	private TransferOptions transferOptions = null;
+
+	private IRODSSession iRODSSession = null;
+
+	private IRODSFileFactory iRODSFileFactory = null;
+
+	public IRODSFileFactory getiRODSFileFactory() {
 		return iRODSFileFactory;
 	}
 
@@ -64,11 +61,12 @@ public class IrodsImageJBean implements Serializable {
 		return transferControlBlock;
 	}
 
-	public void setTransferControlBlock(TransferControlBlock transferControlBlock) {
+	public void setTransferControlBlock(
+			TransferControlBlock transferControlBlock) {
 		this.transferControlBlock = transferControlBlock;
 	}
 
-	private IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener= null; 
+	private IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener = null;
 
 	public IrodsTransferStatusCallbackListener getIrodsTransferStatusCallbackListener() {
 		return irodsTransferStatusCallbackListener;
@@ -102,6 +100,5 @@ public class IrodsImageJBean implements Serializable {
 	public void setIrodsFileSystem(IRODSFileSystem irodsFileSystem) {
 		this.irodsFileSystem = irodsFileSystem;
 	}
-	
-	
+
 }

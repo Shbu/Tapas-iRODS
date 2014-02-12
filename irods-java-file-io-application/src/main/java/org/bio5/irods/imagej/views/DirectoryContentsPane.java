@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -32,6 +31,7 @@ import org.bio5.irods.imagej.fileoperations.FileOperations;
 import org.bio5.irods.imagej.fileoperations.GetFileFromIrods;
 import org.bio5.irods.imagej.listeners.MyTreeModelListener;
 import org.bio5.irods.imagej.utilities.Constants;
+import org.bio5.irods.imagej.utilities.IrodsPropertiesConstruction;
 import org.bio5.irods.imagej.utilities.IrodsTransferStatusCallbackListener;
 import org.bio5.irods.imagej.utilities.IrodsUtilities;
 //import org.eclipse.wb.swing.FocusTraversalOnArray;
@@ -43,6 +43,7 @@ import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
+import org.irods.jargon.core.transfer.TransferControlBlock;
 
 public class DirectoryContentsPane extends JPanel {
 
@@ -50,7 +51,6 @@ public class DirectoryContentsPane extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 722996165620904921L;
-	private String irodsZone;
 	public IRODSFileSystem irodsFileSystem;
 	public UserAO  userAccount;
 	private DataTransferOperations dataTransferOperationsAO;
@@ -69,6 +69,7 @@ public class DirectoryContentsPane extends JPanel {
 	private JScrollPane scrollPane;
 	private IRODSAccount irodsAccount;
 	private IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener;
+	private TransferControlBlock transferControlBlock;
 
 	/*Logger instantiation*/
 	static Logger log = Logger.getLogger(
@@ -105,6 +106,11 @@ public class DirectoryContentsPane extends JPanel {
 		final JLabel jTextField_sourceFile = new JLabel("Local file");
 		final JLabel jTextField_destinationPath = new JLabel("Destination");
 		final JButton jButton_saveToIrodsServer = new JButton("Save to iRODS Server");
+		
+		/*Construct TransferControlBlock from default jargon properties*/
+		IrodsPropertiesConstruction irodsPropertiesConstruction = new IrodsPropertiesConstruction(); 
+		transferControlBlock= irodsPropertiesConstruction.constructHighPerformanceTransferControlBlockFromJargonProperties(irodsImagej);
+		irodsImagej.setTransferControlBlock(transferControlBlock);
 		
 		File localFiles=null;
 		if(null!= IrodsImageJBean.getiRodsFile()){
@@ -204,7 +210,7 @@ public class DirectoryContentsPane extends JPanel {
 							destinaitonIrodsFile = iRODSFileFactory.instanceIRODSFile(destinationFilePath);
 							System.out.println("sourceLocalfile absolute path: " +sourceLocalfile.getAbsolutePath() +"\n"  +"destinaitonIrodsFile absolutepath: " +destinaitonIrodsFile.getAbsoluteFile());
 							try{
-								dataTransferOperationsAO.putOperation(sourceLocalfile.getAbsolutePath(),destinaitonIrodsFile.getAbsolutePath(),targetResourceName,irodsTransferStatusCallbackListener,null);
+								dataTransferOperationsAO.putOperation(sourceLocalfile.getAbsolutePath(),destinaitonIrodsFile.getAbsolutePath(),targetResourceName,irodsTransferStatusCallbackListener,transferControlBlock);
 								JOptionPane.showMessageDialog(null, "File Transfer done successfully");
 
 								DefaultMutableTreeNode parentNode = null;
