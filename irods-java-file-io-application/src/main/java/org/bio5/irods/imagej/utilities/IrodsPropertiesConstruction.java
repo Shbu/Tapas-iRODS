@@ -1,5 +1,7 @@
 package org.bio5.irods.imagej.utilities;
 
+import javax.swing.JProgressBar;
+
 import org.bio5.irods.imagej.bean.IrodsImageJBean;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.transfer.TransferControlBlock;
@@ -31,6 +33,21 @@ public class IrodsPropertiesConstruction {
 		defaultTransferControlBlock.getTransferOptions()
 				.setUseParallelTransfer(true);
 		return defaultTransferControlBlock;
+	}
+
+	public IrodsTransferStatusCallbackListener constructIrodsTransferStatusCallbackListener(
+			IrodsImageJBean irodsImagej) {
+		IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener = null;
+		if (null != irodsImagej && null != irodsImagej.getiRODSFileFactory()) {
+			JProgressBar jprogressbar = new JProgressBar();
+			irodsTransferStatusCallbackListener = new IrodsTransferStatusCallbackListener(
+					irodsImagej.getiRODSFileFactory(), null, irodsImagej,
+					jprogressbar);
+			irodsImagej
+					.setIrodsTransferStatusCallbackListener(irodsTransferStatusCallbackListener);
+		}
+		return irodsTransferStatusCallbackListener;
+
 	}
 
 }

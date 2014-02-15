@@ -6,14 +6,13 @@ import javax.swing.JProgressBar;
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.bean.IrodsImageJBean;
 import org.bio5.irods.imagej.fileoperations.GetFileFromIrods;
-import org.bio5.irods.imagej.views.DirectoryContentsPane;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.transfer.TransferStatus;
 import org.irods.jargon.core.transfer.TransferStatusCallbackListener;
 
 public class IrodsTransferStatusCallbackListener extends GetFileFromIrods
-		implements TransferStatusCallbackListener {
+implements TransferStatusCallbackListener {
 
 	/* Logger instantiation */
 	static Logger log = Logger
@@ -25,7 +24,7 @@ public class IrodsTransferStatusCallbackListener extends GetFileFromIrods
 			IRODSFileFactory iRODSFileFactory, String treePath,
 			IrodsImageJBean irodsImagej, JProgressBar progressbar) {
 		super(iRODSFileFactory, treePath, irodsImagej,
-				jprogressbar = progressbar);
+				jprogressbar = irodsImagej.getJprogressbar());
 	}
 
 	public void overallStatusCallback(TransferStatus ts) throws JargonException {
@@ -38,7 +37,8 @@ public class IrodsTransferStatusCallbackListener extends GetFileFromIrods
 			log.error("error occurred in transfer:" + ts);
 
 		} else if (ts.isIntraFileStatusReport()) {
-			log.info("Bytes Transferred so far:" + ts.getBytesTransfered()
+			log.info("Transfer state: " + ts.getTransferState()
+					+ " | Bytes Transferred so far:" + ts.getBytesTransfered()
 					+ "| Total file size inf bytes:" + ts.getTotalSize()
 					+ "| Transfer percentage out of 100: "
 					+ ts.getBytesTransfered() * 100 / ts.getTotalSize());
@@ -47,7 +47,8 @@ public class IrodsTransferStatusCallbackListener extends GetFileFromIrods
 			jprogressbar.setValue((int) (ts.getBytesTransfered() * 100 / ts
 					.getTotalSize()));
 		} else if (ts.getTransferState() == TransferStatus.TransferState.IN_PROGRESS_COMPLETE_FILE) {
-			log.info("Bytes Transferred so far:" + ts.getBytesTransfered()
+			log.info("Transfer state: " + ts.getTransferState()
+					+ " | Bytes Transferred so far:" + ts.getBytesTransfered()
 					+ "| Total file size inf bytes:" + ts.getTotalSize()
 					+ "| Transfer percentage out of 100: "
 					+ ts.getBytesTransfered() * 100 / ts.getTotalSize());
@@ -55,7 +56,18 @@ public class IrodsTransferStatusCallbackListener extends GetFileFromIrods
 			jprogressbar.setMaximum(100);
 			jprogressbar.setValue((int) (ts.getBytesTransfered() * 100 / ts
 					.getTotalSize()));
-		} else if (ts.getTransferException() != null) {
+		} /*else if (ts.getTransferState() == TransferStatus.TransferState.IN_PROGRESS_START_FILE) {
+			log.info("Transfer state: " + ts.getTransferState()
+					+ " | Bytes Transferred so far:" + ts.getBytesTransfered()
+					+ "| Total file size inf bytes:" + ts.getTotalSize()
+					+ "| Transfer percentage out of 100: "
+					+ ts.getBytesTransfered() * 100 / ts.getTotalSize());
+			jprogressbar.setMinimum(0);
+			jprogressbar.setMaximum(100);
+			jprogressbar.setValue((int) (ts.getBytesTransfered() * 100 / ts
+					.getTotalSize()));
+
+		} */else if (ts.getTransferException() != null) {
 			log.info("Exception in file transfer: " + ts.getTransferState());
 		} else {
 			log.info("Something else is going on!" + ts.getTransferState());
@@ -92,8 +104,6 @@ public class IrodsTransferStatusCallbackListener extends GetFileFromIrods
 			response = CallbackResponse.YES_THIS_FILE;
 			break;
 		}
-
 		return response;
 	}
-
 }

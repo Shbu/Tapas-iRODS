@@ -2,6 +2,8 @@ package org.bio5.irods.imagej.bean;
 
 import java.io.Serializable;
 
+import javax.swing.JProgressBar;
+
 import org.bio5.irods.imagej.utilities.IrodsTransferStatusCallbackListener;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.IRODSSession;
@@ -32,6 +34,18 @@ public class IrodsImageJBean implements Serializable {
 	private IRODSSession iRODSSession = null;
 
 	private IRODSFileFactory iRODSFileFactory = null;
+
+	private JProgressBar jprogressbar = null;
+
+	private IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener = null;
+
+	public JProgressBar getJprogressbar() {
+		return jprogressbar;
+	}
+
+	public void setJprogressbar(JProgressBar jprogressbar) {
+		this.jprogressbar = jprogressbar;
+	}
 
 	public IRODSFileFactory getiRODSFileFactory() {
 		return iRODSFileFactory;
@@ -65,8 +79,6 @@ public class IrodsImageJBean implements Serializable {
 			TransferControlBlock transferControlBlock) {
 		this.transferControlBlock = transferControlBlock;
 	}
-
-	private IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener = null;
 
 	public IrodsTransferStatusCallbackListener getIrodsTransferStatusCallbackListener() {
 		return irodsTransferStatusCallbackListener;
