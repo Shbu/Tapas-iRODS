@@ -39,10 +39,8 @@ public class IrodsPropertiesConstruction {
 			IrodsImageJBean irodsImagej) {
 		IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener = null;
 		if (null != irodsImagej && null != irodsImagej.getiRODSFileFactory()) {
-			JProgressBar jprogressbar = new JProgressBar();
 			irodsTransferStatusCallbackListener = new IrodsTransferStatusCallbackListener(
-					irodsImagej.getiRODSFileFactory(), null, irodsImagej,
-					jprogressbar);
+					irodsImagej);
 			irodsImagej
 					.setIrodsTransferStatusCallbackListener(irodsTransferStatusCallbackListener);
 		}

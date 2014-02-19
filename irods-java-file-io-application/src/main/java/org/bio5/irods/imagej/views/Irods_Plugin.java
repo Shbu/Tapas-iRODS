@@ -8,7 +8,6 @@ import java.awt.Frame;
 import java.awt.event.WindowEvent;
 
 import org.apache.log4j.Logger;
-import org.irods.jargon.core.connection.IRODSAccount;
 
 public class Irods_Plugin extends PlugInFrame {
 

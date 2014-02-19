@@ -5,27 +5,25 @@ import javax.swing.JProgressBar;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.bean.IrodsImageJBean;
-import org.bio5.irods.imagej.fileoperations.GetFileFromIrods;
 import org.irods.jargon.core.exception.JargonException;
-import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.transfer.TransferStatus;
 import org.irods.jargon.core.transfer.TransferStatusCallbackListener;
 
-public class IrodsTransferStatusCallbackListener extends GetFileFromIrods
-implements TransferStatusCallbackListener {
+public class IrodsTransferStatusCallbackListener implements
+TransferStatusCallbackListener {
+
+	private JProgressBar jprogressbar;
+	private IrodsImageJBean irodsImagej;
+
+	public IrodsTransferStatusCallbackListener(IrodsImageJBean irodsImagej) {
+		super();
+		this.irodsImagej = irodsImagej;
+		this.jprogressbar = irodsImagej.getJprogressbar();
+	}
 
 	/* Logger instantiation */
 	static Logger log = Logger
 			.getLogger(IrodsTransferStatusCallbackListener.class.getName());
-
-	private static JProgressBar jprogressbar;
-
-	public IrodsTransferStatusCallbackListener(
-			IRODSFileFactory iRODSFileFactory, String treePath,
-			IrodsImageJBean irodsImagej, JProgressBar progressbar) {
-		super(iRODSFileFactory, treePath, irodsImagej,
-				jprogressbar = irodsImagej.getJprogressbar());
-	}
 
 	public void overallStatusCallback(TransferStatus ts) throws JargonException {
 	}
@@ -56,18 +54,7 @@ implements TransferStatusCallbackListener {
 			jprogressbar.setMaximum(100);
 			jprogressbar.setValue((int) (ts.getBytesTransfered() * 100 / ts
 					.getTotalSize()));
-		} /*else if (ts.getTransferState() == TransferStatus.TransferState.IN_PROGRESS_START_FILE) {
-			log.info("Transfer state: " + ts.getTransferState()
-					+ " | Bytes Transferred so far:" + ts.getBytesTransfered()
-					+ "| Total file size inf bytes:" + ts.getTotalSize()
-					+ "| Transfer percentage out of 100: "
-					+ ts.getBytesTransfered() * 100 / ts.getTotalSize());
-			jprogressbar.setMinimum(0);
-			jprogressbar.setMaximum(100);
-			jprogressbar.setValue((int) (ts.getBytesTransfered() * 100 / ts
-					.getTotalSize()));
-
-		} */else if (ts.getTransferException() != null) {
+		} else if (ts.getTransferException() != null) {
 			log.info("Exception in file transfer: " + ts.getTransferState());
 		} else {
 			log.info("Something else is going on!" + ts.getTransferState());

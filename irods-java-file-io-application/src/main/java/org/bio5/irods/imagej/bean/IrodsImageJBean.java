@@ -3,8 +3,10 @@ package org.bio5.irods.imagej.bean;
 import java.io.Serializable;
 
 import javax.swing.JProgressBar;
+import javax.swing.JTree;
 
 import org.bio5.irods.imagej.utilities.IrodsTransferStatusCallbackListener;
+import org.bio5.irods.imagej.views.DirectoryContentsPane;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.packinstr.TransferOptions;
@@ -38,9 +40,29 @@ public class IrodsImageJBean implements Serializable {
 	private JProgressBar jprogressbar = null;
 
 	private IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener = null;
+	
+	private JTree userDirectoryTree= null;
+	
+	private DirectoryContentsPane directoryContentsPane= null;
 
 	public JProgressBar getJprogressbar() {
 		return jprogressbar;
+	}
+
+	public DirectoryContentsPane getDirectoryContentsPane() {
+		return directoryContentsPane;
+	}
+
+	public void setDirectoryContentsPane(DirectoryContentsPane directoryContentsPane) {
+		this.directoryContentsPane = directoryContentsPane;
+	}
+
+	public JTree getUserDirectoryTree() {
+		return userDirectoryTree;
+	}
+
+	public void setUserDirectoryTree(JTree userDirectoryTree) {
+		this.userDirectoryTree = userDirectoryTree;
 	}
 
 	public void setJprogressbar(JProgressBar jprogressbar) {

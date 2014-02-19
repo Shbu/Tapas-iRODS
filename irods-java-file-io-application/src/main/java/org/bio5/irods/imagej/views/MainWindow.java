@@ -63,7 +63,7 @@ public class MainWindow extends JFrame {
 	private JTextField textField_Port;
 	private JTextField textField_Zone;
 	private JTextField textField_Host;
-	private DirectoryContentsPane directoryContents;
+	private DirectoryContentsPane directoryContentsPane;
 	private IrodsImageJBean irodsImagej;
 
 
@@ -154,8 +154,9 @@ public class MainWindow extends JFrame {
 						//List<String> dirList= 
 						FileOperations.setIrodsFile(irodsAccount, null, irodsImagej);
 
-						directoryContents  =new DirectoryContentsPane(irodsImagej);
-						setContentPane(directoryContents);
+						directoryContentsPane  =new DirectoryContentsPane(irodsImagej);
+						irodsImagej.setDirectoryContentsPane(directoryContentsPane);
+						setContentPane(directoryContentsPane);
 						validate(); 
 						repaint(); // optional
 						pack();

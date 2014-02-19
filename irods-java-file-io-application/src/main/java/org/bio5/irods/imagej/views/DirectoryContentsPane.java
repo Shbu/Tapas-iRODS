@@ -119,7 +119,7 @@ public class DirectoryContentsPane extends JPanel {
 		IrodsPropertiesConstruction irodsPropertiesConstruction = new IrodsPropertiesConstruction(); 
 		transferControlBlock= irodsPropertiesConstruction.constructHighPerformanceTransferControlBlockFromJargonProperties(irodsImagej);
 		irodsImagej.setTransferControlBlock(transferControlBlock);
-		
+
 		/*Construct IrodsTransferStatusCallbackListener*/
 		irodsPropertiesConstruction.constructIrodsTransferStatusCallbackListener(irodsImagej);
 
@@ -223,30 +223,17 @@ public class DirectoryContentsPane extends JPanel {
 								if(null!=irodsImagej && null!= sourceLocalfile &&  null!=destinaitonIrodsFile && null!=targetResourceName){
 									putFile=new PutFileToIrods(irodsImagej, sourceLocalfile, destinaitonIrodsFile, targetResourceName);
 									putFile.execute();
-									JOptionPane.showMessageDialog(null, "File Transfer done successfully");
-									
-									DefaultMutableTreeNode parentNode = null;
 
-									/*Destination selection - Fetching parent path if leaf node is selected*/
+									/*DefaultMutableTreeNode parentNode = null;
+
+									Destination selection - Fetching parent path if leaf node is selected
 									parentNode = (DefaultMutableTreeNode)
 											userDirectoryTree.getLastSelectedPathComponent();
 									if (parentNode.isLeaf()) {
 										parentNode= (DefaultMutableTreeNode) parentNode.getParent();
 									} 
 
-									/*	String filePath= IrodsUtilities.createFilePathFromTreePath(parentPath);
-									if(filePath.contains(".")){
-										parentPath=parentPath.getParentPath();
-									}
-									System.out.println("selection path " +parentPath);
-									if (parentPath == null) {
-										parentNode = rootNode;
-									} else  {
-										parentNode = (DefaultMutableTreeNode)
-												(parentPath.getLastPathComponent());
-									}*/
-
-									addObject(parentNode, sourceLocalfile.getName(), true);
+									addObject(parentNode, sourceLocalfile.getName(), true);*/
 								}
 							}
 							catch(Exception exception){
@@ -306,14 +293,8 @@ public class DirectoryContentsPane extends JPanel {
 		JPanel panel_1 = new JPanel();
 		tabbedPane.addTab("File Information", null, panel_1, null);
 
-		userDirectoryTree= new JTree(treeModel);
-		userDirectoryTree.setToolTipText("Directory list");
-		userDirectoryTree.setVisibleRowCount(100);
-		userDirectoryTree.setBorder(new LineBorder(new Color(0, 0, 0)));
-
-
-		scrollPane.setViewportView(userDirectoryTree);
-		userDirectoryTree.setModel(treeModel);
+		constructUserDirectoryTree(irodsImagej);
+		
 		userDirectoryTree.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent mouseEvent) {
@@ -342,6 +323,20 @@ public class DirectoryContentsPane extends JPanel {
 		userDirectoryTree.setVisible(true);
 		viewport.add(userDirectoryTree);
 		setLayout(groupLayout);
+	}
+
+
+	/**
+	 * @param irodsImagej
+	 */
+	private void constructUserDirectoryTree(final IrodsImageJBean irodsImagej) {
+		userDirectoryTree= new JTree(treeModel);
+		userDirectoryTree.setToolTipText("Directory list");
+		userDirectoryTree.setVisibleRowCount(100);
+		userDirectoryTree.setBorder(new LineBorder(new Color(0, 0, 0)));
+		irodsImagej.setUserDirectoryTree(userDirectoryTree);
+		scrollPane.setViewportView(userDirectoryTree);
+		userDirectoryTree.setModel(treeModel);
 	}
 
 
