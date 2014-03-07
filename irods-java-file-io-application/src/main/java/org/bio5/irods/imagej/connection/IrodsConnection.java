@@ -37,7 +37,6 @@ public class IrodsConnection {
 				iRODSAccount.getAuthenticationScheme());
 
 		return irodsAccount_Details_Map;
-
 	}
 
 	public static IRODSSession createDefaultiRodsSession() {

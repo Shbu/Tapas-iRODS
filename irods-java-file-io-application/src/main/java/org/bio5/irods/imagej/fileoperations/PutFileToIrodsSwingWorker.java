@@ -13,7 +13,7 @@ import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.io.IRODSFile;
 
-public class PutFileToIrods extends SwingWorker<Void, Integer> {
+public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 
 	private IrodsImageJBean irodsImagej;
 	private DataTransferOperations dataTransferOperationsAO;
@@ -24,7 +24,7 @@ public class PutFileToIrods extends SwingWorker<Void, Integer> {
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(DirectoryContentsPane.class.getName());
 
-	public PutFileToIrods(IrodsImageJBean irodsImagej, File sourceLocalfile,
+	public PutFileToIrodsSwingWorker(IrodsImageJBean irodsImagej, File sourceLocalfile,
 			IRODSFile destinaitonIrodsFile, String targetResourceName) {
 		super();
 		this.irodsImagej = irodsImagej;

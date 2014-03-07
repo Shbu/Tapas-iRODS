@@ -26,7 +26,7 @@ import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.transfer.TransferControlBlock;
 
-public class GetFileFromIrods extends SwingWorker<Void, Integer> {
+public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 
 	private IRODSFileFactory iRODSFileFactory;
 	private String treePath;
@@ -40,7 +40,7 @@ public class GetFileFromIrods extends SwingWorker<Void, Integer> {
 	static Logger log = Logger.getLogger(DirectoryContentsPane.class.getName());
 
 	/* Get files from iRODS Server */
-	public GetFileFromIrods(IRODSFileFactory iRODSFileFactory, String treePath,
+	public GetFileFromIrodsSwingWorker(IRODSFileFactory iRODSFileFactory, String treePath,
 			IrodsImageJBean irodsImagej, JProgressBar progressbar) {
 		this.iRODSFileFactory = iRODSFileFactory;
 		this.treePath = treePath;

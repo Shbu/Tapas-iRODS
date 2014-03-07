@@ -6,11 +6,9 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
-import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -22,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
@@ -34,10 +32,9 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.AuthenticationException;
 import org.irods.jargon.core.exception.CatalogSQLException;
 import org.irods.jargon.core.exception.InvalidUserException;
-import org.irods.jargon.core.pub.io.IRODSFile;
-
-import javax.swing.border.TitledBorder;
-import javax.swing.SwingConstants;
+import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 
 public class MainWindow extends JFrame {
 
@@ -45,6 +42,7 @@ public class MainWindow extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 393011043100419159L;
+	public IRODSFileSystem irodsFileSystem;
 
 
 	/*Logger instantiation*/
@@ -57,7 +55,7 @@ public class MainWindow extends JFrame {
 		// TODO Auto-generated constructor stub
 	}
 
-	private JPanel contentPane;
+	private JPanel contentPanePanel;
 	private JTextField textbox_LoginId;
 	private JPasswordField textField_passwordField;
 	private JTextField textField_Port;
@@ -65,6 +63,7 @@ public class MainWindow extends JFrame {
 	private JTextField textField_Host;
 	private DirectoryContentsPane directoryContentsPane;
 	private IrodsImageJBean irodsImagej;
+	private ConstructDirectoryStructureSwingWorker constructDirectoryStructureSwingWorker;
 
 
 	public JFileChooser localImageJFileChooser;
@@ -76,6 +75,8 @@ public class MainWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public MainWindow() {
+		mainWindowInit();
+		
 		setTitle("iRODS");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 656, 466);
@@ -110,10 +111,10 @@ public class MainWindow extends JFrame {
 			}
 		});
 		mnHelp.add(mntm_About);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+		contentPanePanel = new JPanel();
+		contentPanePanel.setBorder(new EmptyBorder(0, 0, 0, 0));
 
-		setContentPane(contentPane);
+		setContentPane(contentPanePanel);
 
 		textbox_LoginId = new JTextField();
 		textbox_LoginId.setHorizontalAlignment(SwingConstants.LEFT);
@@ -146,21 +147,18 @@ public class MainWindow extends JFrame {
 				{
 					try{
 						IRODSAccount irodsAccount =IrodsConnection.irodsConnection(username, password_full, zone, host, port);
-						irodsImagej = new IrodsImageJBean();
 						irodsImagej.setIrodsAccount(irodsAccount);
 						/*IRODSFileSystem irodsFileSystem= IRODSFileSystem.instance();
 						UserAO  userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);*/
 
-						//List<String> dirList= 
-						FileOperations.setIrodsFile(irodsAccount, null, irodsImagej);
-
+						List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath= 
+								FileOperations.setIrodsFile(irodsAccount, null, irodsImagej);
+								irodsImagej.setCollectionsUnderGivenAbsolutePath(collectionsUnderGivenAbsolutePath);
 						directoryContentsPane  =new DirectoryContentsPane(irodsImagej);
 						irodsImagej.setDirectoryContentsPane(directoryContentsPane);
-						setContentPane(directoryContentsPane);
-						validate(); 
-						repaint(); // optional
-						pack();
-						setVisible(true);
+						directoryContentsPane.init();
+						directoryContentsPane.implementation();
+						setVisibilityOfForm();
 						show();
 					}
 					/*Exception when username/password is empty*/
@@ -236,7 +234,7 @@ public class MainWindow extends JFrame {
 
 		JLabel label_Host = new JLabel("Host:");
 		label_Host.setHorizontalAlignment(SwingConstants.CENTER);
-		GroupLayout gl_contentPane = new GroupLayout(contentPane);
+		GroupLayout gl_contentPane = new GroupLayout(contentPanePanel);
 		gl_contentPane.setHorizontalGroup(
 				gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
@@ -297,6 +295,27 @@ public class MainWindow extends JFrame {
 																		.addComponent(button_Cancel))
 																		.addGap(101))
 				);
-		contentPane.setLayout(gl_contentPane);
+		contentPanePanel.setLayout(gl_contentPane);
+	}
+	
+	public void setVisibilityOfForm() {
+		setContentPane(directoryContentsPane);
+		validate();
+		repaint();
+		pack();
+		setVisible(true);
+	}
+	
+	private void mainWindowInit() {
+		irodsImagej = new IrodsImageJBean();
+		
+		/*Setting iRODS file system*/
+		try {
+			irodsFileSystem= IRODSFileSystem.instance();
+		} catch (JargonException e) {
+			log.error("Error while retrieving irodsFileSystem" +e.getMessage());
+		}
+		irodsImagej.setIrodsFileSystem(irodsFileSystem);
+		
 	}
 }

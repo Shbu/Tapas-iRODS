@@ -8,6 +8,7 @@ import java.awt.Frame;
 import java.awt.event.WindowEvent;
 
 import org.apache.log4j.Logger;
+import org.bio5.irods.imagej.bean.IrodsImageJBean;
 
 public class Irods_Plugin extends PlugInFrame {
 
@@ -15,6 +16,7 @@ public class Irods_Plugin extends PlugInFrame {
 
 	/* Declare static variables */
 	private static Frame instance;
+	private IrodsImageJBean irodsImagej;
 
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(Irods_Plugin.class.getName());
@@ -33,8 +35,10 @@ public class Irods_Plugin extends PlugInFrame {
 
 	public void run(String arg) {
 
-		MainWindow mw = new MainWindow();
-		mw.setVisible(true);
+		MainWindow mainWindow = new MainWindow();
+		irodsImagej = new IrodsImageJBean();
+		irodsImagej.setMainWindow(mainWindow);
+		mainWindow.setVisible(true);
 
 	}
 
