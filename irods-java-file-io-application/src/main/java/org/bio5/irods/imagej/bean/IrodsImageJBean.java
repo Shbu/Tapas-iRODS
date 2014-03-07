@@ -64,8 +64,29 @@ public class IrodsImageJBean implements Serializable {
 	private DefaultTreeModel treeModel;
 
 	private JViewport viewport;
-	
+
+	private String pathTillHome;
+
+	private List<DefaultMutableTreeNode> childNodesListAfterLazyLoading;
+
 	private List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = null;
+
+	public String getPathTillHome() {
+		return pathTillHome;
+	}
+
+	public void setPathTillHome(String pathTillHome) {
+		this.pathTillHome = pathTillHome;
+	}
+
+	public List<DefaultMutableTreeNode> getChildNodesListAfterLazyLoading() {
+		return childNodesListAfterLazyLoading;
+	}
+
+	public void setChildNodesListAfterLazyLoading(
+			List<DefaultMutableTreeNode> childNodesListAfterLazyLoading) {
+		this.childNodesListAfterLazyLoading = childNodesListAfterLazyLoading;
+	}
 
 	public List<CollectionAndDataObjectListingEntry> getCollectionsUnderGivenAbsolutePath() {
 		return collectionsUnderGivenAbsolutePath;
@@ -83,7 +104,7 @@ public class IrodsImageJBean implements Serializable {
 	public void setMainWindow(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
 	}
-	
+
 	public JViewport getViewport() {
 		return viewport;
 	}

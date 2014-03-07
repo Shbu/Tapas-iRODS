@@ -152,7 +152,7 @@ public class MainWindow extends JFrame {
 						UserAO  userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);*/
 
 						List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath= 
-								FileOperations.setIrodsFile(irodsAccount, null, irodsImagej);
+								FileOperations.setIrodsFile(null, irodsImagej);
 								irodsImagej.setCollectionsUnderGivenAbsolutePath(collectionsUnderGivenAbsolutePath);
 						directoryContentsPane  =new DirectoryContentsPane(irodsImagej);
 						irodsImagej.setDirectoryContentsPane(directoryContentsPane);

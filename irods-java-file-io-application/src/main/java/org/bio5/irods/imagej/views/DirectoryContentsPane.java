@@ -26,15 +26,22 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.JViewport;
 import javax.swing.border.LineBorder;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.bean.IrodsImageJBean;
 import org.bio5.irods.imagej.fileoperations.FileOperations;
 import org.bio5.irods.imagej.fileoperations.GetFileFromIrodsSwingWorker;
 import org.bio5.irods.imagej.fileoperations.PutFileToIrodsSwingWorker;
+import org.bio5.irods.imagej.fileoperations.RetrieveInternalNodesSwingWorker;
 import org.bio5.irods.imagej.listeners.MyTreeModelListener;
 import org.bio5.irods.imagej.utilities.Constants;
 import org.bio5.irods.imagej.utilities.IrodsPropertiesConstruction;
@@ -50,7 +57,7 @@ import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 import org.irods.jargon.core.transfer.TransferControlBlock;
 
-public class DirectoryContentsPane extends JPanel {
+public class DirectoryContentsPane extends JPanel implements TreeWillExpandListener {
 
 	/**
 	 * 
@@ -81,11 +88,6 @@ public class DirectoryContentsPane extends JPanel {
 	private JButton jButton_saveToIrodsServer;
 	private IrodsPropertiesConstruction irodsPropertiesConstruction;
 	
-	/*SplashScreen variables*/
-	private JProgressBar progress;
-	private JDialog dialog;
-	private JFrame frame;
-
 	/*Logger instantiation*/
 	static Logger log = Logger.getLogger(
 			DirectoryContentsPane.class.getName());
@@ -154,6 +156,7 @@ public class DirectoryContentsPane extends JPanel {
 		/*Construct IrodsTransferStatusCallbackListener*/
 		irodsPropertiesConstruction.constructIrodsTransferStatusCallbackListener(irodsImagej);
 		
+		/*Creating model*/
 		setVisible(true);
 	}
 
@@ -178,7 +181,7 @@ public class DirectoryContentsPane extends JPanel {
 		
 		if(null!= irodsImagej.getCollectionsUnderGivenAbsolutePath() ){
 			List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath =irodsImagej.getCollectionsUnderGivenAbsolutePath();
-			parseDirectoryContentsUsingList(listOfCollectionsUnderGivenAbsolutePath,rootNode, irodsAccount);
+			parseDirectoryContentsUsingList(listOfCollectionsUnderGivenAbsolutePath,rootNode);
 		}
 		else{
 			log.error("File directory is empty");
@@ -393,6 +396,9 @@ public class DirectoryContentsPane extends JPanel {
 		scrollPane.setViewportView(userDirectoryTree);
 		userDirectoryTree.setModel(treeModel);
 		irodsImagej.setUserDirectoryTree(userDirectoryTree);
+		
+		/*Adding Jtree Listeners*/
+		userDirectoryTree.addTreeWillExpandListener(this);
 	}
 
 
@@ -435,7 +441,9 @@ public class DirectoryContentsPane extends JPanel {
 		repaint();
 	}
 	
-	public void parseDirectoryContentsUsingList(List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath, DefaultMutableTreeNode node, final IRODSAccount irodsAccount)
+	public void parseDirectoryContentsUsingList(
+			List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath,
+			DefaultMutableTreeNode node)
 	{
 		Iterator<CollectionAndDataObjectListingEntry> collectionAndDataObjectListingEntryIterator =listOfCollectionsUnderGivenAbsolutePath.iterator();
 		CollectionAndDataObjectListingEntry fileUnderCollectionAndDataObjectListingEntry  =null;
@@ -499,4 +507,39 @@ public class DirectoryContentsPane extends JPanel {
 		}
 		return childNode;
 	}
+
+	/**
+	 * Default empty implementation, do nothing on collapse event.
+	 */
+	public void treeWillCollapse(TreeExpansionEvent arg0)
+			throws ExpandVetoException {}
+
+
+	/**
+	 * Node will expand, it's time to retreive nodes
+	 */
+	public void treeWillExpand(TreeExpansionEvent treeExpansionEvent)
+			throws ExpandVetoException {
+		log.info("Node expanded: " + treeExpansionEvent.getPath());
+		TreePath tp = treeExpansionEvent.getPath();
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tp
+				.getLastPathComponent();
+		Object[] elements= tp.getPath();/* edit path */
+		//String pathOfInternalNode=builder.toString();
+		RetrieveInternalNodesSwingWorker retrieveInternalNodesSwingWorker = new RetrieveInternalNodesSwingWorker(
+				elements, irodsImagej);
+		try {
+			retrieveInternalNodesSwingWorker.doInBackground();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		for(int i=0;i<irodsImagej.getChildNodesListAfterLazyLoading().size();i++){
+		treeModel.insertNodeInto(
+				irodsImagej.getChildNodesListAfterLazyLoading().get(i), node,
+				node.getChildCount());
+		}
+	}
+
 }

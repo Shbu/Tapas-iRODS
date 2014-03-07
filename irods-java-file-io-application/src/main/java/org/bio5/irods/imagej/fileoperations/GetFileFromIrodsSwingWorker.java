@@ -35,6 +35,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	private DataObjectAO dataObjectAO;
 	private JProgressBar jprogressbar;
 	private TransferControlBlock transferControlBlock;
+	IRODSFile sourceIrodsFilePath=null;
 
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(DirectoryContentsPane.class.getName());
@@ -76,7 +77,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 			dataTransferOperationsAO = irodsImagej.getIrodsFileSystem()
 					.getIRODSAccessObjectFactory()
 					.getDataTransferOperations(irodsImagej.getIrodsAccount());
-			IRODSFile sourceIrodsFilePath = iRODSFileFactory
+			sourceIrodsFilePath = iRODSFileFactory
 					.instanceIRODSFile(IrodsUtilities.getPathSeperator()
 							+ irodsImagej.getIrodsAccount().getZone()
 							+ treePath);
@@ -92,8 +93,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 				log.info("MD5checksum of iRODS server file: "
 						+ md5ChecksumServerFile);
 			} catch (Exception e) {
-				log.info("Error while reading MD5 checksum");
-				e.printStackTrace();
+				log.info("Error while reading MD5 checksum" +e.getMessage());
 			}
 			File destinationLocalFilePath = new File(
 					Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
@@ -129,24 +129,6 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 						 * destinationLocalFilePath.toString());
 						 */
 
-						/* Opening the selected ImageJ */
-						Opener imageOpener = new Opener();
-						String imageFilePath = Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY
-								+ IrodsUtilities.getPathSeperator()
-								+ sourceIrodsFilePath.getName();
-						log.info("Current file opened by user: "
-								+ imageFilePath);
-						ImagePlus imp = imageOpener.openImage(imageFilePath);
-						// ImagePlus imp = IJ.openImage(imageFilePath);
-
-						if (imp != null) {
-							log.info("ImagePlus is not null and before calling show() function of ImagePlus class");
-							imp.show();
-						} else {
-							IJ.showMessage("Opening file Failed.");
-							IJ.showStatus("Opening file Failed.");
-							log.error("ImagePlus instance is null and opening file Failed.");
-						}
 					}
 				}
 			} catch (OverwriteException oe) {
@@ -188,7 +170,26 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	 * { jprogressbar.setValue(i); } }
 	 */
 
-	/*
-	 * @Override public void done() { publish(100); }
-	 */
+	
+	  @Override public void done() {
+		  /* Opening the selected ImageJ */
+			Opener imageOpener = new Opener();
+			String imageFilePath = Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY
+					+ IrodsUtilities.getPathSeperator()
+					+ sourceIrodsFilePath.getName();
+			log.info("Current file opened by user: "
+					+ imageFilePath);
+			ImagePlus imp = imageOpener.openImage(imageFilePath);
+			// ImagePlus imp = IJ.openImage(imageFilePath);
+
+			if (imp != null) {
+				log.info("ImagePlus is not null and before calling show() function of ImagePlus class");
+				imp.show();
+			} else {
+				IJ.showMessage("Opening file Failed.");
+				IJ.showStatus("Opening file Failed.");
+				log.error("ImagePlus instance is null and opening file Failed.");
+			}
+	  }
+	 
 }

@@ -1,21 +1,17 @@
 package org.bio5.irods.imagej.fileoperations;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.bean.IrodsImageJBean;
-import org.bio5.irods.imagej.connection.IrodsConnection;
 import org.bio5.irods.imagej.utilities.Constants;
 import org.bio5.irods.imagej.utilities.IrodsUtilities;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.connection.SettableJargonProperties;
-import org.irods.jargon.core.exception.FileNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
 import org.irods.jargon.core.pub.IRODSFileSystem;
-import org.irods.jargon.core.pub.IRODSFileSystemAOImpl;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
@@ -81,7 +77,7 @@ public class FileOperations {
 				.getIRODSFileFactory(iRODSAccount);
 	}
 
-	public static List<CollectionAndDataObjectListingEntry> setIrodsFile(IRODSAccount iRODSAccount,String pathForInternalFiles, IrodsImageJBean irodsImagej) throws JargonException{
+	public static List<CollectionAndDataObjectListingEntry> setIrodsFile(String pathForInternalFiles, IrodsImageJBean irodsImagej) throws JargonException{
 
 		/* Setting jargon properties */
 		SettableJargonProperties jp = new SettableJargonProperties();
@@ -89,7 +85,7 @@ public class FileOperations {
 		jp.setMaxParallelThreads(10);
 		log.info("Threads upgraded to : " + jp.getMaxParallelThreads());
 
-		IRODSFileFactory iRODSFileFactory = getIrodsAccountFileFactory(iRODSAccount);
+		IRODSFileFactory iRODSFileFactory = getIrodsAccountFileFactory(irodsImagej.getIrodsAccount());
 		List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath   = null;
 
 		if(null!= pathForInternalFiles){
@@ -97,17 +93,19 @@ public class FileOperations {
 			iRodsFile = iRODSFileFactory.instanceIRODSFile(pathForInternalFiles);
 			collectionsUnderGivenAbsolutePath= retrieveCollectionsUnderGivenPath(iRodsFile,irodsImagej);
 		}
- else {
+		else {
 			pathForInternalFiles = irodsImagej.getIrodsAccount()
 					.getHomeDirectory()
 					+ IrodsUtilities.getPathSeperator()
 					+ Constants.HOME
 					+ IrodsUtilities.getPathSeperator()
 					+ irodsImagej.getIrodsAccount().getUserName();
+			irodsImagej.setPathTillHome(pathForInternalFiles);
 
 			iRodsFile = iRODSFileFactory
 					.instanceIRODSFile(pathForInternalFiles);
 			collectionsUnderGivenAbsolutePath= retrieveCollectionsUnderGivenPath(iRodsFile,irodsImagej);
+			
 
 		}
 		irodsImagej.setiRodsFile(iRodsFile);
@@ -115,7 +113,7 @@ public class FileOperations {
 		return collectionsUnderGivenAbsolutePath;
 	}
 	
-	private static List<CollectionAndDataObjectListingEntry> retrieveCollectionsUnderGivenPath(
+	public static List<CollectionAndDataObjectListingEntry> retrieveCollectionsUnderGivenPath(
 			IRODSFile irodsFileForAbsolutePath, IrodsImageJBean irodsImagej) {
 
 		CollectionAndDataObjectListAndSearchAO collectionAO;
@@ -126,9 +124,10 @@ public class FileOperations {
 					.getIRODSAccessObjectFactory()
 					.getCollectionAndDataObjectListAndSearchAO(
 							irodsImagej.getIrodsAccount());
-
-			collectionsUnderGivenAbsolutePath = collectionAO.listDataObjectsAndCollectionsUnderPath(
-					irodsFileForAbsolutePath.getAbsolutePath());
+			log.info("internal node path" +irodsFileForAbsolutePath.getAbsolutePath());
+			String path="iplant//home//sharanbabuk//test";
+			//collectionsUnderGivenAbsolutePath = collectionAO.listDataObjectsAndCollectionsUnderPath(path);
+			collectionsUnderGivenAbsolutePath = collectionAO.listDataObjectsAndCollectionsUnderPath(irodsFileForAbsolutePath.getAbsolutePath());
 
 		} catch (JargonException e) {
 			log.error("Error while retrieving collectionsUnderGivenAbsolutePath: "

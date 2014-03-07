@@ -33,6 +33,8 @@ TransferStatusCallbackListener {
 
 		if (ts.getTransferState() == TransferStatus.TransferState.FAILURE) {
 			log.error("error occurred in transfer:" + ts);
+			JOptionPane.showMessageDialog(null, ts.getTransferState());
+			return;
 
 		} else if (ts.isIntraFileStatusReport()) {
 			log.info("Transfer state: " + ts.getTransferState()
@@ -63,6 +65,7 @@ TransferStatusCallbackListener {
 
 	public CallbackResponse transferAsksWhetherToForceOperation(
 			String irodsAbsolutePath, boolean isCollection) {
+		
 
 		CallbackResponse response = CallbackResponse.YES_FOR_ALL;
 		StringBuilder stringBuilder = new StringBuilder(
