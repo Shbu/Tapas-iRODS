@@ -35,6 +35,9 @@ import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
+import javax.swing.JCheckBox;
+import javax.swing.JRadioButton;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class MainWindow extends JFrame {
 
@@ -63,7 +66,7 @@ public class MainWindow extends JFrame {
 	private JTextField textField_Host;
 	private DirectoryContentsPane directoryContentsPane;
 	private IrodsImageJBean irodsImagej;
-	private ConstructDirectoryStructureSwingWorker constructDirectoryStructureSwingWorker;
+	private JCheckBox HomeDirectory_CheckBox;
 
 
 	public JFileChooser localImageJFileChooser;
@@ -146,13 +149,17 @@ public class MainWindow extends JFrame {
 				String zone=textField_Zone.getText();
 				{
 					try{
+						if(HomeDirectory_CheckBox.isSelected()){
+							irodsImagej.setHomeDirectoryTheRootNode(true);
+						}
+						
 						IRODSAccount irodsAccount =IrodsConnection.irodsConnection(username, password_full, zone, host, port);
 						irodsImagej.setIrodsAccount(irodsAccount);
 						/*IRODSFileSystem irodsFileSystem= IRODSFileSystem.instance();
 						UserAO  userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);*/
 
 						List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath= 
-								FileOperations.setIrodsFile(null, irodsImagej);
+								FileOperations.setIrodsFile(null, irodsImagej,irodsImagej.isHomeDirectoryTheRootNode());
 								irodsImagej.setCollectionsUnderGivenAbsolutePath(collectionsUnderGivenAbsolutePath);
 						directoryContentsPane  =new DirectoryContentsPane(irodsImagej);
 						irodsImagej.setDirectoryContentsPane(directoryContentsPane);
@@ -234,67 +241,77 @@ public class MainWindow extends JFrame {
 
 		JLabel label_Host = new JLabel("Host:");
 		label_Host.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		JLabel homeDirectory_Label = new JLabel("File Selection:");
+		
+		HomeDirectory_CheckBox = new JCheckBox("Home Directory");
 		GroupLayout gl_contentPane = new GroupLayout(contentPanePanel);
 		gl_contentPane.setHorizontalGroup(
-				gl_contentPane.createParallelGroup(Alignment.LEADING)
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_contentPane.createSequentialGroup()
-										.addGap(267)
-										.addComponent(button_Login)
-										.addGap(18)
-										.addComponent(button_Cancel))
-										.addGroup(gl_contentPane.createSequentialGroup()
-												.addGap(81)
-												.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-														.addComponent(Label_Password)
-														.addComponent(Label_Username)
-														.addComponent(Label_Port)
-														.addComponent(label_Host)
-														.addComponent(label_Zone))
-														.addGap(26)
-														.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-																.addComponent(textField_Host, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
-																.addComponent(textField_passwordField, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
-																.addComponent(textbox_LoginId, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
-																.addGroup(gl_contentPane.createSequentialGroup()
-																		.addComponent(textField_Port)
-																		.addGap(296))
-																		.addGroup(gl_contentPane.createSequentialGroup()
-																				.addComponent(textField_Zone)
-																				.addGap(296)))
-																				.addGap(10)))
-																				.addGap(85))
-				);
-		gl_contentPane.setVerticalGroup(
-				gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPane.createSequentialGroup()
-						.addGap(54)
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE, false)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(267)
+							.addComponent(button_Login)
+							.addGap(18)
+							.addComponent(button_Cancel))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(81)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(Label_Password)
 								.addComponent(Label_Username)
-								.addComponent(textbox_LoginId, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-								.addGap(17)
-								.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-										.addComponent(Label_Password)
-										.addComponent(textField_passwordField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-										.addGap(18)
-										.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-												.addComponent(Label_Port)
-												.addComponent(textField_Port, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-												.addGap(18)
-												.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-														.addComponent(label_Zone)
-														.addComponent(textField_Zone, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-														.addGap(15)
-														.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-																.addComponent(label_Host)
-																.addComponent(textField_Host, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-																.addGap(52)
-																.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-																		.addComponent(button_Login)
-																		.addComponent(button_Cancel))
-																		.addGap(101))
-				);
+								.addComponent(Label_Port)
+								.addComponent(label_Host)
+								.addComponent(label_Zone)
+								.addComponent(homeDirectory_Label))
+							.addGap(26)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(HomeDirectory_CheckBox)
+								.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+									.addComponent(textField_Zone, 64, 64, 64)
+									.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+										.addComponent(textField_Port, 64, 64, 64)
+										.addGroup(gl_contentPane.createSequentialGroup()
+											.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+												.addComponent(textField_Host, GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)
+												.addComponent(textField_passwordField, GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)
+												.addComponent(textbox_LoginId, GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE))
+											.addGap(10)))))))
+					.addGap(85))
+		);
+		gl_contentPane.setVerticalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(54)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE, false)
+						.addComponent(Label_Username)
+						.addComponent(textbox_LoginId, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(17)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(Label_Password)
+						.addComponent(textField_passwordField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(Label_Port)
+						.addComponent(textField_Port, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_Zone)
+						.addComponent(textField_Zone, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(15)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_Host)
+						.addComponent(textField_Host, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(homeDirectory_Label)
+						.addComponent(HomeDirectory_CheckBox))
+					.addGap(20)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(button_Login)
+						.addComponent(button_Cancel))
+					.addGap(101))
+		);
 		contentPanePanel.setLayout(gl_contentPane);
 	}
 	

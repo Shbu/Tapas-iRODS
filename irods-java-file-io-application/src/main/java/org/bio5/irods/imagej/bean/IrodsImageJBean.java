@@ -71,6 +71,27 @@ public class IrodsImageJBean implements Serializable {
 
 	private List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = null;
 
+	private DefaultMutableTreeNode rootTreeNodeForDirectoryContents = null;
+
+	private boolean isHomeDirectoryTheRootNode = false;
+
+	public boolean isHomeDirectoryTheRootNode() {
+		return isHomeDirectoryTheRootNode;
+	}
+
+	public void setHomeDirectoryTheRootNode(boolean isHomeDirectoryTheRootNode) {
+		this.isHomeDirectoryTheRootNode = isHomeDirectoryTheRootNode;
+	}
+
+	public DefaultMutableTreeNode getRootTreeNodeForDirectoryContents() {
+		return rootTreeNodeForDirectoryContents;
+	}
+
+	public void setRootTreeNodeForDirectoryContents(
+			DefaultMutableTreeNode rootTreeNode) {
+		this.rootTreeNodeForDirectoryContents = rootTreeNode;
+	}
+
 	public String getPathTillHome() {
 		return pathTillHome;
 	}

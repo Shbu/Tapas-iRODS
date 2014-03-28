@@ -8,15 +8,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -27,15 +24,12 @@ import javax.swing.JTree;
 import javax.swing.JViewport;
 import javax.swing.border.LineBorder;
 import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.bean.IrodsImageJBean;
 import org.bio5.irods.imagej.fileoperations.FileOperations;
@@ -51,7 +45,6 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.IRODSFileSystem;
-import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
@@ -64,7 +57,6 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 	 */
 	private static final long serialVersionUID = 722996165620904921L;
 	private IRODSFileSystem irodsFileSystem;
-	private UserAO  userAccount;
 	private DataTransferOperations dataTransferOperationsAO;
 	private IRODSFileFactory iRODSFileFactory;
 	private String selectedNodeInTreeForDoubleClick;
@@ -76,7 +68,8 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 
 	private DefaultTreeModel treeModel;
 	private JTree userDirectoryTree;
-	private DefaultMutableTreeNode rootNode;
+	private DefaultMutableTreeNode homeNode;
+	private DefaultMutableTreeNode accountNode;
 
 	private JViewport viewport;
 	private JScrollPane scrollPane;
@@ -114,11 +107,20 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 		iRODSFileFactory= FileOperations.getIrodsAccountFileFactory(irodsImagej.getIrodsAccount());
 		irodsImagej.setiRODSFileFactory(iRODSFileFactory);
 
-		//String irodsZone =irodsAccount.getZone();
-		//System.out.println("irodsZone" +irodsZone);
-		rootNode = new DefaultMutableTreeNode(Constants.HOME);
-		irodsImagej.setRootNode(rootNode);
-		treeModel = new DefaultTreeModel(rootNode,true);
+		homeNode = new DefaultMutableTreeNode(Constants.HOME);
+		if(!irodsImagej.isHomeDirectoryTheRootNode()){
+		accountNode= new DefaultMutableTreeNode(irodsImagej.getIrodsAccount().getUserName());
+		homeNode.add(accountNode); /*Adding accountNode to HomeNode */
+		irodsImagej.setRootTreeNodeForDirectoryContents(accountNode);
+		treeModel = new DefaultTreeModel(accountNode,true);
+		}
+		else{
+			irodsImagej.setRootTreeNodeForDirectoryContents(homeNode);
+			treeModel = new DefaultTreeModel(homeNode,true);
+		}
+		//rootNode = new DefaultMutableTreeNode(irodsImagej.getIrodsAccount().getUserName());
+		//irodsImagej.setRootNode(irodsImagej.getRootTreeNodeForDirectoryContents());
+		//treeModel = new DefaultTreeModel(homeNode,true);
 		treeModel.addTreeModelListener(new MyTreeModelListener());
 		irodsImagej.setTreeModel(treeModel);
 
@@ -168,10 +170,10 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 	 * @param jButton_saveToIrodsServer
 	 */
 	public void implementation() {
-		File irodsAccountFile=null;
+		/*File irodsAccountFile=null;
 		if(null!= IrodsImageJBean.getiRodsFile()){
 			irodsAccountFile= (File) IrodsImageJBean.getiRodsFile();
-		}
+		}*/
 		/*constructDirectoryStructureSwingWorker = new ConstructDirectoryStructureSwingWorker(
 				irodsImagej, iRODSFileFactory, localFiles, rootNode,
 				irodsAccount); 
@@ -181,7 +183,7 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 		
 		if(null!= irodsImagej.getCollectionsUnderGivenAbsolutePath() ){
 			List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath =irodsImagej.getCollectionsUnderGivenAbsolutePath();
-			parseDirectoryContentsUsingList(listOfCollectionsUnderGivenAbsolutePath,rootNode);
+			parseDirectoryContentsUsingList(listOfCollectionsUnderGivenAbsolutePath,irodsImagej.getRootTreeNodeForDirectoryContents());
 		}
 		else{
 			log.error("File directory is empty");
@@ -431,7 +433,7 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 		/*if(null !=irodsImagej.getMainWindow()){
 			irodsImagej.getMainWindow().setVisibilityOfForm();
 		}*/
-		viewport.removeAll();
+		//viewport.removeAll();
 		viewport.setVisible(true);
 		viewport.repaint();
 		viewport.revalidate();
@@ -445,7 +447,6 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 			List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath,
 			DefaultMutableTreeNode node)
 	{
-		Iterator<CollectionAndDataObjectListingEntry> collectionAndDataObjectListingEntryIterator =listOfCollectionsUnderGivenAbsolutePath.iterator();
 		CollectionAndDataObjectListingEntry fileUnderCollectionAndDataObjectListingEntry  =null;
 		for(int i=0;i<listOfCollectionsUnderGivenAbsolutePath.size();i++){
 			fileUnderCollectionAndDataObjectListingEntry= listOfCollectionsUnderGivenAbsolutePath.get(i);
@@ -477,8 +478,8 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 		viewport.revalidate();
 		add(scrollPane,BorderLayout.CENTER);
 		setVisible(true);
-		revalidate();
-		repaint();
+		//revalidate();
+		//repaint();
 	}
 
 
@@ -489,9 +490,8 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 		try{
 			childNode = 
 					new DefaultMutableTreeNode(child, false);
-
 			if (parent == null) {
-				parent = rootNode;
+				parent = irodsImagej.getRootTreeNodeForDirectoryContents();
 			}
 
 			treeModel.insertNodeInto(childNode, parent, 

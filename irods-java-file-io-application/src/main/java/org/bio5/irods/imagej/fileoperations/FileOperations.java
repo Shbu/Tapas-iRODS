@@ -77,7 +77,7 @@ public class FileOperations {
 				.getIRODSFileFactory(iRODSAccount);
 	}
 
-	public static List<CollectionAndDataObjectListingEntry> setIrodsFile(String pathForInternalFiles, IrodsImageJBean irodsImagej) throws JargonException{
+	public static List<CollectionAndDataObjectListingEntry> setIrodsFile(String pathForInternalFiles, IrodsImageJBean irodsImagej, boolean isHomeDirectoryFlagOn) throws JargonException{
 
 		/* Setting jargon properties */
 		SettableJargonProperties jp = new SettableJargonProperties();
@@ -93,7 +93,20 @@ public class FileOperations {
 			iRodsFile = iRODSFileFactory.instanceIRODSFile(pathForInternalFiles);
 			collectionsUnderGivenAbsolutePath= retrieveCollectionsUnderGivenPath(iRodsFile,irodsImagej);
 		}
-		else {
+		else if(pathForInternalFiles==null && isHomeDirectoryFlagOn){
+
+			pathForInternalFiles = irodsImagej.getIrodsAccount()
+					.getHomeDirectory()
+					+ IrodsUtilities.getPathSeperator()
+					+ Constants.HOME;
+			irodsImagej.setPathTillHome(pathForInternalFiles);
+			log.info("irods file path if pathForInternalFiles is null and isHomeDirectoryFlagOn is true" +irodsImagej.getPathTillHome());
+
+			iRodsFile = iRODSFileFactory
+					.instanceIRODSFile(irodsImagej.getPathTillHome());
+			collectionsUnderGivenAbsolutePath= retrieveCollectionsUnderGivenPath(iRodsFile,irodsImagej);
+		}
+		else if (pathForInternalFiles==null && !isHomeDirectoryFlagOn){
 			pathForInternalFiles = irodsImagej.getIrodsAccount()
 					.getHomeDirectory()
 					+ IrodsUtilities.getPathSeperator()
@@ -101,12 +114,11 @@ public class FileOperations {
 					+ IrodsUtilities.getPathSeperator()
 					+ irodsImagej.getIrodsAccount().getUserName();
 			irodsImagej.setPathTillHome(pathForInternalFiles);
+			log.info("irods file path if pathForInternalFiles is null and isHomeDirectoryFlagOn is false:" +irodsImagej.getPathTillHome());
 
 			iRodsFile = iRODSFileFactory
-					.instanceIRODSFile(pathForInternalFiles);
+					.instanceIRODSFile(irodsImagej.getPathTillHome());
 			collectionsUnderGivenAbsolutePath= retrieveCollectionsUnderGivenPath(iRodsFile,irodsImagej);
-			
-
 		}
 		irodsImagej.setiRodsFile(iRodsFile);
 		
@@ -125,7 +137,6 @@ public class FileOperations {
 					.getCollectionAndDataObjectListAndSearchAO(
 							irodsImagej.getIrodsAccount());
 			log.info("internal node path" +irodsFileForAbsolutePath.getAbsolutePath());
-			String path="iplant//home//sharanbabuk//test";
 			//collectionsUnderGivenAbsolutePath = collectionAO.listDataObjectsAndCollectionsUnderPath(path);
 			collectionsUnderGivenAbsolutePath = collectionAO.listDataObjectsAndCollectionsUnderPath(irodsFileForAbsolutePath.getAbsolutePath());
 

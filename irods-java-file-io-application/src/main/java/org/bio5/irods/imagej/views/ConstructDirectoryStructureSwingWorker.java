@@ -86,7 +86,7 @@ public class ConstructDirectoryStructureSwingWorker extends SwingWorker<Void, In
 		
 	}
 	
-	public void addObject(DefaultMutableTreeNode parent,
+	/*public void addObject(DefaultMutableTreeNode parent,
 			Object child, 
 			boolean shouldBeVisible) {
 		DefaultMutableTreeNode childNode =null;
@@ -94,8 +94,8 @@ public class ConstructDirectoryStructureSwingWorker extends SwingWorker<Void, In
 			childNode = 
 					new DefaultMutableTreeNode(child, false);
 
-			if (parent == null && null !=irodsImageJ.getRootNode()) {
-				parent = irodsImageJ.getRootNode();
+			if (parent == null && null !=irodsImageJ.getRootTreeNodeForDirectoryContents()) {
+				parent = irodsImageJ.getRootTreeNodeForDirectoryContents();
 			}
 
 			if (null !=irodsImageJ.getTreeModel() && null !=irodsImageJ.getUserDirectoryTree()) {
@@ -116,7 +116,7 @@ public class ConstructDirectoryStructureSwingWorker extends SwingWorker<Void, In
 			JOptionPane.showMessageDialog(null, "node does not allow children");
 		}
 		//return childNode;
-	}
+	}*/
 	
 	@Override
 	public void done() {
