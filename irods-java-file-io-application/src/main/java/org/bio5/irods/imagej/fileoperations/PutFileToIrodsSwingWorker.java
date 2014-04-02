@@ -45,11 +45,18 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 			if (null != dataTransferOperationsAO) {
 				if (null != sourceLocalfile.getAbsolutePath()
 						&& null != destinaitonIrodsFile.getAbsolutePath()) {
+					/*Option -1 - Absolute path*/
 					dataTransferOperationsAO.putOperation(sourceLocalfile
 							.getAbsolutePath(), destinaitonIrodsFile
 							.getAbsolutePath(), targetResourceName, irodsImagej
 							.getIrodsTransferStatusCallbackListener(),
 							irodsImagej.getTransferControlBlock());
+					
+					/*Option -2 - iRODS File */
+				/*	dataTransferOperationsAO.putOperation(sourceLocalfile, destinaitonIrodsFile, irodsImagej
+							.getIrodsTransferStatusCallbackListener(),
+							irodsImagej.getTransferControlBlock());*/
+					log.info("file Transfer successfull!!");
 				}
 			}
 		}

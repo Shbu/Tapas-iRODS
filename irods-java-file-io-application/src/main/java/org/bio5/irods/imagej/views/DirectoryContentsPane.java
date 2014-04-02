@@ -50,7 +50,8 @@ import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 import org.irods.jargon.core.transfer.TransferControlBlock;
 
-public class DirectoryContentsPane extends JPanel implements TreeWillExpandListener {
+public class DirectoryContentsPane extends JPanel implements
+		TreeWillExpandListener {
 
 	/**
 	 * 
@@ -80,88 +81,94 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 	private JLabel jTextField_destinationPath;
 	private JButton jButton_saveToIrodsServer;
 	private IrodsPropertiesConstruction irodsPropertiesConstruction;
-	
-	/*Logger instantiation*/
-	static Logger log = Logger.getLogger(
-			DirectoryContentsPane.class.getName());
+
+	/* Logger instantiation */
+	static Logger log = Logger.getLogger(DirectoryContentsPane.class.getName());
 
 	/**
 	 * Create the panel.
-	 * @throws JargonException 
-	 * @throws MalformedURLException 
+	 * 
+	 * @throws JargonException
+	 * @throws MalformedURLException
 	 */
 
-	public DirectoryContentsPane( final IrodsImageJBean irodsImageJ) throws JargonException, MalformedURLException {
+	public DirectoryContentsPane(final IrodsImageJBean irodsImageJ)
+			throws JargonException, MalformedURLException {
 		this.irodsImagej = irodsImageJ;
 	}
-
 
 	/**
 	 * @throws JargonException
 	 */
 	public void init() throws JargonException {
-		log.info("Local path before refactoring: " +Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
-		//Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY.replaceAll(IrodsUtilities.pathSeperator(), "//");
-		log.info("Local directory to store ImageJ files: " +Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
-		irodsAccount= irodsImagej.getIrodsAccount();
-		iRODSFileFactory= FileOperations.getIrodsAccountFileFactory(irodsImagej.getIrodsAccount());
+		log.info("Local path before refactoring: "
+				+ Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
+		// Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY.replaceAll(IrodsUtilities.pathSeperator(),
+		// "//");
+		log.info("Local directory to store ImageJ files: "
+				+ Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
+		irodsAccount = irodsImagej.getIrodsAccount();
+		iRODSFileFactory = FileOperations
+				.getIrodsAccountFileFactory(irodsImagej.getIrodsAccount());
 		irodsImagej.setiRODSFileFactory(iRODSFileFactory);
 
 		homeNode = new DefaultMutableTreeNode(Constants.HOME);
-		if(!irodsImagej.isHomeDirectoryTheRootNode()){
-		accountNode= new DefaultMutableTreeNode(irodsImagej.getIrodsAccount().getUserName());
-		homeNode.add(accountNode); /*Adding accountNode to HomeNode */
-		irodsImagej.setRootTreeNodeForDirectoryContents(accountNode);
-		treeModel = new DefaultTreeModel(accountNode,true);
-		}
-		else{
+		if (!irodsImagej.isHomeDirectoryTheRootNode()) {
+			accountNode = new DefaultMutableTreeNode(irodsImagej
+					.getIrodsAccount().getUserName());
+			homeNode.add(accountNode); /* Adding accountNode to HomeNode */
+			irodsImagej.setRootTreeNodeForDirectoryContents(accountNode);
+			treeModel = new DefaultTreeModel(accountNode, true);
+		} else {
 			irodsImagej.setRootTreeNodeForDirectoryContents(homeNode);
-			treeModel = new DefaultTreeModel(homeNode,true);
+			treeModel = new DefaultTreeModel(homeNode, true);
 		}
-		//rootNode = new DefaultMutableTreeNode(irodsImagej.getIrodsAccount().getUserName());
-		//irodsImagej.setRootNode(irodsImagej.getRootTreeNodeForDirectoryContents());
-		//treeModel = new DefaultTreeModel(homeNode,true);
+		// rootNode = new
+		// DefaultMutableTreeNode(irodsImagej.getIrodsAccount().getUserName());
+		// irodsImagej.setRootNode(irodsImagej.getRootTreeNodeForDirectoryContents());
+		// treeModel = new DefaultTreeModel(homeNode,true);
 		treeModel.addTreeModelListener(new MyTreeModelListener());
 		irodsImagej.setTreeModel(treeModel);
 
-		/*Initiating Jprogressbar*/
+		/* Initiating Jprogressbar */
 		progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
 		progressBar.setToolTipText("Progress of action");
 		irodsImagej.setJprogressbar(progressBar);
 
-		/*Setting iRODS file system*/
-		irodsFileSystem= IRODSFileSystem.instance();
+		/* Setting iRODS file system */
+		irodsFileSystem = IRODSFileSystem.instance();
 		irodsImagej.setIrodsFileSystem(irodsFileSystem);
 
-		//userAccount = irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);
-		dataTransferOperationsAO =  irodsFileSystem
+		// userAccount =
+		// irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);
+		dataTransferOperationsAO = irodsFileSystem
 				.getIRODSAccessObjectFactory().getDataTransferOperations(
 						irodsAccount);
 
-		/*Setting scrollPane*/
+		/* Setting scrollPane */
 		scrollPane = new javax.swing.JScrollPane();
-		viewport = scrollPane.getViewport(); 
+		viewport = scrollPane.getViewport();
 		irodsImagej.setScrollPane(scrollPane);
 		irodsImagej.setViewport(viewport);
-		
-		
+
 		jTextField_sourceFile = new JLabel("Local file");
 		jTextField_destinationPath = new JLabel("Destination");
 		jButton_saveToIrodsServer = new JButton("Save to iRODS Server");
 
-		/*Construct TransferControlBlock from default jargon properties*/
-		irodsPropertiesConstruction= new IrodsPropertiesConstruction(); 
-		transferControlBlock= irodsPropertiesConstruction.constructHighPerformanceTransferControlBlockFromJargonProperties(irodsImagej);
+		/* Construct TransferControlBlock from default jargon properties */
+		irodsPropertiesConstruction = new IrodsPropertiesConstruction();
+		transferControlBlock = irodsPropertiesConstruction
+				.constructHighPerformanceTransferControlBlockFromJargonProperties(irodsImagej);
 		irodsImagej.setTransferControlBlock(transferControlBlock);
 
-		/*Construct IrodsTransferStatusCallbackListener*/
-		irodsPropertiesConstruction.constructIrodsTransferStatusCallbackListener(irodsImagej);
-		
-		/*Creating model*/
+		/* Construct IrodsTransferStatusCallbackListener */
+		irodsPropertiesConstruction
+				.constructIrodsTransferStatusCallbackListener(irodsImagej);
+
+		/* Creating model */
 		setVisible(true);
 	}
-
 
 	/**
 	 * @param irodsImagej
@@ -170,55 +177,83 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 	 * @param jButton_saveToIrodsServer
 	 */
 	public void implementation() {
-		/*File irodsAccountFile=null;
-		if(null!= IrodsImageJBean.getiRodsFile()){
-			irodsAccountFile= (File) IrodsImageJBean.getiRodsFile();
-		}*/
-		/*constructDirectoryStructureSwingWorker = new ConstructDirectoryStructureSwingWorker(
-				irodsImagej, iRODSFileFactory, localFiles, rootNode,
-				irodsAccount); 
-		constructDirectoryStructureSwingWorker.parseDirectoryContents(iRODSFileFactory, localFiles, rootNode, irodsAccount);*/
-		
-		//parseDirectoryContents(iRODSFileFactory, irodsAccountFile, rootNode, irodsAccount);
-		
-		if(null!= irodsImagej.getCollectionsUnderGivenAbsolutePath() ){
-			List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath =irodsImagej.getCollectionsUnderGivenAbsolutePath();
-			parseDirectoryContentsUsingList(listOfCollectionsUnderGivenAbsolutePath,irodsImagej.getRootTreeNodeForDirectoryContents());
-		}
-		else{
+		/*
+		 * File irodsAccountFile=null; if(null!=
+		 * IrodsImageJBean.getiRodsFile()){ irodsAccountFile= (File)
+		 * IrodsImageJBean.getiRodsFile(); }
+		 */
+		/*
+		 * constructDirectoryStructureSwingWorker = new
+		 * ConstructDirectoryStructureSwingWorker( irodsImagej,
+		 * iRODSFileFactory, localFiles, rootNode, irodsAccount);
+		 * constructDirectoryStructureSwingWorker
+		 * .parseDirectoryContents(iRODSFileFactory, localFiles, rootNode,
+		 * irodsAccount);
+		 */
+
+		// parseDirectoryContents(iRODSFileFactory, irodsAccountFile, rootNode,
+		// irodsAccount);
+
+		if (null != irodsImagej.getCollectionsUnderGivenAbsolutePath()) {
+			List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath = irodsImagej
+					.getCollectionsUnderGivenAbsolutePath();
+			parseDirectoryContentsUsingList(
+					listOfCollectionsUnderGivenAbsolutePath,
+					irodsImagej.getRootTreeNodeForDirectoryContents());
+		} else {
 			log.error("File directory is empty");
 		}
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 
 		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(
-				groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup()
+		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(
+				Alignment.TRAILING).addGroup(
+				groupLayout
+						.createSequentialGroup()
 						.addContainerGap()
-						.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 402, GroupLayout.PREFERRED_SIZE)
+						.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE,
+								402, GroupLayout.PREFERRED_SIZE)
 						.addGap(18)
-						.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
-						.addGap(18))
-				);
-		groupLayout.setVerticalGroup(
-				groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup()
-						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-								.addGroup(groupLayout.createSequentialGroup()
-										.addGap(44)
-										.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE))
-										.addGroup(groupLayout.createSequentialGroup()
-												.addContainerGap()
-												.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE)))
-												.addContainerGap())
-				);
+						.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE,
+								307, Short.MAX_VALUE).addGap(18)));
+		groupLayout
+				.setVerticalGroup(groupLayout
+						.createParallelGroup(Alignment.TRAILING)
+						.addGroup(
+								groupLayout
+										.createSequentialGroup()
+										.addGroup(
+												groupLayout
+														.createParallelGroup(
+																Alignment.LEADING)
+														.addGroup(
+																groupLayout
+																		.createSequentialGroup()
+																		.addGap(44)
+																		.addComponent(
+																				tabbedPane,
+																				GroupLayout.DEFAULT_SIZE,
+																				440,
+																				Short.MAX_VALUE))
+														.addGroup(
+																groupLayout
+																		.createSequentialGroup()
+																		.addContainerGap()
+																		.addComponent(
+																				scrollPane,
+																				GroupLayout.DEFAULT_SIZE,
+																				473,
+																				Short.MAX_VALUE)))
+										.addContainerGap()));
 
 		JPanel panel = new JPanel();
 		tabbedPane.addTab("File Operations", null, panel, null);
 
 		JButton jButton_selectLocalFile = new JButton("Select local file");
-		//irodsTransferStatusCallbackListener = new IrodsTransferStatusCallbackListener(irodsImagej.getiRODSFileFactory(), null, irodsImagej, progressBar); 
+		// irodsTransferStatusCallbackListener = new
+		// IrodsTransferStatusCallbackListener(irodsImagej.getiRODSFileFactory(),
+		// null, irodsImagej, progressBar);
 
 		jButton_selectLocalFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -227,15 +262,15 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				int option = chooser.showOpenDialog(DirectoryContentsPane.this);
 				if (option == JFileChooser.APPROVE_OPTION) {
-					jTextField_sourceFile.setText(((chooser.getSelectedFile()!=null)?
-							chooser.getSelectedFile().getAbsolutePath():"nothing is selected"));
-				}
-				else {
+					jTextField_sourceFile
+							.setText(((chooser.getSelectedFile() != null) ? chooser
+									.getSelectedFile().getAbsolutePath()
+									: "nothing is selected"));
+				} else {
 					jTextField_sourceFile.setName("File selection canceled !");
 				}
 			}
 		});
-
 
 		jTextField_sourceFile.setEnabled(false);
 		JButton jButton_selectDestination = new JButton("Select Destination");
@@ -243,13 +278,15 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 			public void actionPerformed(ActionEvent destinationButtonActionEvent) {
 
 				String destinationFolderPath = selectedNodeInTreeForSingleClick;
-				/*if(selectedNodeInTreeForSingleClick.contains("."))
-				{
-					log.info("Destination before Splitting: " +selectedNodeInTreeForSingleClick);
-					File destinationFile =new File(selectedNodeInTreeForSingleClick);
-					destinationFolderPath =destinationFile.getParent();
-					log.info("Destination after Splitting: " +destinationFolderPath);
-				}*/
+				/*
+				 * if(selectedNodeInTreeForSingleClick.contains(".")) {
+				 * log.info("Destination before Splitting: "
+				 * +selectedNodeInTreeForSingleClick); File destinationFile =new
+				 * File(selectedNodeInTreeForSingleClick); destinationFolderPath
+				 * =destinationFile.getParent();
+				 * log.info("Destination after Splitting: "
+				 * +destinationFolderPath); }
+				 */
 				jTextField_destinationPath.setText(destinationFolderPath);
 				jButton_saveToIrodsServer.setEnabled(true);
 			}
@@ -257,51 +294,79 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 
 		jTextField_destinationPath.setEnabled(false);
 
-
 		jButton_saveToIrodsServer.setEnabled(false);
 		jButton_saveToIrodsServer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					log.info("Save to iRODS Server - Button Clicked");
-					String sourceFilePath=null;
-					String destinationFilePath=null;
+					String sourceFilePath = null;
+					String destinationFilePath = null;
 					String targetResourceName = "";
-					targetResourceName = irodsImagej.getIrodsAccount().getDefaultStorageResource();
+					targetResourceName = irodsImagej.getIrodsAccount()
+							.getDefaultStorageResource();
 					File sourceLocalfile = null;
 					IRODSFile destinaitonIrodsFile = null;
-					if(chooser.getSelectedFile().getAbsolutePath()!=null && chooser.getSelectedFile().getAbsolutePath()!=""){
-						sourceFilePath=chooser.getSelectedFile().getAbsolutePath();
-						sourceLocalfile=new File(sourceFilePath);
-						if(selectedNodeInTreeForSingleClick!=null && selectedNodeInTreeForSingleClick!=""){
-							System.out.println("destination path || selectedNodeInTreeForSingleClick" +selectedNodeInTreeForSingleClick);
-							destinationFilePath=IrodsUtilities.getPathSeperator() +irodsAccount.getZone()+IrodsUtilities.getPathSeperator()+jTextField_destinationPath.getText();
-							destinaitonIrodsFile = iRODSFileFactory.instanceIRODSFile(destinationFilePath);
-							System.out.println("sourceLocalfile absolute path: " +sourceLocalfile.getAbsolutePath() +"\n"  +"destinaitonIrodsFile absolutepath: " +destinaitonIrodsFile.getAbsoluteFile());
-							try{
-								//dataTransferOperationsAO.putOperation(sourceLocalfile.getAbsolutePath(),destinaitonIrodsFile.getAbsolutePath(),targetResourceName,irodsTransferStatusCallbackListener,transferControlBlock);
-								if(null!=irodsImagej && null!= sourceLocalfile &&  null!=destinaitonIrodsFile && null!=targetResourceName){
-									putFile=new PutFileToIrodsSwingWorker(irodsImagej, sourceLocalfile, destinaitonIrodsFile, targetResourceName);
+					if (chooser.getSelectedFile().getAbsolutePath() != null
+							&& chooser.getSelectedFile().getAbsolutePath() != "") {
+						sourceFilePath = chooser.getSelectedFile()
+								.getAbsolutePath();
+						sourceLocalfile = new File(sourceFilePath);
+						if (selectedNodeInTreeForSingleClick != null
+								&& selectedNodeInTreeForSingleClick != "") {
+							System.out
+									.println("destination path || selectedNodeInTreeForSingleClick"
+											+ selectedNodeInTreeForSingleClick);
+							destinationFilePath = IrodsUtilities
+									.getPathSeperator()
+									+ irodsAccount.getZone()
+									+ IrodsUtilities.getPathSeperator()
+									+ Constants.HOME
+									+ IrodsUtilities.getPathSeperator()
+									+ jTextField_destinationPath.getText();
+							destinaitonIrodsFile = iRODSFileFactory
+									.instanceIRODSFile(destinationFilePath);
+							System.out
+									.println("sourceLocalfile absolute path: "
+											+ sourceLocalfile.getAbsolutePath()
+											+ "\n"
+											+ "destinaitonIrodsFile absolutepath: "
+											+ destinaitonIrodsFile
+													.getAbsoluteFile());
+							try {
+								// dataTransferOperationsAO.putOperation(sourceLocalfile.getAbsolutePath(),destinaitonIrodsFile.getAbsolutePath(),targetResourceName,irodsTransferStatusCallbackListener,transferControlBlock);
+								if (null != irodsImagej
+										&& null != sourceLocalfile
+										&& null != destinaitonIrodsFile
+										&& null != targetResourceName) {
+									putFile = new PutFileToIrodsSwingWorker(
+											irodsImagej, sourceLocalfile,
+											destinaitonIrodsFile,
+											targetResourceName);
 									putFile.execute();
 
-									/*DefaultMutableTreeNode parentNode = null;
-
-									Destination selection - Fetching parent path if leaf node is selected
-									parentNode = (DefaultMutableTreeNode)
-											userDirectoryTree.getLastSelectedPathComponent();
-									if (parentNode.isLeaf()) {
-										parentNode= (DefaultMutableTreeNode) parentNode.getParent();
-									} 
-
-									addObject(parentNode, sourceLocalfile.getName(), true);*/
+									/*
+									 * DefaultMutableTreeNode parentNode = null;
+									 * 
+									 * Destination selection - Fetching parent
+									 * path if leaf node is selected parentNode
+									 * = (DefaultMutableTreeNode)
+									 * userDirectoryTree
+									 * .getLastSelectedPathComponent(); if
+									 * (parentNode.isLeaf()) { parentNode=
+									 * (DefaultMutableTreeNode)
+									 * parentNode.getParent(); }
+									 * 
+									 * addObject(parentNode,
+									 * sourceLocalfile.getName(), true);
+									 */
 								}
-							}
-							catch(Exception exception){
+							} catch (Exception exception) {
 								log.error(exception.getMessage());
-								JOptionPane.showMessageDialog(null, exception.getMessage());
+								JOptionPane.showMessageDialog(null,
+										exception.getMessage());
 							}
 						}
-					}
-					else{
+					} else {
 						JOptionPane.showMessageDialog(null, "Source is empty!");
 						log.error("Source is empty!");
 					}
@@ -313,66 +378,101 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 			}
 		});
 		GroupLayout gl_panel = new GroupLayout(panel);
-		gl_panel.setHorizontalGroup(
-				gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addComponent(irodsImagej.getJprogressbar(), GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
-								.addGroup(gl_panel.createSequentialGroup()
-										.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-												.addComponent(jButton_selectLocalFile)
-												.addComponent(jButton_selectDestination))
-												.addGap(27)
-												.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-														.addComponent(jTextField_destinationPath)
-														.addComponent(jTextField_sourceFile)))
-														.addComponent(jButton_saveToIrodsServer))
-														.addContainerGap())
-				);
-		gl_panel.setVerticalGroup(
-				gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel.createSequentialGroup()
-						.addContainerGap()
-						.addComponent(irodsImagej.getJprogressbar(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGap(59)
-						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(jButton_selectLocalFile)
-								.addComponent(jTextField_sourceFile))
+		gl_panel.setHorizontalGroup(gl_panel
+				.createParallelGroup(Alignment.LEADING)
+				.addGroup(
+						gl_panel.createSequentialGroup()
+								.addContainerGap()
+								.addGroup(
+										gl_panel.createParallelGroup(
+												Alignment.LEADING)
+												.addComponent(
+														irodsImagej
+																.getJprogressbar(),
+														GroupLayout.DEFAULT_SIZE,
+														217, Short.MAX_VALUE)
+												.addGroup(
+														gl_panel.createSequentialGroup()
+																.addGroup(
+																		gl_panel.createParallelGroup(
+																				Alignment.LEADING)
+																				.addComponent(
+																						jButton_selectLocalFile)
+																				.addComponent(
+																						jButton_selectDestination))
+																.addGap(27)
+																.addGroup(
+																		gl_panel.createParallelGroup(
+																				Alignment.LEADING)
+																				.addComponent(
+																						jTextField_destinationPath)
+																				.addComponent(
+																						jTextField_sourceFile)))
+												.addComponent(
+														jButton_saveToIrodsServer))
+								.addContainerGap()));
+		gl_panel.setVerticalGroup(gl_panel
+				.createParallelGroup(Alignment.LEADING)
+				.addGroup(
+						gl_panel.createSequentialGroup()
+								.addContainerGap()
+								.addComponent(irodsImagej.getJprogressbar(),
+										GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE,
+										GroupLayout.PREFERRED_SIZE)
+								.addGap(59)
+								.addGroup(
+										gl_panel.createParallelGroup(
+												Alignment.BASELINE)
+												.addComponent(
+														jButton_selectLocalFile)
+												.addComponent(
+														jTextField_sourceFile))
 								.addGap(18)
-								.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-										.addComponent(jButton_selectDestination)
-										.addComponent(jTextField_destinationPath))
-										.addGap(18)
-										.addComponent(jButton_saveToIrodsServer)
-										.addContainerGap(220, Short.MAX_VALUE))
-				);
+								.addGroup(
+										gl_panel.createParallelGroup(
+												Alignment.BASELINE)
+												.addComponent(
+														jButton_selectDestination)
+												.addComponent(
+														jTextField_destinationPath))
+								.addGap(18)
+								.addComponent(jButton_saveToIrodsServer)
+								.addContainerGap(220, Short.MAX_VALUE)));
 		panel.setLayout(gl_panel);
 
 		JPanel panel_1 = new JPanel();
 		tabbedPane.addTab("File Information", null, panel_1, null);
 
 		constructUserDirectoryTree(irodsImagej);
-		
+
 		userDirectoryTree.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent mouseEvent) {
 
-				if(mouseEvent.getClickCount()==2){
-					/*resetting progress bar to 0 if a double click is detected*/
+				if (mouseEvent.getClickCount() == 2) {
+					/* resetting progress bar to 0 if a double click is detected */
 					irodsImagej.getJprogressbar().setValue(0);
-					log.info("tree path after double click" +selectedNodeInTreeForDoubleClick);
-					System.out.println("double click selection: " +selectedNodeInTreeForDoubleClick);
+					log.info("tree path after double click"
+							+ selectedNodeInTreeForDoubleClick);
+					System.out.println("double click selection: "
+							+ selectedNodeInTreeForDoubleClick);
 
-					selectedNodeInTreeForDoubleClick=IrodsUtilities.getJtreeSelection(mouseEvent,userDirectoryTree );
-					//getImageFile(iRODSFileFactory, selectedNodeInTreeForDoubleClick,irodsAccount);
-					getFile= new GetFileFromIrodsSwingWorker(iRODSFileFactory, selectedNodeInTreeForDoubleClick, irodsImagej, irodsImagej.getJprogressbar());
+					selectedNodeInTreeForDoubleClick = IrodsUtilities
+							.getJtreeSelection(mouseEvent, userDirectoryTree);
+					// getImageFile(iRODSFileFactory,
+					// selectedNodeInTreeForDoubleClick,irodsAccount);
+					getFile = new GetFileFromIrodsSwingWorker(iRODSFileFactory,
+							selectedNodeInTreeForDoubleClick, irodsImagej,
+							irodsImagej.getJprogressbar());
 					getFile.execute();
-				}
-				else if(mouseEvent.getClickCount()==1){
-					//resetting progress bar to 0 if a single click is detected
-					selectedNodeInTreeForSingleClick=IrodsUtilities.getJtreeSelectionForSingleClick(mouseEvent,userDirectoryTree);
-					//log.info("Single click selection: " +selectedNodeInTreeForSingleClick);
+				} else if (mouseEvent.getClickCount() == 1) {
+					// resetting progress bar to 0 if a single click is detected
+					selectedNodeInTreeForSingleClick = IrodsUtilities
+							.getJtreeSelectionForSingleClick(mouseEvent,
+									userDirectoryTree);
+					// log.info("Single click selection: "
+					// +selectedNodeInTreeForSingleClick);
 				}
 			}
 		});
@@ -381,16 +481,15 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 		userDirectoryTree.setEditable(true);
 		userDirectoryTree.setVisible(true);
 		viewport.add(userDirectoryTree);
-		
+
 		setLayout(groupLayout);
 	}
-
 
 	/**
 	 * @param irodsImagej
 	 */
 	private void constructUserDirectoryTree(final IrodsImageJBean irodsImagej) {
-		userDirectoryTree= new JTree(treeModel);
+		userDirectoryTree = new JTree(treeModel);
 		userDirectoryTree.setToolTipText("Directory list");
 		userDirectoryTree.setVisibleRowCount(100);
 		userDirectoryTree.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -398,110 +497,131 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 		scrollPane.setViewportView(userDirectoryTree);
 		userDirectoryTree.setModel(treeModel);
 		irodsImagej.setUserDirectoryTree(userDirectoryTree);
-		
-		/*Adding Jtree Listeners*/
+
+		/* Adding Jtree Listeners */
 		userDirectoryTree.addTreeWillExpandListener(this);
 	}
 
+	public void parseDirectoryContents(final IRODSFileFactory iRODSFileFactory,
+			final File irodsAccountFile, DefaultMutableTreeNode node,
+			final IRODSAccount irodsAccount) {
 
-	public void parseDirectoryContents(final IRODSFileFactory iRODSFileFactory,final File irodsAccountFile, DefaultMutableTreeNode node, final IRODSAccount irodsAccount)
-	{
-
-		if(!irodsAccountFile.isDirectory()){
-			//System.out.println("File name" +irodsAccountFile.getName() +":" +irodsAccountFile.getAbsolutePath());
-			log.info("File name:" +irodsAccountFile.getName() +":" +irodsAccountFile.getAbsolutePath());
-			DefaultMutableTreeNode child = new DefaultMutableTreeNode(irodsAccountFile.getName(),false);
+		if (!irodsAccountFile.isDirectory()) {
+			// System.out.println("File name" +irodsAccountFile.getName() +":"
+			// +irodsAccountFile.getAbsolutePath());
+			log.info("File name:" + irodsAccountFile.getName() + ":"
+					+ irodsAccountFile.getAbsolutePath());
+			DefaultMutableTreeNode child = new DefaultMutableTreeNode(
+					irodsAccountFile.getName(), false);
 			node.add(child);
 		}
 
-		if(irodsAccountFile.isDirectory()){
-			//System.out.println("Direc name" + irodsAccountFile.getName());
+		if (irodsAccountFile.isDirectory()) {
+			// System.out.println("Direc name" + irodsAccountFile.getName());
 			log.info("Direc name:" + irodsAccountFile.getName());
-			DefaultMutableTreeNode child = new DefaultMutableTreeNode(irodsAccountFile.getName(),true);
+			DefaultMutableTreeNode child = new DefaultMutableTreeNode(
+					irodsAccountFile.getName(), true);
 			node.add(child);
-			File[] direcFiles=irodsAccountFile.listFiles();
-			for(int i=0;i<direcFiles.length;i++){
-				//System.out.println("File number" +i +"\n depth:" +direcFiles.length);
-				log.info("File number:" +i +"\t depth:" +direcFiles.length);
-				parseDirectoryContents(iRODSFileFactory, direcFiles[i], child, irodsAccount);
+			File[] direcFiles = irodsAccountFile.listFiles();
+			for (int i = 0; i < direcFiles.length; i++) {
+				// System.out.println("File number" +i +"\n depth:"
+				// +direcFiles.length);
+				log.info("File number:" + i + "\t depth:" + direcFiles.length);
+				parseDirectoryContents(iRODSFileFactory, direcFiles[i], child,
+						irodsAccount);
 			}
 		}
 		repaintPanel();
 	}
-	
-	public void repaintPanel(){
-		/*if(null !=irodsImagej.getMainWindow()){
-			irodsImagej.getMainWindow().setVisibilityOfForm();
-		}*/
-		//viewport.removeAll();
+
+	public void repaintPanel() {
+		/*
+		 * if(null !=irodsImagej.getMainWindow()){
+		 * irodsImagej.getMainWindow().setVisibilityOfForm(); }
+		 */
+		// viewport.removeAll();
 		viewport.setVisible(true);
 		viewport.repaint();
 		viewport.revalidate();
-		add(scrollPane,BorderLayout.CENTER);
+		add(scrollPane, BorderLayout.CENTER);
 		setVisible(true);
 		revalidate();
 		repaint();
 	}
-	
+
 	public void parseDirectoryContentsUsingList(
 			List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath,
-			DefaultMutableTreeNode node)
-	{
-		CollectionAndDataObjectListingEntry fileUnderCollectionAndDataObjectListingEntry  =null;
-		for(int i=0;i<listOfCollectionsUnderGivenAbsolutePath.size();i++){
-			fileUnderCollectionAndDataObjectListingEntry= listOfCollectionsUnderGivenAbsolutePath.get(i);
-			
-			if(!fileUnderCollectionAndDataObjectListingEntry.isCollection()){
-				//System.out.println("File name" +irodsAccountFile.getName() +":" +irodsAccountFile.getAbsolutePath());
-				log.info("File name:" +fileUnderCollectionAndDataObjectListingEntry.getNodeLabelDisplayValue() +":" +fileUnderCollectionAndDataObjectListingEntry.getFormattedAbsolutePath());
-				DefaultMutableTreeNode child = new DefaultMutableTreeNode(fileUnderCollectionAndDataObjectListingEntry.getNodeLabelDisplayValue(),false);
+			DefaultMutableTreeNode node) {
+		CollectionAndDataObjectListingEntry fileUnderCollectionAndDataObjectListingEntry = null;
+		for (int i = 0; i < listOfCollectionsUnderGivenAbsolutePath.size(); i++) {
+			fileUnderCollectionAndDataObjectListingEntry = listOfCollectionsUnderGivenAbsolutePath
+					.get(i);
+
+			if (!fileUnderCollectionAndDataObjectListingEntry.isCollection()) {
+				// System.out.println("File name" +irodsAccountFile.getName()
+				// +":" +irodsAccountFile.getAbsolutePath());
+				log.info("File name:"
+						+ fileUnderCollectionAndDataObjectListingEntry
+								.getNodeLabelDisplayValue()
+						+ ":"
+						+ fileUnderCollectionAndDataObjectListingEntry
+								.getFormattedAbsolutePath());
+				DefaultMutableTreeNode child = new DefaultMutableTreeNode(
+						fileUnderCollectionAndDataObjectListingEntry
+								.getNodeLabelDisplayValue(),
+						false);
 				node.add(child);
 			}
-			
-			if(fileUnderCollectionAndDataObjectListingEntry.isCollection()){
-				//System.out.println("Direc name" + irodsAccountFile.getName());
-				log.info("Direc name:" + fileUnderCollectionAndDataObjectListingEntry.getNodeLabelDisplayValue());
-				DefaultMutableTreeNode child = new DefaultMutableTreeNode(fileUnderCollectionAndDataObjectListingEntry.getNodeLabelDisplayValue(),true);
+
+			if (fileUnderCollectionAndDataObjectListingEntry.isCollection()) {
+				// System.out.println("Direc name" +
+				// irodsAccountFile.getName());
+				log.info("Direc name:"
+						+ fileUnderCollectionAndDataObjectListingEntry
+								.getNodeLabelDisplayValue());
+				DefaultMutableTreeNode child = new DefaultMutableTreeNode(
+						fileUnderCollectionAndDataObjectListingEntry
+								.getNodeLabelDisplayValue(),
+						true);
 				node.add(child);
-				/*File[] direcFiles=irodsAccountFile.listFiles();
-				for(int i=0;i<direcFiles.length;i++){
-					//System.out.println("File number" +i +"\n depth:" +direcFiles.length);
-					log.info("File number:" +i +"\t depth:" +direcFiles.length);
-					parseDirectoryContentsUsingList(direcFiles[i], child, irodsAccount);
-				}*/
+				/*
+				 * File[] direcFiles=irodsAccountFile.listFiles(); for(int
+				 * i=0;i<direcFiles.length;i++){
+				 * //System.out.println("File number" +i +"\n depth:"
+				 * +direcFiles.length); log.info("File number:" +i +"\t depth:"
+				 * +direcFiles.length);
+				 * parseDirectoryContentsUsingList(direcFiles[i], child,
+				 * irodsAccount); }
+				 */
 			}
 		}
-		
+
 		viewport.removeAll();
 		viewport.setVisible(true);
 		viewport.repaint();
 		viewport.revalidate();
-		add(scrollPane,BorderLayout.CENTER);
+		add(scrollPane, BorderLayout.CENTER);
 		setVisible(true);
-		//revalidate();
-		//repaint();
+		// revalidate();
+		// repaint();
 	}
 
-
 	public DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent,
-			Object child, 
-			boolean shouldBeVisible) {
-		DefaultMutableTreeNode childNode =null;
-		try{
-			childNode = 
-					new DefaultMutableTreeNode(child, false);
+			Object child, boolean shouldBeVisible) {
+		DefaultMutableTreeNode childNode = null;
+		try {
+			childNode = new DefaultMutableTreeNode(child, false);
 			if (parent == null) {
 				parent = irodsImagej.getRootTreeNodeForDirectoryContents();
 			}
 
-			treeModel.insertNodeInto(childNode, parent, 
-					parent.getChildCount());
+			treeModel.insertNodeInto(childNode, parent, parent.getChildCount());
 
 			if (shouldBeVisible) {
-				userDirectoryTree.scrollPathToVisible(new TreePath(childNode.getPath()));
+				userDirectoryTree.scrollPathToVisible(new TreePath(childNode
+						.getPath()));
 			}
-		}
-		catch(IllegalStateException illegalStateException){
+		} catch (IllegalStateException illegalStateException) {
 			log.error(illegalStateException.getMessage());
 			JOptionPane.showMessageDialog(null, "node does not allow children");
 		}
@@ -512,8 +632,8 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 	 * Default empty implementation, do nothing on collapse event.
 	 */
 	public void treeWillCollapse(TreeExpansionEvent arg0)
-			throws ExpandVetoException {}
-
+			throws ExpandVetoException {
+	}
 
 	/**
 	 * Node will expand, it's time to retreive nodes
@@ -524,8 +644,15 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 		TreePath tp = treeExpansionEvent.getPath();
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tp
 				.getLastPathComponent();
-		Object[] elements= tp.getPath();/* edit path */
-		//String pathOfInternalNode=builder.toString();
+		/*
+		 * Removing children of a node and re-inserting them back - This avoids
+		 * the risk of re-adding the same children if handle is tree is expanded
+		 * again
+		 */
+		node.removeAllChildren();
+		treeModel.nodeStructureChanged(node);
+		Object[] elements = tp.getPath();/* edit path */
+		// String pathOfInternalNode=builder.toString();
 		RetrieveInternalNodesSwingWorker retrieveInternalNodesSwingWorker = new RetrieveInternalNodesSwingWorker(
 				elements, irodsImagej);
 		try {
@@ -534,11 +661,11 @@ public class DirectoryContentsPane extends JPanel implements TreeWillExpandListe
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		for(int i=0;i<irodsImagej.getChildNodesListAfterLazyLoading().size();i++){
-		treeModel.insertNodeInto(
-				irodsImagej.getChildNodesListAfterLazyLoading().get(i), node,
-				node.getChildCount());
+		for (int i = 0; i < irodsImagej.getChildNodesListAfterLazyLoading()
+				.size(); i++) {
+			treeModel.insertNodeInto(irodsImagej
+					.getChildNodesListAfterLazyLoading().get(i), node, node
+					.getChildCount());
 		}
 	}
 
