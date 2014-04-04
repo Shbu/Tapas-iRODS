@@ -28,6 +28,7 @@ import org.bio5.irods.imagej.bean.IrodsImageJBean;
 import org.bio5.irods.imagej.connection.IrodsConnection;
 import org.bio5.irods.imagej.fileoperations.FileOperations;
 import org.bio5.irods.imagej.utilities.Constants;
+import org.bio5.irods.imagej.utilities.IrodsUtilities;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.AuthenticationException;
 import org.irods.jargon.core.exception.CatalogSQLException;
@@ -35,6 +36,7 @@ import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
+
 import javax.swing.JCheckBox;
 import javax.swing.JRadioButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -70,6 +72,7 @@ public class MainWindow extends JFrame {
 
 
 	public JFileChooser localImageJFileChooser;
+	private JTextField textField_ImageJCacheFolderPath;
 
 	/**
 	 * Launch the application.
@@ -82,7 +85,7 @@ public class MainWindow extends JFrame {
 		
 		setTitle("iRODS");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 656, 466);
+		setBounds(100, 100, 662, 500);
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -141,6 +144,19 @@ public class MainWindow extends JFrame {
 				String username= textbox_LoginId.getText();
 				char[] password= textField_passwordField.getPassword();
 				String password_full= "";
+				if (null != textField_ImageJCacheFolderPath.getText()) {
+					boolean isDirectoryCreated =IrodsUtilities
+							.createDirectoryIfDoesntExist(textField_ImageJCacheFolderPath
+									.getText());
+					if(!isDirectoryCreated){
+						log.info("isDirectoryCreated: " +isDirectoryCreated);
+						JOptionPane.showMessageDialog(null, "Error while creating path!");
+					}
+					else{
+						log.info("ImageJ cache folder path specified by user:" +textField_ImageJCacheFolderPath.getText());
+						irodsImagej.setImageJCacheFolder(textField_ImageJCacheFolderPath.getText());
+					}
+				}
 
 				for (char chars: password)
 					password_full += chars;
@@ -245,39 +261,49 @@ public class MainWindow extends JFrame {
 		JLabel homeDirectory_Label = new JLabel("File Selection:");
 		
 		HomeDirectory_CheckBox = new JCheckBox("Home Directory");
+		
+		textField_ImageJCacheFolderPath = new JTextField();
+		textField_ImageJCacheFolderPath.setColumns(10);
+		textField_ImageJCacheFolderPath.setText(irodsImagej.getImageJCacheFolder());
+		
+		JLabel lblImagejCacheFolder = new JLabel("ImageJ Cache Folder:");
 		GroupLayout gl_contentPane = new GroupLayout(contentPanePanel);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(269)
+					.addComponent(button_Login)
+					.addGap(18)
+					.addComponent(button_Cancel)
+					.addContainerGap(237, Short.MAX_VALUE))
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(81)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addComponent(Label_Password)
+						.addComponent(Label_Username)
+						.addComponent(Label_Port)
+						.addComponent(label_Host)
+						.addComponent(label_Zone)
+						.addComponent(homeDirectory_Label)
+						.addComponent(lblImagejCacheFolder))
+					.addGap(26)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGap(267)
-							.addComponent(button_Login)
-							.addGap(18)
-							.addComponent(button_Cancel))
+							.addComponent(HomeDirectory_CheckBox)
+							.addContainerGap())
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGap(81)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addComponent(Label_Password)
-								.addComponent(Label_Username)
-								.addComponent(Label_Port)
-								.addComponent(label_Host)
-								.addComponent(label_Zone)
-								.addComponent(homeDirectory_Label))
-							.addGap(26)
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addComponent(HomeDirectory_CheckBox)
+								.addComponent(textField_Zone, 64, 64, 64)
 								.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-									.addComponent(textField_Zone, 64, 64, 64)
-									.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-										.addComponent(textField_Port, 64, 64, 64)
-										.addGroup(gl_contentPane.createSequentialGroup()
-											.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-												.addComponent(textField_Host, GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)
-												.addComponent(textField_passwordField, GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)
-												.addComponent(textbox_LoginId, GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE))
-											.addGap(10)))))))
-					.addGap(85))
+									.addComponent(textField_Port, 64, 64, 64)
+									.addGroup(gl_contentPane.createSequentialGroup()
+										.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+											.addComponent(textField_Host, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+											.addComponent(textField_passwordField, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+											.addComponent(textbox_LoginId, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+											.addComponent(textField_ImageJCacheFolderPath, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE))
+										.addGap(10))))
+							.addGap(85))))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -304,13 +330,17 @@ public class MainWindow extends JFrame {
 						.addComponent(textField_Host, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(homeDirectory_Label)
-						.addComponent(HomeDirectory_CheckBox))
-					.addGap(20)
+						.addComponent(textField_ImageJCacheFolderPath, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblImagejCacheFolder))
+					.addGap(15)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(HomeDirectory_CheckBox)
+						.addComponent(homeDirectory_Label))
+					.addGap(31)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(button_Login)
 						.addComponent(button_Cancel))
-					.addGap(101))
+					.addGap(51))
 		);
 		contentPanePanel.setLayout(gl_contentPane);
 	}

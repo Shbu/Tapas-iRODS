@@ -10,7 +10,7 @@ import org.irods.jargon.core.transfer.TransferStatus;
 import org.irods.jargon.core.transfer.TransferStatusCallbackListener;
 
 public class IrodsTransferStatusCallbackListener implements
-TransferStatusCallbackListener {
+		TransferStatusCallbackListener {
 
 	private JProgressBar jprogressbar;
 	private IrodsImageJBean irodsImagej;
@@ -65,7 +65,6 @@ TransferStatusCallbackListener {
 
 	public CallbackResponse transferAsksWhetherToForceOperation(
 			String irodsAbsolutePath, boolean isCollection) {
-		
 
 		CallbackResponse response = CallbackResponse.YES_FOR_ALL;
 		StringBuilder stringBuilder = new StringBuilder(

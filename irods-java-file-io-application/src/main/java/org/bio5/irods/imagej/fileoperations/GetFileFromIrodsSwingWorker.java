@@ -110,8 +110,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 			} catch (Exception e) {
 				log.info("Error while reading MD5 checksum" + e.getMessage());
 			}
-			File destinationLocalFilePath = new File(
-					Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
+			File destinationLocalFilePath = new File(irodsImagej.getImageJCacheFolder());
 			log.info("sourceIrodsFilePath before inserting file"
 					+ sourceIrodsFilePath);
 			log.info("destinationLocalFilePath before inserting file"
@@ -196,7 +195,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	public void done() {
 		/* Opening the selected ImageJ */
 		Opener imageOpener = new Opener();
-		String imageFilePath = Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY
+		String imageFilePath = irodsImagej.getImageJCacheFolder()
 				+ IrodsUtilities.getPathSeperator()
 				+ sourceIrodsFilePath.getName();
 		log.info("Current file opened by user: " + imageFilePath);

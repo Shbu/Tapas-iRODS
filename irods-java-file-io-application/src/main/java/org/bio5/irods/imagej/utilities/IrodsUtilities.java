@@ -6,14 +6,17 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
 
-import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import org.apache.log4j.Logger;
 
 public final class IrodsUtilities {
 
-	/*Calculate MD5 CheckSum of a File*/
+	/* Logger instantiation */
+	static Logger log = Logger.getLogger(IrodsUtilities.class.getName());
+
+	/* Calculate MD5 CheckSum of a File */
 	public static String calculateMD5CheckSum(File file) {
 		try {
 			InputStream fin = new FileInputStream(file);
@@ -41,24 +44,24 @@ public final class IrodsUtilities {
 		}
 	}
 
-	/*Pull pathSeperator of the Operating System*/
+	/* Pull pathSeperator of the Operating System */
 	public static String getPathSeperator() {
 		String pathSeperator = Constants.DEFAULT_PATH_SEPERATOR;
 		pathSeperator = System.getProperty("file.separator");
 		return pathSeperator;
 	}
 
-	/*Get JTree node path depending on the Mouse selection*/
-	public static String getJtreeSelection(MouseEvent me, JTree userDirectoryTree)
-	{
-		String fullTreePath="";
-		TreePath tp =userDirectoryTree.getPathForLocation(me.getX(), me.getY());
-		if(tp!=null)
-		{
-			Object treepath[] =tp.getPath();
-			for(int i=0;i<treepath.length;i++)
-			{
-				fullTreePath  += IrodsUtilities.getPathSeperator() +treepath[i].toString();
+	/* Get JTree node path depending on the Mouse selection */
+	public static String getJtreeSelection(MouseEvent me,
+			JTree userDirectoryTree) {
+		String fullTreePath = "";
+		TreePath tp = userDirectoryTree
+				.getPathForLocation(me.getX(), me.getY());
+		if (tp != null) {
+			Object treepath[] = tp.getPath();
+			for (int i = 0; i < treepath.length; i++) {
+				fullTreePath += IrodsUtilities.getPathSeperator()
+						+ treepath[i].toString();
 			}
 		}
 		return fullTreePath;
@@ -67,37 +70,59 @@ public final class IrodsUtilities {
 	public static File createFileFromTreePath(TreePath treePath) {
 		StringBuilder sb = new StringBuilder();
 		Object[] nodes = treePath.getPath();
-		for(int i=0;i<nodes.length;i++) {
-			sb.append(File.separatorChar).append(nodes[i].toString()); 
-		} 
+		for (int i = 0; i < nodes.length; i++) {
+			sb.append(File.separatorChar).append(nodes[i].toString());
+		}
 		return new File(sb.toString());
 	}
 
 	public static String createFilePathFromTreePath(TreePath treePath) {
 		StringBuilder sb = new StringBuilder();
 		Object[] nodes = treePath.getPath();
-		for(int i=0;i<nodes.length;i++) {
-			sb.append(File.separatorChar).append(nodes[i].toString()); 
-		} 
+		for (int i = 0; i < nodes.length; i++) {
+			sb.append(File.separatorChar).append(nodes[i].toString());
+		}
 		return sb.toString();
 	}
 
-	public static String getJtreeSelectionForSingleClick(MouseEvent me, JTree userDirectoryTree)
-	{
-		String fullTreePath="";
-		TreePath tp =userDirectoryTree.getPathForLocation(me.getX(), me.getY());
-		if(tp!=null)
-		{
-			DefaultMutableTreeNode lastPathComponentNode =(DefaultMutableTreeNode) tp.getLastPathComponent();
-			if(lastPathComponentNode.isLeaf()){
-				tp= tp.getParentPath();
+	public static String getJtreeSelectionForSingleClick(MouseEvent me,
+			JTree userDirectoryTree) {
+		String fullTreePath = "";
+		TreePath tp = userDirectoryTree
+				.getPathForLocation(me.getX(), me.getY());
+		if (tp != null) {
+			DefaultMutableTreeNode lastPathComponentNode = (DefaultMutableTreeNode) tp
+					.getLastPathComponent();
+			if (lastPathComponentNode.isLeaf()) {
+				tp = tp.getParentPath();
 			}
-			Object treepath[] =tp.getPath();
-			for(int i=0;i<treepath.length;i++)
-			{
-				fullTreePath  += IrodsUtilities.getPathSeperator() +treepath[i].toString();
+			Object treepath[] = tp.getPath();
+			for (int i = 0; i < treepath.length; i++) {
+				fullTreePath += IrodsUtilities.getPathSeperator()
+						+ treepath[i].toString();
 			}
 		}
 		return fullTreePath;
+	}
+
+	public static boolean createDirectoryIfDoesntExist(String directoryPath) {
+		boolean isDirectoryCreated = false;
+		try {
+			if (null != directoryPath && !"".equals(directoryPath)) {
+				File file = new File(directoryPath);
+				if (!file.exists()) {
+					log.info("Cache folder doesn't exist- Creating folder");
+					isDirectoryCreated = file.mkdirs();
+				}
+				if (file.exists()) {
+					isDirectoryCreated = true;
+				}
+			}
+		} catch (Exception e) {
+			log.error("Error while creating ImageJ cache directory"
+					+ e.getMessage());
+			isDirectoryCreated = false;
+		}
+		return isDirectoryCreated;
 	}
 }

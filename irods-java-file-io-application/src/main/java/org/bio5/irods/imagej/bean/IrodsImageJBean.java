@@ -11,6 +11,7 @@ import javax.swing.JViewport;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import org.bio5.irods.imagej.utilities.Constants;
 import org.bio5.irods.imagej.utilities.IrodsTransferStatusCallbackListener;
 import org.bio5.irods.imagej.views.DirectoryContentsPane;
 import org.bio5.irods.imagej.views.MainWindow;
@@ -74,6 +75,16 @@ public class IrodsImageJBean implements Serializable {
 	private DefaultMutableTreeNode rootTreeNodeForDirectoryContents = null;
 
 	private boolean isHomeDirectoryTheRootNode = false;
+
+	private String imageJCacheFolder = Constants.IMAGEJ_CACHE_FOLDER;
+
+	public String getImageJCacheFolder() {
+		return imageJCacheFolder;
+	}
+
+	public void setImageJCacheFolder(String imageJCacheFolder) {
+		this.imageJCacheFolder = imageJCacheFolder;
+	}
 
 	public boolean isHomeDirectoryTheRootNode() {
 		return isHomeDirectoryTheRootNode;

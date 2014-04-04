@@ -102,11 +102,11 @@ public class DirectoryContentsPane extends JPanel implements
 	 */
 	public void init() throws JargonException {
 		log.info("Local path before refactoring: "
-				+ Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
+				+ irodsImagej.getImageJCacheFolder());
 		// Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY.replaceAll(IrodsUtilities.pathSeperator(),
 		// "//");
 		log.info("Local directory to store ImageJ files: "
-				+ Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY);
+				+ irodsImagej.getImageJCacheFolder());
 		irodsAccount = irodsImagej.getIrodsAccount();
 		iRODSFileFactory = FileOperations
 				.getIrodsAccountFileFactory(irodsImagej.getIrodsAccount());
