@@ -9,11 +9,11 @@ New Requirements - Received on 4/2/2014
 ----------------------
 1. User should be able to enter directory path for his landing page. This should happen before application successfully authenticates credentials. If path specified is wrong, then default it to user account folder.
 
-2. User should be given an option to select system cache folder before he logs into system. -- done
-- Mac testing is pending.
+2. User should be given an option to select system cache folder before he logs into system. 
+    update on 4/4/2014: Mac testing is pending.
 
-3. If user opts to download a file, system should check if selected file already exists in cache folder and then download depending on user consent.
--- full testing pending.
+3. If user opts to download a file, system should check if selected file already exists in cache folder and then download depending on user consent. 
+    update on 4/4/2014: Full testing pending.
 
 4. If user clicks on a file and navigates to file details tab, then populate file information under "file details" tab.
 5. While file transfers are in progress, show percentage(%) of file completed including the no of bytes transferred so far. 
