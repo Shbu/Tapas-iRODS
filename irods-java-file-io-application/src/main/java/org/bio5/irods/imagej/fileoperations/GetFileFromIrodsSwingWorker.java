@@ -99,22 +99,42 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 			dataObjectAO = irodsImagej.getIrodsFileSystem()
 					.getIRODSAccessObjectFactory()
 					.getDataObjectAO(irodsImagej.getIrodsAccount());
+			
 			/* Getting MD5 checksum of the current file from iRODS */
 			String md5ChecksumLocalFile = null;
 			String md5ChecksumServerFile = null;
 			try {
 				md5ChecksumServerFile = dataObjectAO
 						.computeMD5ChecksumOnDataObject(sourceIrodsFilePath);
-				log.info("MD5checksum of iRODS server file: "
-						+ md5ChecksumServerFile);
 			} catch (Exception e) {
-				log.info("Error while reading MD5 checksum" + e.getMessage());
+				log.info("Error while reading MD5 checksum of md5ChecksumServerFile" + e.getMessage());
 			}
 			File destinationLocalFilePath = new File(irodsImagej.getImageJCacheFolder());
 			log.info("sourceIrodsFilePath before inserting file"
 					+ sourceIrodsFilePath);
 			log.info("destinationLocalFilePath before inserting file"
 					+ destinationLocalFilePath);
+			
+			/* Getting MD5 checksum of local file, if exists */
+			File localFile = new File(
+					destinationLocalFilePath.getAbsolutePath()
+							+ IrodsUtilities.getPathSeperator()
+							+ sourceIrodsFilePath.getName());
+			md5ChecksumLocalFile = IrodsUtilities
+					.calculateMD5CheckSum(localFile);
+			log.info("MD5checksum of iRODS server file: "
+					+ md5ChecksumServerFile);
+			log.info("MD5checksum of local file: " + md5ChecksumLocalFile);
+			
+			if(null!=md5ChecksumLocalFile && null!=md5ChecksumServerFile && ""!=md5ChecksumLocalFile && ""!=md5ChecksumServerFile){
+				log.info("MD5 checksum compared - are they Similar files ?"
+						+ md5ChecksumLocalFile.equals(md5ChecksumServerFile));
+
+			if (!md5ChecksumLocalFile.equals(md5ChecksumServerFile))
+				JOptionPane
+						.showMessageDialog(null,
+								"Local cache directory have files with same name but MD5 checksum is different!");
+			}
 			try {
 				if (null != sourceIrodsFilePath) {
 					if (null != irodsImagej) {
@@ -136,6 +156,13 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 										irodsImagej
 												.getIrodsTransferStatusCallbackListener(),
 										transferControlBlock);
+						
+					/*	dataTransferOperationsAO
+						.getOperation(
+								sourceIrodsFilePath,
+								destinationLocalFilePath,
+								null,
+								null);*/
 
 						/*
 						 * Getting CollectionAndDataObjectListAndSearchAO -
@@ -160,12 +187,12 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 								"File with same name already exist in local directory!");
 
 				/* Getting MD5 checksum of local file, if exists */
-				File localFile = new File(
+				File localFile2 = new File(
 						destinationLocalFilePath.getAbsolutePath()
 								+ IrodsUtilities.getPathSeperator()
 								+ sourceIrodsFilePath.getName());
 				md5ChecksumLocalFile = IrodsUtilities
-						.calculateMD5CheckSum(localFile);
+						.calculateMD5CheckSum(localFile2);
 				log.info("MD5checksum of local file: " + md5ChecksumLocalFile);
 
 				log.info("MD5 checksum compared - Similar files:"
