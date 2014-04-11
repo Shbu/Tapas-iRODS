@@ -19,6 +19,8 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.packinstr.TransferOptions;
 import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.pub.IRODSFileSystemAOImpl;
+import org.irods.jargon.core.pub.domain.ObjStat;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
@@ -74,9 +76,58 @@ public class IrodsImageJBean implements Serializable {
 
 	private DefaultMutableTreeNode rootTreeNodeForDirectoryContents = null;
 
+	/*
+	 * true - if you want to pull everything from home directory (This includes
+	 * shared files too). False- if you want to pull collections from only your
+	 * account
+	 */
 	private boolean isHomeDirectoryTheRootNode = false;
 
 	private String imageJCacheFolder = Constants.IMAGEJ_CACHE_FOLDER;
+
+	private String objSelectedUsingSingleClick;
+
+	private IRODSFileSystemAOImpl iRODSFileSystemAOImpl;
+
+	private String currentActiveTabUnderJTabbedPane;
+
+	private ObjStat objStatForGivenAbsolutePath;
+
+	public ObjStat getObjStatForGivenAbsolutePath() {
+		return objStatForGivenAbsolutePath;
+	}
+
+	public void setObjStatForGivenAbsolutePath(
+			ObjStat objStatForGivenAbsolutePath) {
+		this.objStatForGivenAbsolutePath = objStatForGivenAbsolutePath;
+	}
+
+	public String getCurrentActiveTabUnderJTabbedPane() {
+		return currentActiveTabUnderJTabbedPane;
+	}
+
+	public void setCurrentActiveTabUnderJTabbedPane(
+			String currentActiveTabUnderJTabbedPane) {
+		this.currentActiveTabUnderJTabbedPane = currentActiveTabUnderJTabbedPane;
+	}
+
+	public IRODSFileSystemAOImpl getiRODSFileSystemAOImpl() {
+		return iRODSFileSystemAOImpl;
+	}
+
+	public void setiRODSFileSystemAOImpl(
+			IRODSFileSystemAOImpl iRODSFileSystemAOImpl) {
+		this.iRODSFileSystemAOImpl = iRODSFileSystemAOImpl;
+	}
+
+	public String getObjSelectedUsingSingleClick() {
+		return objSelectedUsingSingleClick;
+	}
+
+	public void setObjSelectedUsingSingleClick(
+			String objSelectedUsingSingleClick) {
+		this.objSelectedUsingSingleClick = objSelectedUsingSingleClick;
+	}
 
 	public String getImageJCacheFolder() {
 		return imageJCacheFolder;

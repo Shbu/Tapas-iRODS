@@ -15,7 +15,8 @@ public class Constants {
 	public static String HOME = "home";
 	public static int MAX_THREADS = 10;
 	public static String FOLDER_SELECTION_CANCELED = "Folder Selection is canceled";
-	public static boolean IS_HOME_DIRECTORY_THE_ROOT_NODE = true; /*
+	public static String JTABBEDPANE_SELECTED_TAB_FILE_INFORMATION = "File Information";
+	public static boolean IS_HOME_DIRECTORY_THE_ROOT_NODE = false; /*
 																 * true - if you
 																 * want to pull
 																 * everything
