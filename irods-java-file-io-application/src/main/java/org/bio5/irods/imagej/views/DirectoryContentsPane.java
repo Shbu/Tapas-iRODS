@@ -2,6 +2,7 @@ package org.bio5.irods.imagej.views;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -237,7 +238,7 @@ public class DirectoryContentsPane extends JPanel implements
 										GroupLayout.PREFERRED_SIZE)
 								.addGap(18)
 								.addComponent(tabbedPane,
-										GroupLayout.DEFAULT_SIZE, 307,
+										GroupLayout.DEFAULT_SIZE, 480,
 										Short.MAX_VALUE).addGap(18))
 				.addGroup(groupLayout.createSequentialGroup().addGap(216)));
 		groupLayout
@@ -441,17 +442,19 @@ public class DirectoryContentsPane extends JPanel implements
 		tabbedPane.addTab("File Information", null, panel_1, null);
 
 		table = new JTable();
+		table.setIntercellSpacing(new Dimension(5, 5));
 		table.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		table.setToolTipText("File Information");
 		table.setModel(new DefaultTableModel(new Object[][] {
-				{ "Absolute Path", null }, { "Object Size", null },
-				{ "Created Date", null }, { "Modified Date", null },
-				{ "Data Id", null }, { "Object Type", null },
-				{ "File Checksum", null }, { "Owner Name", null },
-				{ "Owner Zone", null }, { "Chache Dirty", null }, },
+				{ " Absolute Path", null }, { " Object Size", null },
+				{ " Created Date", null }, { " Modified Date", null },
+				{ " Data Id", null }, { " Object Type", null },
+				{ " File Checksum", null }, { " Owner Name", null },
+				{ " Owner Zone", null }, { " Chache Dirty", null }, },
 				new String[] { "Field", "Information" }));
 		table.getColumnModel().getColumn(0).setPreferredWidth(150);
 		table.getColumnModel().getColumn(0).setMinWidth(100);
+		table.setRowHeight(20);
 		table.getColumnModel().getColumn(1).setPreferredWidth(300);
 		table.getColumnModel().getColumn(1).setMinWidth(200);
 		panel_1.add(table);

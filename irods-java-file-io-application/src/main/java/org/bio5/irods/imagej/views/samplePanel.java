@@ -20,6 +20,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.JLabel;
 import java.awt.FlowLayout;
 import javax.swing.border.LineBorder;
+import java.awt.Dimension;
 
 public class samplePanel extends JPanel {
 	private JTable table;
@@ -42,8 +43,8 @@ public class samplePanel extends JPanel {
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addGap(23)
-					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
-					.addContainerGap())
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 405, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(38, Short.MAX_VALUE))
 		);
 		
 		JPanel panel = new JPanel();
@@ -63,6 +64,8 @@ public class samplePanel extends JPanel {
 		tabbedPane.addTab("File Information", null, panel_1, null);
 		
 		table = new JTable();
+		table.setRowHeight(20);
+		table.setIntercellSpacing(new Dimension(2, 2));
 		table.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		table.setToolTipText("File Information");
 		table.setModel(new DefaultTableModel(
@@ -97,11 +100,11 @@ public class samplePanel extends JPanel {
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addGap(43)
-							.addComponent(table, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addComponent(table, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addGap(146)
 							.addComponent(label_ProgressBar_BytesTrasferredOutofTotalFileSize, GroupLayout.PREFERRED_SIZE, 179, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(72, Short.MAX_VALUE))
+					.addGap(72))
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -109,8 +112,8 @@ public class samplePanel extends JPanel {
 					.addGap(76)
 					.addComponent(label_ProgressBar_BytesTrasferredOutofTotalFileSize, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
 					.addGap(41)
-					.addComponent(table, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(119, Short.MAX_VALUE))
+					.addComponent(table, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGap(57))
 		);
 		panel_1.setLayout(gl_panel_1);
 		setLayout(groupLayout);
