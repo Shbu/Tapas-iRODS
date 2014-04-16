@@ -2,6 +2,7 @@ package org.bio5.irods.imagej.views;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -21,10 +22,8 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.JViewport;
-import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
@@ -61,8 +60,6 @@ import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 import org.irods.jargon.core.transfer.TransferControlBlock;
 
-import java.awt.FlowLayout;
-
 public class DirectoryContentsPane extends JPanel implements
 		TreeWillExpandListener {
 
@@ -71,6 +68,7 @@ public class DirectoryContentsPane extends JPanel implements
 	 */
 	private static final long serialVersionUID = 722996165620904921L;
 	private IRODSFileSystem irodsFileSystem;
+	@SuppressWarnings("unused")
 	private DataTransferOperations dataTransferOperationsAO;
 	private IRODSFileFactory iRODSFileFactory;
 	private String selectedNodeInTreeForDoubleClick;
@@ -140,10 +138,6 @@ public class DirectoryContentsPane extends JPanel implements
 			irodsImagej.setRootTreeNodeForDirectoryContents(homeNode);
 			treeModel = new DefaultTreeModel(homeNode, true);
 		}
-		// rootNode = new
-		// DefaultMutableTreeNode(irodsImagej.getIrodsAccount().getUserName());
-		// irodsImagej.setRootNode(irodsImagej.getRootTreeNodeForDirectoryContents());
-		// treeModel = new DefaultTreeModel(homeNode,true);
 		treeModel.addTreeModelListener(new MyTreeModelListener());
 		irodsImagej.setTreeModel(treeModel);
 
@@ -152,18 +146,19 @@ public class DirectoryContentsPane extends JPanel implements
 		progressBar.setStringPainted(true);
 		progressBar.setToolTipText("Progress of action");
 		irodsImagej.setJprogressbar(progressBar);
-		
-		/*Progress bar label to show bytesTrasferred out of TotalFileSize*/
-		label_ProgressBar_BytesTrasferredOutofTotalFileSize = new JLabel(" Progress:");
-		label_ProgressBar_BytesTrasferredOutofTotalFileSize.setToolTipText(" Progress: bytesTransferred/Total File Size in Bytes");
-		label_ProgressBar_BytesTrasferredOutofTotalFileSize.setBorder(new LineBorder(new Color(0, 0, 0)));
+
+		/* Progress bar label to show bytesTrasferred out of TotalFileSize */
+		label_ProgressBar_BytesTrasferredOutofTotalFileSize = new JLabel(
+				" Progress:");
+		label_ProgressBar_BytesTrasferredOutofTotalFileSize
+				.setToolTipText(" Progress: bytesTransferred/Total File Size in Bytes");
+		label_ProgressBar_BytesTrasferredOutofTotalFileSize
+				.setBorder(new LineBorder(new Color(0, 0, 0)));
 
 		/* Setting iRODS file system */
 		irodsFileSystem = IRODSFileSystem.instance();
 		irodsImagej.setIrodsFileSystem(irodsFileSystem);
 
-		// userAccount =
-		// irodsFileSystem.getIRODSAccessObjectFactory().getUserAO(irodsAccount);
 		dataTransferOperationsAO = irodsFileSystem
 				.getIRODSAccessObjectFactory().getDataTransferOperations(
 						irodsAccount);
@@ -199,22 +194,6 @@ public class DirectoryContentsPane extends JPanel implements
 	 * @param jButton_saveToIrodsServer
 	 */
 	public void implementation() {
-		/*
-		 * File irodsAccountFile=null; if(null!=
-		 * IrodsImageJBean.getiRodsFile()){ irodsAccountFile= (File)
-		 * IrodsImageJBean.getiRodsFile(); }
-		 */
-		/*
-		 * constructDirectoryStructureSwingWorker = new
-		 * ConstructDirectoryStructureSwingWorker( irodsImagej,
-		 * iRODSFileFactory, localFiles, rootNode, irodsAccount);
-		 * constructDirectoryStructureSwingWorker
-		 * .parseDirectoryContents(iRODSFileFactory, localFiles, rootNode,
-		 * irodsAccount);
-		 */
-
-		// parseDirectoryContents(iRODSFileFactory, irodsAccountFile, rootNode,
-		// irodsAccount);
 
 		if (null != irodsImagej.getCollectionsUnderGivenAbsolutePath()) {
 			List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath = irodsImagej
@@ -247,8 +226,8 @@ public class DirectoryContentsPane extends JPanel implements
 		tabbedPane.addChangeListener(changeListener);
 
 		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(
-Alignment.TRAILING)
+		groupLayout.setHorizontalGroup(groupLayout
+				.createParallelGroup(Alignment.TRAILING)
 				.addGroup(
 						groupLayout
 								.createSequentialGroup()
@@ -260,9 +239,7 @@ Alignment.TRAILING)
 								.addComponent(tabbedPane,
 										GroupLayout.DEFAULT_SIZE, 307,
 										Short.MAX_VALUE).addGap(18))
-								.addGroup(groupLayout.createSequentialGroup()
-										.addGap(216)
-									));
+				.addGroup(groupLayout.createSequentialGroup().addGap(216)));
 		groupLayout
 				.setVerticalGroup(groupLayout
 						.createParallelGroup(Alignment.TRAILING)
@@ -297,9 +274,6 @@ Alignment.TRAILING)
 		tabbedPane.addTab("File Operations", null, panel, null);
 
 		JButton jButton_selectLocalFile = new JButton("Select local file");
-		// irodsTransferStatusCallbackListener = new
-		// IrodsTransferStatusCallbackListener(irodsImagej.getiRODSFileFactory(),
-		// null, irodsImagej, progressBar);
 
 		jButton_selectLocalFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -381,21 +355,6 @@ Alignment.TRAILING)
 											targetResourceName);
 									putFile.execute();
 
-									/*
-									 * DefaultMutableTreeNode parentNode = null;
-									 * 
-									 * Destination selection - Fetching parent
-									 * path if leaf node is selected parentNode
-									 * = (DefaultMutableTreeNode)
-									 * userDirectoryTree
-									 * .getLastSelectedPathComponent(); if
-									 * (parentNode.isLeaf()) { parentNode=
-									 * (DefaultMutableTreeNode)
-									 * parentNode.getParent(); }
-									 * 
-									 * addObject(parentNode,
-									 * sourceLocalfile.getName(), true);
-									 */
 								}
 							} catch (Exception exception) {
 								log.error(exception.getMessage());
@@ -505,6 +464,7 @@ Alignment.TRAILING)
 			public void mouseClicked(MouseEvent mouseEvent) {
 
 				if (mouseEvent.getClickCount() == 2) {
+
 					/* resetting progress bar to 0 if a double click is detected */
 					irodsImagej.getJprogressbar().setValue(0);
 					log.info("tree path after double click"
@@ -514,14 +474,13 @@ Alignment.TRAILING)
 
 					selectedNodeInTreeForDoubleClick = IrodsUtilities
 							.getJtreeSelection(mouseEvent, userDirectoryTree);
-					// getImageFile(iRODSFileFactory,
-					// selectedNodeInTreeForDoubleClick,irodsAccount);
 					getFile = new GetFileFromIrodsSwingWorker(iRODSFileFactory,
 							selectedNodeInTreeForDoubleClick, irodsImagej,
 							irodsImagej.getJprogressbar());
 					getFile.execute();
 				} else if (mouseEvent.getClickCount() == 1) {
-					// resetting progress bar to 0 if a single click is detected
+
+					/* resetting progress bar to 0 if a single click is detected */
 					selectedNodeInTreeForSingleClick = IrodsUtilities
 							.getJtreeSelectionForSingleClick(mouseEvent,
 									userDirectoryTree);
@@ -600,15 +559,12 @@ Alignment.TRAILING)
 		}
 
 		if (irodsAccountFile.isDirectory()) {
-			// System.out.println("Direc name" + irodsAccountFile.getName());
 			log.info("Direc name:" + irodsAccountFile.getName());
 			DefaultMutableTreeNode child = new DefaultMutableTreeNode(
 					irodsAccountFile.getName(), true);
 			node.add(child);
 			File[] direcFiles = irodsAccountFile.listFiles();
 			for (int i = 0; i < direcFiles.length; i++) {
-				// System.out.println("File number" +i +"\n depth:"
-				// +direcFiles.length);
 				log.info("File number:" + i + "\t depth:" + direcFiles.length);
 				parseDirectoryContents(iRODSFileFactory, direcFiles[i], child,
 						irodsAccount);
@@ -618,11 +574,6 @@ Alignment.TRAILING)
 	}
 
 	public void repaintPanel() {
-		/*
-		 * if(null !=irodsImagej.getMainWindow()){
-		 * irodsImagej.getMainWindow().setVisibilityOfForm(); }
-		 */
-		// viewport.removeAll();
 		viewport.setVisible(true);
 		viewport.repaint();
 		viewport.revalidate();
@@ -641,8 +592,6 @@ Alignment.TRAILING)
 					.get(i);
 
 			if (!fileUnderCollectionAndDataObjectListingEntry.isCollection()) {
-				// System.out.println("File name" +irodsAccountFile.getName()
-				// +":" +irodsAccountFile.getAbsolutePath());
 				log.info("File name:"
 						+ fileUnderCollectionAndDataObjectListingEntry
 								.getNodeLabelDisplayValue()
@@ -657,8 +606,6 @@ Alignment.TRAILING)
 			}
 
 			if (fileUnderCollectionAndDataObjectListingEntry.isCollection()) {
-				// System.out.println("Direc name" +
-				// irodsAccountFile.getName());
 				log.info("Direc name:"
 						+ fileUnderCollectionAndDataObjectListingEntry
 								.getNodeLabelDisplayValue());
@@ -730,7 +677,6 @@ Alignment.TRAILING)
 		try {
 			retrieveInternalNodesSwingWorker.doInBackground();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		/*

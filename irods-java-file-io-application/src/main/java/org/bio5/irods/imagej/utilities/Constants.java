@@ -16,6 +16,8 @@ public class Constants {
 	public static int MAX_THREADS = 10;
 	public static String FOLDER_SELECTION_CANCELED = "Folder Selection is canceled";
 	public static String JTABBEDPANE_SELECTED_TAB_FILE_INFORMATION = "File Information";
+	
+	public static boolean JPROGRESS_SET_STRING_PAINTED =true;
 	public static boolean IS_HOME_DIRECTORY_THE_ROOT_NODE = false; /*
 																 * true - if you
 																 * want to pull

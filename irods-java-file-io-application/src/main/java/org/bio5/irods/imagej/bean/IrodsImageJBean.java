@@ -295,11 +295,11 @@ public class IrodsImageJBean implements Serializable {
 		this.irodsTransferStatusCallbackListener = irodsTransferStatusCallbackListener;
 	}
 
-	public static IRODSFile getiRodsFile() {
+	public  IRODSFile getiRodsFile() {
 		return iRodsFile;
 	}
 
-	public static void setiRodsFile(IRODSFile iRodsFile) {
+	public void setiRodsFile(IRODSFile iRodsFile) {
 		IrodsImageJBean.iRodsFile = iRodsFile;
 	}
 

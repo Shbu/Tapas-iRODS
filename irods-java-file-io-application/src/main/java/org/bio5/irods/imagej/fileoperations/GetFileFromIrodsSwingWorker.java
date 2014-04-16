@@ -50,7 +50,6 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	 * Using SwingWorker-doInBackGround() function to do processing in
 	 * background
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public Void doInBackground() throws Exception {
 

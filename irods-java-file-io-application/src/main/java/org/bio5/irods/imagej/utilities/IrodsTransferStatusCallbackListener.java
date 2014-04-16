@@ -3,6 +3,7 @@ package org.bio5.irods.imagej.utilities;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.bean.IrodsImageJBean;
 import org.irods.jargon.core.exception.JargonException;
@@ -13,6 +14,7 @@ public class IrodsTransferStatusCallbackListener implements
 		TransferStatusCallbackListener {
 
 	private JProgressBar jprogressbar;
+	@SuppressWarnings("unused")
 	private IrodsImageJBean irodsImagej;
 
 	public IrodsTransferStatusCallbackListener(IrodsImageJBean irodsImagej) {
@@ -29,6 +31,7 @@ public class IrodsTransferStatusCallbackListener implements
 	}
 
 	public void statusCallback(TransferStatus ts) throws JargonException {
+
 		log.info("transfer status callback details: " + ts);
 
 		if (ts.getTransferState() == TransferStatus.TransferState.FAILURE) {
@@ -46,6 +49,12 @@ public class IrodsTransferStatusCallbackListener implements
 			jprogressbar.setMaximum(100);
 			jprogressbar.setValue((int) (ts.getBytesTransfered() * 100 / ts
 					.getTotalSize()));
+			if (Constants.JPROGRESS_SET_STRING_PAINTED) {
+				jprogressbar.setString("Progress: "
+						+ FileUtils.byteCountToDisplaySize(ts
+								.getBytesTransfered()) + "/"
+						+ FileUtils.byteCountToDisplaySize(ts.getTotalSize()));
+			}
 		} else if (ts.getTransferState() == TransferStatus.TransferState.IN_PROGRESS_COMPLETE_FILE) {
 			log.info("Transfer state: " + ts.getTransferState()
 					+ " | Bytes Transferred so far:" + ts.getBytesTransfered()
@@ -56,6 +65,12 @@ public class IrodsTransferStatusCallbackListener implements
 			jprogressbar.setMaximum(100);
 			jprogressbar.setValue((int) (ts.getBytesTransfered() * 100 / ts
 					.getTotalSize()));
+			if (Constants.JPROGRESS_SET_STRING_PAINTED) {
+				jprogressbar.setString("Progress: "
+						+ FileUtils.byteCountToDisplaySize(ts
+								.getBytesTransfered()) + "/"
+						+ FileUtils.byteCountToDisplaySize(ts.getTotalSize()));
+			}
 		} else if (ts.getTransferException() != null) {
 			log.info("Exception in file transfer: " + ts.getTransferState());
 		} else {

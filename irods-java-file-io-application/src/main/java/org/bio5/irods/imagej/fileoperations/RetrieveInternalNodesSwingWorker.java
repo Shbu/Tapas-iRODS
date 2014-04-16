@@ -58,7 +58,7 @@ public class RetrieveInternalNodesSwingWorker extends
 					.retrieveCollectionsUnderGivenPath(iRodsFile, irodsImageJ);
 
 		}
-		IrodsImageJBean.setiRodsFile(iRodsFile);
+		irodsImageJ.setiRodsFile(iRodsFile);
 		done();
 		return null;
 	}
