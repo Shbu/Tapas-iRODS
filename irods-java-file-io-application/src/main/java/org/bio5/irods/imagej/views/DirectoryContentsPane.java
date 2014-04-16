@@ -95,6 +95,7 @@ public class DirectoryContentsPane extends JPanel implements
 	private JButton jButton_saveToIrodsServer;
 	private IrodsPropertiesConstruction irodsPropertiesConstruction;
 	private JTable table;
+	private JLabel label_ProgressBar_BytesTrasferredOutofTotalFileSize;
 
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(DirectoryContentsPane.class.getName());
@@ -151,6 +152,11 @@ public class DirectoryContentsPane extends JPanel implements
 		progressBar.setStringPainted(true);
 		progressBar.setToolTipText("Progress of action");
 		irodsImagej.setJprogressbar(progressBar);
+		
+		/*Progress bar label to show bytesTrasferred out of TotalFileSize*/
+		label_ProgressBar_BytesTrasferredOutofTotalFileSize = new JLabel(" Progress:");
+		label_ProgressBar_BytesTrasferredOutofTotalFileSize.setToolTipText(" Progress: bytesTransferred/Total File Size in Bytes");
+		label_ProgressBar_BytesTrasferredOutofTotalFileSize.setBorder(new LineBorder(new Color(0, 0, 0)));
 
 		/* Setting iRODS file system */
 		irodsFileSystem = IRODSFileSystem.instance();
@@ -242,15 +248,21 @@ public class DirectoryContentsPane extends JPanel implements
 
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(
-				Alignment.TRAILING).addGroup(
-				groupLayout
-						.createSequentialGroup()
-						.addContainerGap()
-						.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE,
-								402, GroupLayout.PREFERRED_SIZE)
-						.addGap(18)
-						.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE,
-								307, Short.MAX_VALUE).addGap(18)));
+Alignment.TRAILING)
+				.addGroup(
+						groupLayout
+								.createSequentialGroup()
+								.addContainerGap()
+								.addComponent(scrollPane,
+										GroupLayout.PREFERRED_SIZE, 402,
+										GroupLayout.PREFERRED_SIZE)
+								.addGap(18)
+								.addComponent(tabbedPane,
+										GroupLayout.DEFAULT_SIZE, 307,
+										Short.MAX_VALUE).addGap(18))
+								.addGroup(groupLayout.createSequentialGroup()
+										.addGap(216)
+									));
 		groupLayout
 				.setVerticalGroup(groupLayout
 						.createParallelGroup(Alignment.TRAILING)
@@ -312,16 +324,6 @@ public class DirectoryContentsPane extends JPanel implements
 			public void actionPerformed(ActionEvent destinationButtonActionEvent) {
 
 				String destinationFolderPath = selectedNodeInTreeForSingleClick;
-				/*
-				 * if(selectedNodeInTreeForSingleClick.contains(".")) {
-				 * log.info("Destination before Splitting: "
-				 * +selectedNodeInTreeForSingleClick); File destinationFile =new
-				 * File(selectedNodeInTreeForSingleClick); destinationFolderPath
-				 * =destinationFile.getParent();
-				 * log.info("Destination after Splitting: "
-				 * +destinationFolderPath); }
-				 */
-
 				jTextField_destinationPath.setText(destinationFolderPath);
 				jButton_saveToIrodsServer.setEnabled(true);
 			}
@@ -478,7 +480,7 @@ public class DirectoryContentsPane extends JPanel implements
 
 		JPanel panel_1 = new JPanel();
 		tabbedPane.addTab("File Information", null, panel_1, null);
-		
+
 		table = new JTable();
 		table.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		table.setToolTipText("File Information");
@@ -495,7 +497,7 @@ public class DirectoryContentsPane extends JPanel implements
 		table.getColumnModel().getColumn(1).setMinWidth(200);
 		panel_1.add(table);
 		setLayout(groupLayout);
-		
+
 		constructUserDirectoryTree(irodsImagej);
 
 		userDirectoryTree.addMouseListener(new MouseAdapter() {
@@ -546,18 +548,20 @@ public class DirectoryContentsPane extends JPanel implements
 		userDirectoryTree.setEditable(true);
 		userDirectoryTree.setVisible(true);
 		viewport.add(userDirectoryTree);
-		
+
 	}
-	
-	public void setFileInformationFromObjStat(ObjStat objstatWithFileInformation){
-		
-		TableModel tm =table.getModel();
+
+	public void setFileInformationFromObjStat(ObjStat objstatWithFileInformation) {
+
+		TableModel tm = table.getModel();
 		tm.setValueAt(objstatWithFileInformation.getAbsolutePath(), 0, 1);
-		tm.setValueAt(FileUtils.byteCountToDisplaySize(objstatWithFileInformation.getObjSize()), 1, 1);
+		tm.setValueAt(
+				FileUtils.byteCountToDisplaySize(objstatWithFileInformation
+						.getObjSize()), 1, 1);
 		tm.setValueAt(objstatWithFileInformation.getCreatedAt(), 2, 1);
 		tm.setValueAt(objstatWithFileInformation.getModifiedAt(), 3, 1);
 		tm.setValueAt(objstatWithFileInformation.getDataId(), 4, 1);
-		tm.setValueAt(objstatWithFileInformation.getObjectType(),5, 1);
+		tm.setValueAt(objstatWithFileInformation.getObjectType(), 5, 1);
 		tm.setValueAt(objstatWithFileInformation.getChecksum(), 6, 1);
 		tm.setValueAt(objstatWithFileInformation.getOwnerName(), 7, 1);
 		tm.setValueAt(objstatWithFileInformation.getOwnerZone(), 8, 1);
@@ -704,7 +708,7 @@ public class DirectoryContentsPane extends JPanel implements
 	}
 
 	/**
-	 * Node will expand, it's time to retreive nodes
+	 * Node will expand, it's time to retrieve nodes
 	 */
 	public void treeWillExpand(TreeExpansionEvent treeExpansionEvent)
 			throws ExpandVetoException {
@@ -729,11 +733,17 @@ public class DirectoryContentsPane extends JPanel implements
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		for (int i = 0; i < irodsImagej.getChildNodesListAfterLazyLoading()
-				.size(); i++) {
-			treeModel.insertNodeInto(irodsImagej
-					.getChildNodesListAfterLazyLoading().get(i), node, node
-					.getChildCount());
+		/*
+		 * Add nodes only if size of extracted list is more than Zero. This will
+		 * prevent empty nodes from expanding.
+		 */
+		if (irodsImagej.getChildNodesListAfterLazyLoading().size() > 0) {
+			for (int i = 0; i < irodsImagej.getChildNodesListAfterLazyLoading()
+					.size(); i++) {
+				treeModel.insertNodeInto(irodsImagej
+						.getChildNodesListAfterLazyLoading().get(i), node, node
+						.getChildCount());
+			}
 		}
 	}
 

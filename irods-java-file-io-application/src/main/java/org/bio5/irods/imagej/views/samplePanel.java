@@ -17,6 +17,9 @@ import javax.swing.border.MatteBorder;
 import java.awt.Color;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.CompoundBorder;
+import javax.swing.JLabel;
+import java.awt.FlowLayout;
+import javax.swing.border.LineBorder;
 
 public class samplePanel extends JPanel {
 	private JTable table;
@@ -45,6 +48,16 @@ public class samplePanel extends JPanel {
 		
 		JPanel panel = new JPanel();
 		tabbedPane.addTab("New tab", null, panel, null);
+		GroupLayout gl_panel = new GroupLayout(panel);
+		gl_panel.setHorizontalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 565, Short.MAX_VALUE)
+		);
+		gl_panel.setVerticalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 375, Short.MAX_VALUE)
+		);
+		panel.setLayout(gl_panel);
 		
 		JPanel panel_1 = new JPanel();
 		tabbedPane.addTab("File Information", null, panel_1, null);
@@ -73,7 +86,33 @@ public class samplePanel extends JPanel {
 		table.getColumnModel().getColumn(0).setMinWidth(100);
 		table.getColumnModel().getColumn(1).setPreferredWidth(300);
 		table.getColumnModel().getColumn(1).setMinWidth(200);
-		panel_1.add(table);
+		
+		JLabel label_ProgressBar_BytesTrasferredOutofTotalFileSize = new JLabel(" Progress:");
+		label_ProgressBar_BytesTrasferredOutofTotalFileSize.setToolTipText(" Progress: bytesTransferred/Total File Size in Bytes");
+		label_ProgressBar_BytesTrasferredOutofTotalFileSize.setBorder(new LineBorder(new Color(0, 0, 0)));
+		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
+		gl_panel_1.setHorizontalGroup(
+			gl_panel_1.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_1.createSequentialGroup()
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addGap(43)
+							.addComponent(table, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addGap(146)
+							.addComponent(label_ProgressBar_BytesTrasferredOutofTotalFileSize, GroupLayout.PREFERRED_SIZE, 179, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(72, Short.MAX_VALUE))
+		);
+		gl_panel_1.setVerticalGroup(
+			gl_panel_1.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_1.createSequentialGroup()
+					.addGap(76)
+					.addComponent(label_ProgressBar_BytesTrasferredOutofTotalFileSize, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+					.addGap(41)
+					.addComponent(table, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(119, Short.MAX_VALUE))
+		);
+		panel_1.setLayout(gl_panel_1);
 		setLayout(groupLayout);
 
 	}

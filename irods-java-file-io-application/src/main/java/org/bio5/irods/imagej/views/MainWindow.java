@@ -84,7 +84,7 @@ public class MainWindow extends JFrame {
 
 		setTitle("iRODS");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 757, 568);
+		setBounds(100, 100, 682, 454);
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
