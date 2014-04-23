@@ -1,6 +1,7 @@
 package org.bio5.irods.imagej.bean;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -92,6 +93,26 @@ public class IrodsImageJBean implements Serializable {
 	private String currentActiveTabUnderJTabbedPane;
 
 	private ObjStat objStatForGivenAbsolutePath;
+
+	private HashMap<String, Object> saveDetails;
+
+	private boolean isImageOpened = false;
+
+	public boolean isImageOpened() {
+		return isImageOpened;
+	}
+
+	public void setImageOpened(boolean isImageOpened) {
+		this.isImageOpened = isImageOpened;
+	}
+
+	public HashMap<String, Object> getSaveDetails() {
+		return saveDetails;
+	}
+
+	public void setSaveDetails(HashMap<String, Object> saveDetails) {
+		this.saveDetails = saveDetails;
+	}
 
 	public ObjStat getObjStatForGivenAbsolutePath() {
 		return objStatForGivenAbsolutePath;
@@ -295,7 +316,7 @@ public class IrodsImageJBean implements Serializable {
 		this.irodsTransferStatusCallbackListener = irodsTransferStatusCallbackListener;
 	}
 
-	public  IRODSFile getiRodsFile() {
+	public IRODSFile getiRodsFile() {
 		return iRodsFile;
 	}
 

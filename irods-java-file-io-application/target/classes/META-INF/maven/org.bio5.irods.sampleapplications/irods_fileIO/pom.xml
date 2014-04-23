@@ -1,0 +1,127 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.bio5.irods.sampleapplications</groupId>
+	<artifactId>irods_fileIO</artifactId>
+	<version>0.0.1Snapshot</version>
+	<packaging>jar</packaging>
+
+	<name>irods_java_file_io_application</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jargon.version>3.3.3-SNAPSHOT</jargon.version>
+		<imagej.version>1.47</imagej.version>
+		<imagej.path>C:\Program Files (x86)\ImageJ</imagej.path>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JARGON Dependency -->
+		<dependency>
+			<groupId>org.irods.jargon</groupId>
+			<artifactId>jargon-core</artifactId>
+			<version>${jargon.version}</version>
+		</dependency>
+
+		<!-- ImageJ Dependency -->
+		<dependency>
+			<groupId>gov.nih.imagej</groupId>
+			<artifactId>imagej</artifactId>
+			<version>${imagej.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<!-- jar with dependencies -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<finalName>${artifactId}-${version}-jar-with-dependencies</finalName>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copytoplugins</id>
+						<phase>install</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<!-- Below snippet will drop jar directly into ImageJ's */plugins/irods 
+									folder -->
+								<copy todir="${imagej.path}/plugins/iRODS"
+									file="target/${project.build.finalName}-jar-with-dependencies.jar" />
+							</tasks>
+							<archive>
+								<manifest>
+									<addDefaultImplementationEntries>false</addDefaultImplementationEntries>
+									<addClasspath>true</addClasspath>
+									<mainClass>org.bio5.irods.imagej.views.Irods_Plugin</mainClass>
+									<classpathPrefix>../org/</classpathPrefix>
+								</manifest>
+								<manifestEntries>
+									<Class-Path>../org/</Class-Path>
+								</manifestEntries>
+							</archive>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<!-- Added RENCI repository -->
+		<repository>
+			<id>renci.repository</id>
+			<name>renci.repository</name>
+			<url>http://ci-dev.renci.org/nexus/content/repositories/public
+			</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+		</repository>
+		<!-- End of RENCI repository -->
+	</repositories>
+</project>

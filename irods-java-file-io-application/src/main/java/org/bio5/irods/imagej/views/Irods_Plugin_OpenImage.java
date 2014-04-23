@@ -10,20 +10,32 @@ import java.awt.event.WindowEvent;
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.bean.IrodsImageJBean;
 
-public class Irods_Plugin extends PlugInFrame {
+public class Irods_Plugin_OpenImage extends PlugInFrame {
 
 	private static final long serialVersionUID = 3225639715931294038L;
 
 	/* Declare static variables */
+	private static Irods_Plugin_OpenImage irods_Plugin_instance;
+	@SuppressWarnings("unused")
 	private static Frame instance;
-	private IrodsImageJBean irodsImagej;
+	private static IrodsImageJBean irodsImagej;
+	private static MainWindow mainWindow;
 
 	/* Logger instantiation */
-	static Logger log = Logger.getLogger(Irods_Plugin.class.getName());
+	static Logger log = Logger
+			.getLogger(Irods_Plugin_OpenImage.class.getName());
 
-	public Irods_Plugin() {
+	public static IrodsImageJBean getIrodsImagej() {
+		return irodsImagej;
+	}
+
+	public static Irods_Plugin_OpenImage getIrods_Plugin_instance() {
+		return irods_Plugin_instance;
+	}
+
+	public Irods_Plugin_OpenImage() {
 		super("iRODS");
-		log = Logger.getLogger(Irods_Plugin.class);
+		log = Logger.getLogger(Irods_Plugin_OpenImage.class);
 	}
 
 	public void processWindowEvent(WindowEvent e) {
@@ -34,19 +46,17 @@ public class Irods_Plugin extends PlugInFrame {
 	}
 
 	public void run(String arg) {
-
-		MainWindow mainWindow = new MainWindow();
 		irodsImagej = new IrodsImageJBean();
-		irodsImagej.setMainWindow(mainWindow);
+		//irodsImagej.setMainWindow(mainWindow);
+		mainWindow = new MainWindow(irodsImagej);
 		mainWindow.setVisible(true);
-
 	}
 
 	/* Main method to Debug the code - Remove it once app is done! */
 	public static void main(String[] args) {
 		// set the plugins.dir property to make the plugin appear in the Plugins
 		// menu
-		Class<?> clazz = Irods_Plugin.class;
+		Class<?> clazz = Irods_Plugin_OpenImage.class;
 		String url = clazz.getResource(
 				"/" + clazz.getName().replace('.', '/') + ".class").toString();
 		String pluginsDir = url.substring(5, url.length()

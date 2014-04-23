@@ -179,16 +179,23 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	public void done() {
 		/* Opening the selected ImageJ */
 		Opener imagejOpener = new Opener();
-		String imageFilePath = irodsImagej.getImageJCacheFolder()
-				+ IrodsUtilities.getPathSeperator()
-				+ sourceIrodsFilePath.getName();
-		log.info("Current file opened by user: " + imageFilePath);
-		ImagePlus imagePlus = imagejOpener.openImage(imageFilePath);
-		// ImagePlus imagePlus = IJ.openImage(imageFilePath);
+		if (null != irodsImagej.getImageJCacheFolder()) {
+			String imageFilePath = irodsImagej.getImageJCacheFolder()
+					+ IrodsUtilities.getPathSeperator()
+					+ sourceIrodsFilePath.getName();
+			log.info("Current file opened by user: " + imageFilePath);
+			ImagePlus imagePlus = imagejOpener.openImage(imageFilePath);
+			// ImagePlus imagePlus = IJ.openImage(imageFilePath);
 
-		if (imagePlus != null) {
-			log.info("ImagePlus instance is not null and before calling show() function of ImagePlus class");
-			imagePlus.show();
+			if (imagePlus != null) {
+				log.info("ImagePlus instance is not null and before calling show() function of ImagePlus class");
+				imagePlus.show();
+				irodsImagej.setImageOpened(true);
+				log.info("irodsImagej.isImageOpened is set to true");
+			} else {
+				log.error("imagePlus instance in GetFileFromIrodsSwingWorker is null and irodsImagej.isImageOpened is false");
+
+			}
 		} else {
 			IJ.showMessage("ImageJ is not able to open requested file!");
 			IJ.showStatus("ImageJ is not able to open requested file!");
