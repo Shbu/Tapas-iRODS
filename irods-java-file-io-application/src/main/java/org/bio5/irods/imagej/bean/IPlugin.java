@@ -88,6 +88,8 @@ public class IPlugin implements Serializable {
 
 	private String objSelectedUsingSingleClick;
 
+	private String selectedNodeInTreeForSingleClick;
+
 	private IRODSFileSystemAOImpl iRODSFileSystemAOImpl;
 
 	private String currentActiveTabUnderJTabbedPane;
@@ -97,6 +99,15 @@ public class IPlugin implements Serializable {
 	private HashMap<String, Object> saveDetails;
 
 	private boolean isImageOpened = false;
+
+	public String getSelectedNodeInTreeForSingleClick() {
+		return selectedNodeInTreeForSingleClick;
+	}
+
+	public void setSelectedNodeInTreeForSingleClick(
+			String selectedNodeInTreeForSingleClick) {
+		this.selectedNodeInTreeForSingleClick = selectedNodeInTreeForSingleClick;
+	}
 
 	public boolean isImageOpened() {
 		return isImageOpened;

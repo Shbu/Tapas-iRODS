@@ -97,7 +97,8 @@ public class DirectoryContentsWindow extends JPanel implements
 	private JLabel label_ProgressBar_BytesTrasferredOutofTotalFileSize;
 
 	/* Logger instantiation */
-	static Logger log = Logger.getLogger(DirectoryContentsWindow.class.getName());
+	static Logger log = Logger.getLogger(DirectoryContentsWindow.class
+			.getName());
 
 	/**
 	 * Create the panel.
@@ -189,7 +190,7 @@ public class DirectoryContentsWindow extends JPanel implements
 	}
 
 	/**
-	 * @param irodsImagej
+	 * @param iplugin
 	 * @param jTextField_sourceFile
 	 * @param jTextField_destinationPath
 	 * @param jButton_saveToIrodsServer
@@ -215,7 +216,7 @@ public class DirectoryContentsWindow extends JPanel implements
 				JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
 						.getSource();
 				int index = sourceTabbedPane.getSelectedIndex();
-				System.out.println("CurrentActiveTabUnderJTabbedPane : "
+				log.info("CurrentActiveTabUnderJTabbedPane : "
 						+ sourceTabbedPane.getTitleAt(index));
 				String currentActiveTabUnderJTabbedPane = sourceTabbedPane
 						.getTitleAt(index);
@@ -281,7 +282,8 @@ public class DirectoryContentsWindow extends JPanel implements
 
 				chooser = new JFileChooser();
 				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				int option = chooser.showOpenDialog(DirectoryContentsWindow.this);
+				int option = chooser
+						.showOpenDialog(DirectoryContentsWindow.this);
 				if (option == JFileChooser.APPROVE_OPTION) {
 					jTextField_sourceFile
 							.setText(((chooser.getSelectedFile() != null) ? chooser
@@ -325,9 +327,8 @@ public class DirectoryContentsWindow extends JPanel implements
 						sourceLocalfile = new File(sourceFilePath);
 						if (selectedNodeInTreeForSingleClick != null
 								&& selectedNodeInTreeForSingleClick != "") {
-							System.out
-									.println("destination path || selectedNodeInTreeForSingleClick"
-											+ selectedNodeInTreeForSingleClick);
+							log.info("destination path || selectedNodeInTreeForSingleClick"
+									+ selectedNodeInTreeForSingleClick);
 							destinationFilePath = IrodsUtilities
 									.getPathSeperator()
 									+ irodsAccount.getZone()
@@ -337,13 +338,10 @@ public class DirectoryContentsWindow extends JPanel implements
 									+ jTextField_destinationPath.getText();
 							destinaitonIrodsFile = iRODSFileFactory
 									.instanceIRODSFile(destinationFilePath);
-							System.out
-									.println("sourceLocalfile absolute path: "
-											+ sourceLocalfile.getAbsolutePath()
-											+ "\n"
-											+ "destinaitonIrodsFile absolutepath: "
-											+ destinaitonIrodsFile
-													.getAbsoluteFile());
+							log.info("sourceLocalfile absolute path: "
+									+ sourceLocalfile.getAbsolutePath() + "\n"
+									+ "destinaitonIrodsFile absolutepath: "
+									+ destinaitonIrodsFile.getAbsoluteFile());
 							try {
 								// dataTransferOperationsAO.putOperation(sourceLocalfile.getAbsolutePath(),destinaitonIrodsFile.getAbsolutePath(),targetResourceName,irodsTransferStatusCallbackListener,transferControlBlock);
 								if (null != irodsImagej
@@ -472,7 +470,7 @@ public class DirectoryContentsWindow extends JPanel implements
 					irodsImagej.getJprogressbar().setValue(0);
 					log.info("tree path after double click"
 							+ selectedNodeInTreeForDoubleClick);
-					System.out.println("double click selection: "
+					log.info("double click selection: "
 							+ selectedNodeInTreeForDoubleClick);
 
 					selectedNodeInTreeForDoubleClick = IrodsUtilities
@@ -487,6 +485,10 @@ public class DirectoryContentsWindow extends JPanel implements
 					selectedNodeInTreeForSingleClick = IrodsUtilities
 							.getJtreeSelectionForSingleClick(mouseEvent,
 									userDirectoryTree);
+					if (null != selectedNodeInTreeForSingleClick) {
+						irodsImagej
+								.setSelectedNodeInTreeForSingleClick(selectedNodeInTreeForSingleClick);
+					}
 
 					if (irodsImagej.getCurrentActiveTabUnderJTabbedPane() == Constants.JTABBEDPANE_SELECTED_TAB_FILE_INFORMATION) {
 						String selectedNodeInTreeForSingleClickToGetObjStat = IrodsUtilities
@@ -552,8 +554,6 @@ public class DirectoryContentsWindow extends JPanel implements
 			final IRODSAccount irodsAccount) {
 
 		if (!irodsAccountFile.isDirectory()) {
-			// System.out.println("File name" +irodsAccountFile.getName() +":"
-			// +irodsAccountFile.getAbsolutePath());
 			log.info("File name:" + irodsAccountFile.getName() + ":"
 					+ irodsAccountFile.getAbsolutePath());
 			DefaultMutableTreeNode child = new DefaultMutableTreeNode(

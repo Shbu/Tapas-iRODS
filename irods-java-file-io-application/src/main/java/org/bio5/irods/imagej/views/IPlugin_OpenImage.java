@@ -1,7 +1,6 @@
 package org.bio5.irods.imagej.views;
 
 import ij.IJ;
-import ij.ImageJ;
 import ij.plugin.frame.PlugInFrame;
 
 import java.awt.Frame;
@@ -22,8 +21,7 @@ public class IPlugin_OpenImage extends PlugInFrame {
 	private static MainWindow mainWindow;
 
 	/* Logger instantiation */
-	static Logger log = Logger
-			.getLogger(IPlugin_OpenImage.class.getName());
+	static Logger log = Logger.getLogger(IPlugin_OpenImage.class.getName());
 
 	public static IPlugin getIrodsImagej() {
 		return irodsImagej;
@@ -47,7 +45,7 @@ public class IPlugin_OpenImage extends PlugInFrame {
 
 	public void run(String arg) {
 		irodsImagej = new IPlugin();
-		//irodsImagej.setMainWindow(mainWindow);
+		// irodsImagej.setMainWindow(mainWindow);
 		mainWindow = new MainWindow(irodsImagej);
 		mainWindow.setVisible(true);
 	}
@@ -62,9 +60,6 @@ public class IPlugin_OpenImage extends PlugInFrame {
 		String pluginsDir = url.substring(5, url.length()
 				- clazz.getName().length() - 6);
 		System.setProperty("plugins.dir", pluginsDir);
-
-		// start ImageJ
-		new ImageJ();
 
 		// open a sample bio5 image
 		/*

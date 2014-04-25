@@ -49,8 +49,7 @@ public class MainWindow extends JFrame {
 	public IRODSFileSystem irodsFileSystem;
 
 	/* Logger instantiation */
-	static Logger log = Logger
-			.getLogger(IPlugin_OpenImage.class.getName());
+	static Logger log = Logger.getLogger(IPlugin_OpenImage.class.getName());
 
 	private JPanel contentPanePanel;
 	private JTextField textbox_LoginId;
