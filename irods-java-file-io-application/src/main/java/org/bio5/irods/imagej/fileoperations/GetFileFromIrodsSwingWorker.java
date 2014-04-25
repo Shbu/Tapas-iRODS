@@ -28,21 +28,21 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	private IRODSFileFactory iRODSFileFactory;
 	private String treePath;
 	private DataTransferOperations dataTransferOperationsAO;
-	private IPlugin irodsImagej;
+	private IPlugin iPlugin;
 	private DataObjectAO dataObjectAO;
 	private TransferControlBlock transferControlBlock;
 	IRODSFile sourceIrodsFilePath = null;
 
 	/* Logger instantiation */
-	static Logger log = Logger.getLogger(DirectoryContentsWindow.class.getName());
+	static Logger log = Logger.getLogger(DirectoryContentsWindow.class
+			.getName());
 
 	/* Get files from iRODS Server */
 	public GetFileFromIrodsSwingWorker(IRODSFileFactory iRODSFileFactory,
-			String treePath, IPlugin irodsImagej,
-			JProgressBar progressbar) {
+			String treePath, IPlugin irodsImagej, JProgressBar progressbar) {
 		this.iRODSFileFactory = iRODSFileFactory;
 		this.treePath = treePath;
-		this.irodsImagej = irodsImagej;
+		this.iPlugin = irodsImagej;
 
 	}
 
@@ -55,36 +55,36 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 
 		log.info("finalTreePath:" + treePath);
 
-		if (null != irodsImagej) {
-			transferControlBlock = irodsImagej.getTransferControlBlock();
-			irodsImagej.setTransferControlBlock(transferControlBlock);
-			irodsImagej.setTransferOptions(transferControlBlock
+		if (null != iPlugin) {
+			transferControlBlock = iPlugin.getTransferControlBlock();
+			iPlugin.setTransferControlBlock(transferControlBlock);
+			iPlugin.setTransferOptions(transferControlBlock
 					.getTransferOptions());
-			irodsImagej.getTransferOptions().setMaxThreads(10);
-			dataTransferOperationsAO = irodsImagej.getIrodsFileSystem()
+			iPlugin.getTransferOptions().setMaxThreads(10);
+			dataTransferOperationsAO = iPlugin.getIrodsFileSystem()
 					.getIRODSAccessObjectFactory()
-					.getDataTransferOperations(irodsImagej.getIrodsAccount());
+					.getDataTransferOperations(iPlugin.getIrodsAccount());
 			/*
 			 * Check if user requires all files under home directory - this has
 			 * performance degradation.
 			 */
-			if (irodsImagej.isHomeDirectoryTheRootNode()) {
+			if (iPlugin.isHomeDirectoryTheRootNode()) {
 				sourceIrodsFilePath = iRODSFileFactory
 						.instanceIRODSFile(IrodsUtilities.getPathSeperator()
-								+ irodsImagej.getIrodsAccount().getZone()
+								+ iPlugin.getIrodsAccount().getZone()
 								+ treePath);
 			} else {
 				sourceIrodsFilePath = iRODSFileFactory
 						.instanceIRODSFile(IrodsUtilities.getPathSeperator()
-								+ irodsImagej.getIrodsAccount().getZone()
+								+ iPlugin.getIrodsAccount().getZone()
 								+ IrodsUtilities.getPathSeperator()
 								+ Constants.HOME + treePath);
 
 			}
 
-			dataObjectAO = irodsImagej.getIrodsFileSystem()
+			dataObjectAO = iPlugin.getIrodsFileSystem()
 					.getIRODSAccessObjectFactory()
-					.getDataObjectAO(irodsImagej.getIrodsAccount());
+					.getDataObjectAO(iPlugin.getIrodsAccount());
 
 			/* Getting MD5 checksum of the current file from iRODS */
 			String md5ChecksumLocalFile = null;
@@ -97,7 +97,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 						+ e.getMessage());
 			}
 			File destinationLocalFilePath = new File(
-					irodsImagej.getImageJCacheFolder());
+					iPlugin.getImageJCacheFolder());
 			log.info("sourceIrodsFilePath before inserting file"
 					+ sourceIrodsFilePath);
 			log.info("destinationLocalFilePath before inserting file"
@@ -128,7 +128,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 			}
 			try {
 				if (null != sourceIrodsFilePath) {
-					if (null != irodsImagej) {
+					if (null != iPlugin) {
 						log.info("IntraFileStatusCallBack: "
 								+ transferControlBlock.getTransferOptions()
 										.isIntraFileStatusCallbacks());
@@ -136,8 +136,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 								.getOperation(
 										sourceIrodsFilePath,
 										destinationLocalFilePath,
-										irodsImagej
-												.getIrodsTransferStatusCallbackListener(),
+										iPlugin.getIrodsTransferStatusCallbackListener(),
 										transferControlBlock);
 					}
 				}
@@ -179,22 +178,22 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	public void done() {
 		/* Opening the selected ImageJ */
 		Opener imagejOpener = new Opener();
-		if (null != irodsImagej.getImageJCacheFolder()) {
-			String imageFilePath = irodsImagej.getImageJCacheFolder()
+		if (null != iPlugin.getImageJCacheFolder()) {
+			String imageFilePath = iPlugin.getImageJCacheFolder()
 					+ IrodsUtilities.getPathSeperator()
 					+ sourceIrodsFilePath.getName();
 			log.info("Current file opened by user: " + imageFilePath);
 			ImagePlus imagePlus = imagejOpener.openImage(imageFilePath);
 			// ImagePlus imagePlus = IJ.openImage(imageFilePath);
 
-			if (imagePlus != null) {
+			if (null != imagePlus) {
+				iPlugin.setImagePlus(imagePlus);
 				log.info("ImagePlus instance is not null and before calling show() function of ImagePlus class");
 				imagePlus.show();
-				irodsImagej.setImageOpened(true);
+				iPlugin.setImageOpened(true);
 				log.info("irodsImagej.isImageOpened is set to true");
 			} else {
 				log.error("imagePlus instance in GetFileFromIrodsSwingWorker is null and irodsImagej.isImageOpened is false");
-
 			}
 		} else {
 			IJ.showMessage("ImageJ is not able to open requested file!");

@@ -88,7 +88,7 @@ public class DirectoryContentsWindow extends JPanel implements
 	private JScrollPane scrollPane;
 	private IRODSAccount irodsAccount;
 	private TransferControlBlock transferControlBlock;
-	private IPlugin irodsImagej;
+	private IPlugin iPlugin;
 	private JLabel jTextField_sourceFile;
 	private JLabel jTextField_destinationPath;
 	private JButton jButton_saveToIrodsServer;
@@ -111,7 +111,7 @@ public class DirectoryContentsWindow extends JPanel implements
 			throws JargonException, MalformedURLException {
 		FlowLayout flowLayout = (FlowLayout) getLayout();
 		flowLayout.setAlignment(FlowLayout.LEFT);
-		this.irodsImagej = irodsImageJ;
+		this.iPlugin = irodsImageJ;
 	}
 
 	/**
@@ -119,35 +119,35 @@ public class DirectoryContentsWindow extends JPanel implements
 	 */
 	public void init() throws JargonException {
 		log.info("Local path before refactoring: "
-				+ irodsImagej.getImageJCacheFolder());
+				+ iPlugin.getImageJCacheFolder());
 		// Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY.replaceAll(IrodsUtilities.pathSeperator(),
 		// "//");
 		log.info("Local directory to store ImageJ files: "
-				+ irodsImagej.getImageJCacheFolder());
-		irodsAccount = irodsImagej.getIrodsAccount();
-		iRODSFileFactory = FileOperations
-				.getIrodsAccountFileFactory(irodsImagej.getIrodsAccount());
-		irodsImagej.setiRODSFileFactory(iRODSFileFactory);
+				+ iPlugin.getImageJCacheFolder());
+		irodsAccount = iPlugin.getIrodsAccount();
+		iRODSFileFactory = FileOperations.getIrodsAccountFileFactory(iPlugin
+				.getIrodsAccount());
+		iPlugin.setiRODSFileFactory(iRODSFileFactory);
 
 		homeNode = new DefaultMutableTreeNode(Constants.HOME);
-		if (!irodsImagej.isHomeDirectoryTheRootNode()) {
-			accountNode = new DefaultMutableTreeNode(irodsImagej
-					.getIrodsAccount().getUserName());
+		if (!iPlugin.isHomeDirectoryTheRootNode()) {
+			accountNode = new DefaultMutableTreeNode(iPlugin.getIrodsAccount()
+					.getUserName());
 			homeNode.add(accountNode); /* Adding accountNode to HomeNode */
-			irodsImagej.setRootTreeNodeForDirectoryContents(accountNode);
+			iPlugin.setRootTreeNodeForDirectoryContents(accountNode);
 			treeModel = new DefaultTreeModel(accountNode, true);
 		} else {
-			irodsImagej.setRootTreeNodeForDirectoryContents(homeNode);
+			iPlugin.setRootTreeNodeForDirectoryContents(homeNode);
 			treeModel = new DefaultTreeModel(homeNode, true);
 		}
 		treeModel.addTreeModelListener(new MyTreeModelListener());
-		irodsImagej.setTreeModel(treeModel);
+		iPlugin.setTreeModel(treeModel);
 
 		/* Initiating Jprogressbar */
 		progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
 		progressBar.setToolTipText("Progress of action");
-		irodsImagej.setJprogressbar(progressBar);
+		iPlugin.setJprogressbar(progressBar);
 
 		/* Progress bar label to show bytesTrasferred out of TotalFileSize */
 		label_ProgressBar_BytesTrasferredOutofTotalFileSize = new JLabel(
@@ -159,7 +159,7 @@ public class DirectoryContentsWindow extends JPanel implements
 
 		/* Setting iRODS file system */
 		irodsFileSystem = IRODSFileSystem.instance();
-		irodsImagej.setIrodsFileSystem(irodsFileSystem);
+		iPlugin.setIrodsFileSystem(irodsFileSystem);
 
 		dataTransferOperationsAO = irodsFileSystem
 				.getIRODSAccessObjectFactory().getDataTransferOperations(
@@ -168,8 +168,8 @@ public class DirectoryContentsWindow extends JPanel implements
 		/* Setting scrollPane */
 		scrollPane = new javax.swing.JScrollPane();
 		viewport = scrollPane.getViewport();
-		irodsImagej.setScrollPane(scrollPane);
-		irodsImagej.setViewport(viewport);
+		iPlugin.setScrollPane(scrollPane);
+		iPlugin.setViewport(viewport);
 
 		jTextField_sourceFile = new JLabel("Local file");
 		jTextField_destinationPath = new JLabel("Destination");
@@ -178,12 +178,12 @@ public class DirectoryContentsWindow extends JPanel implements
 		/* Construct TransferControlBlock from default jargon properties */
 		irodsPropertiesConstruction = new IrodsPropertiesConstruction();
 		transferControlBlock = irodsPropertiesConstruction
-				.constructHighPerformanceTransferControlBlockFromJargonProperties(irodsImagej);
-		irodsImagej.setTransferControlBlock(transferControlBlock);
+				.constructHighPerformanceTransferControlBlockFromJargonProperties(iPlugin);
+		iPlugin.setTransferControlBlock(transferControlBlock);
 
 		/* Construct IrodsTransferStatusCallbackListener */
 		irodsPropertiesConstruction
-				.constructIrodsTransferStatusCallbackListener(irodsImagej);
+				.constructIrodsTransferStatusCallbackListener(iPlugin);
 
 		/* Creating model */
 		setVisible(true);
@@ -197,12 +197,12 @@ public class DirectoryContentsWindow extends JPanel implements
 	 */
 	public void implementation() {
 
-		if (null != irodsImagej.getCollectionsUnderGivenAbsolutePath()) {
-			List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath = irodsImagej
+		if (null != iPlugin.getCollectionsUnderGivenAbsolutePath()) {
+			List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath = iPlugin
 					.getCollectionsUnderGivenAbsolutePath();
 			parseDirectoryContentsUsingList(
 					listOfCollectionsUnderGivenAbsolutePath,
-					irodsImagej.getRootTreeNodeForDirectoryContents());
+					iPlugin.getRootTreeNodeForDirectoryContents());
 		} else {
 			log.error("File directory is empty");
 		}
@@ -220,8 +220,7 @@ public class DirectoryContentsWindow extends JPanel implements
 						+ sourceTabbedPane.getTitleAt(index));
 				String currentActiveTabUnderJTabbedPane = sourceTabbedPane
 						.getTitleAt(index);
-				irodsImagej
-						.setCurrentActiveTabUnderJTabbedPane(currentActiveTabUnderJTabbedPane);
+				iPlugin.setCurrentActiveTabUnderJTabbedPane(currentActiveTabUnderJTabbedPane);
 			}
 		};
 
@@ -316,7 +315,7 @@ public class DirectoryContentsWindow extends JPanel implements
 					String sourceFilePath = null;
 					String destinationFilePath = null;
 					String targetResourceName = "";
-					targetResourceName = irodsImagej.getIrodsAccount()
+					targetResourceName = iPlugin.getIrodsAccount()
 							.getDefaultStorageResource();
 					File sourceLocalfile = null;
 					IRODSFile destinaitonIrodsFile = null;
@@ -344,12 +343,11 @@ public class DirectoryContentsWindow extends JPanel implements
 									+ destinaitonIrodsFile.getAbsoluteFile());
 							try {
 								// dataTransferOperationsAO.putOperation(sourceLocalfile.getAbsolutePath(),destinaitonIrodsFile.getAbsolutePath(),targetResourceName,irodsTransferStatusCallbackListener,transferControlBlock);
-								if (null != irodsImagej
-										&& null != sourceLocalfile
+								if (null != iPlugin && null != sourceLocalfile
 										&& null != destinaitonIrodsFile
 										&& null != targetResourceName) {
 									putFile = new PutFileToIrodsSwingWorker(
-											irodsImagej, sourceLocalfile,
+											iPlugin, sourceLocalfile,
 											destinaitonIrodsFile,
 											targetResourceName);
 									putFile.execute();
@@ -382,8 +380,7 @@ public class DirectoryContentsWindow extends JPanel implements
 										gl_panel.createParallelGroup(
 												Alignment.LEADING)
 												.addComponent(
-														irodsImagej
-																.getJprogressbar(),
+														iPlugin.getJprogressbar(),
 														GroupLayout.DEFAULT_SIZE,
 														217, Short.MAX_VALUE)
 												.addGroup(
@@ -411,7 +408,7 @@ public class DirectoryContentsWindow extends JPanel implements
 				.addGroup(
 						gl_panel.createSequentialGroup()
 								.addContainerGap()
-								.addComponent(irodsImagej.getJprogressbar(),
+								.addComponent(iPlugin.getJprogressbar(),
 										GroupLayout.PREFERRED_SIZE,
 										GroupLayout.DEFAULT_SIZE,
 										GroupLayout.PREFERRED_SIZE)
@@ -458,7 +455,7 @@ public class DirectoryContentsWindow extends JPanel implements
 		panel_1.add(table);
 		setLayout(groupLayout);
 
-		constructUserDirectoryTree(irodsImagej);
+		constructUserDirectoryTree(iPlugin);
 
 		userDirectoryTree.addMouseListener(new MouseAdapter() {
 			@Override
@@ -467,7 +464,7 @@ public class DirectoryContentsWindow extends JPanel implements
 				if (mouseEvent.getClickCount() == 2) {
 
 					/* resetting progress bar to 0 if a double click is detected */
-					irodsImagej.getJprogressbar().setValue(0);
+					iPlugin.getJprogressbar().setValue(0);
 					log.info("tree path after double click"
 							+ selectedNodeInTreeForDoubleClick);
 					log.info("double click selection: "
@@ -475,10 +472,18 @@ public class DirectoryContentsWindow extends JPanel implements
 
 					selectedNodeInTreeForDoubleClick = IrodsUtilities
 							.getJtreeSelection(mouseEvent, userDirectoryTree);
-					getFile = new GetFileFromIrodsSwingWorker(iRODSFileFactory,
-							selectedNodeInTreeForDoubleClick, irodsImagej,
-							irodsImagej.getJprogressbar());
-					getFile.execute();
+					if (null != selectedNodeInTreeForDoubleClick
+							&& selectedNodeInTreeForDoubleClick != "") {
+						log.info("selectedNodeInTreeForDoubleClick string is "
+								+ selectedNodeInTreeForDoubleClick);
+						iPlugin.setSelectedNodeInTreeForDoubleClick(selectedNodeInTreeForDoubleClick);
+						getFile = new GetFileFromIrodsSwingWorker(
+								iRODSFileFactory,
+								selectedNodeInTreeForDoubleClick, iPlugin,
+								iPlugin.getJprogressbar());
+						getFile.execute();
+					}
+
 				} else if (mouseEvent.getClickCount() == 1) {
 
 					/* resetting progress bar to 0 if a single click is detected */
@@ -486,21 +491,19 @@ public class DirectoryContentsWindow extends JPanel implements
 							.getJtreeSelectionForSingleClick(mouseEvent,
 									userDirectoryTree);
 					if (null != selectedNodeInTreeForSingleClick) {
-						irodsImagej
-								.setSelectedNodeInTreeForSingleClick(selectedNodeInTreeForSingleClick);
+						iPlugin.setSelectedNodeInTreeForSingleClick(selectedNodeInTreeForSingleClick);
 					}
 
-					if (irodsImagej.getCurrentActiveTabUnderJTabbedPane() == Constants.JTABBEDPANE_SELECTED_TAB_FILE_INFORMATION) {
+					if (iPlugin.getCurrentActiveTabUnderJTabbedPane() == Constants.JTABBEDPANE_SELECTED_TAB_FILE_INFORMATION) {
 						String selectedNodeInTreeForSingleClickToGetObjStat = IrodsUtilities
 								.getJtreeSelection(mouseEvent,
 										userDirectoryTree);
 						if (null != selectedNodeInTreeForSingleClickToGetObjStat) {
-							irodsImagej
-									.setObjSelectedUsingSingleClick(selectedNodeInTreeForSingleClickToGetObjStat);
+							iPlugin.setObjSelectedUsingSingleClick(selectedNodeInTreeForSingleClickToGetObjStat);
 							log.info("ObjSelectedUsingSingleClick of irodsImageJ is set: "
 									+ selectedNodeInTreeForSingleClickToGetObjStat);
 							ObjectDetailsSwingWorker objectDetailsFromSwingWorker = new ObjectDetailsSwingWorker(
-									irodsImagej);
+									iPlugin);
 							objectDetailsFromSwingWorker.execute();
 						}
 					}
@@ -634,7 +637,7 @@ public class DirectoryContentsWindow extends JPanel implements
 		try {
 			childNode = new DefaultMutableTreeNode(child, false);
 			if (parent == null) {
-				parent = irodsImagej.getRootTreeNodeForDirectoryContents();
+				parent = iPlugin.getRootTreeNodeForDirectoryContents();
 			}
 
 			treeModel.insertNodeInto(childNode, parent, parent.getChildCount());
@@ -676,7 +679,7 @@ public class DirectoryContentsWindow extends JPanel implements
 		Object[] elements = tp.getPath();/* edit path */
 		// String pathOfInternalNode=builder.toString();
 		RetrieveInternalNodesSwingWorker retrieveInternalNodesSwingWorker = new RetrieveInternalNodesSwingWorker(
-				elements, irodsImagej);
+				elements, iPlugin);
 		try {
 			retrieveInternalNodesSwingWorker.doInBackground();
 		} catch (Exception e) {
@@ -686,10 +689,10 @@ public class DirectoryContentsWindow extends JPanel implements
 		 * Add nodes only if size of extracted list is more than Zero. This will
 		 * prevent empty nodes from expanding.
 		 */
-		if (irodsImagej.getChildNodesListAfterLazyLoading().size() > 0) {
-			for (int i = 0; i < irodsImagej.getChildNodesListAfterLazyLoading()
+		if (iPlugin.getChildNodesListAfterLazyLoading().size() > 0) {
+			for (int i = 0; i < iPlugin.getChildNodesListAfterLazyLoading()
 					.size(); i++) {
-				treeModel.insertNodeInto(irodsImagej
+				treeModel.insertNodeInto(iPlugin
 						.getChildNodesListAfterLazyLoading().get(i), node, node
 						.getChildCount());
 			}

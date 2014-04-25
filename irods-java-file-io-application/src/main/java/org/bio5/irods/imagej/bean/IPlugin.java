@@ -1,5 +1,7 @@
 package org.bio5.irods.imagej.bean;
 
+import ij.ImagePlus;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +18,7 @@ import org.bio5.irods.imagej.utilities.Constants;
 import org.bio5.irods.imagej.utilities.IrodsTransferStatusCallbackListener;
 import org.bio5.irods.imagej.views.DirectoryContentsWindow;
 import org.bio5.irods.imagej.views.MainWindow;
+import org.bio5.irods.imagej.views.SaveImagePanelImplementation;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.packinstr.TransferOptions;
@@ -36,6 +39,8 @@ public class IPlugin implements Serializable {
 	}
 
 	private MainWindow mainWindow = null;
+
+	private SaveImagePanelImplementation saveImagePanelImplementation = null;
 
 	private IRODSAccount irodsAccount = null;
 
@@ -90,6 +95,8 @@ public class IPlugin implements Serializable {
 
 	private String selectedNodeInTreeForSingleClick;
 
+	private String selectedNodeInTreeForDoubleClick;
+
 	private IRODSFileSystemAOImpl iRODSFileSystemAOImpl;
 
 	private String currentActiveTabUnderJTabbedPane;
@@ -99,6 +106,34 @@ public class IPlugin implements Serializable {
 	private HashMap<String, Object> saveDetails;
 
 	private boolean isImageOpened = false;
+
+	private ImagePlus imagePlus;
+
+	public ImagePlus getImagePlus() {
+		return imagePlus;
+	}
+
+	public void setImagePlus(ImagePlus imagePlus) {
+		this.imagePlus = imagePlus;
+	}
+
+	public String getSelectedNodeInTreeForDoubleClick() {
+		return selectedNodeInTreeForDoubleClick;
+	}
+
+	public void setSelectedNodeInTreeForDoubleClick(
+			String selectedNodeInTreeForDoubleClick) {
+		this.selectedNodeInTreeForDoubleClick = selectedNodeInTreeForDoubleClick;
+	}
+
+	public SaveImagePanelImplementation getSaveImagePanelImplementation() {
+		return saveImagePanelImplementation;
+	}
+
+	public void setSaveImagePanelImplementation(
+			SaveImagePanelImplementation saveImagePanelImplementation) {
+		this.saveImagePanelImplementation = saveImagePanelImplementation;
+	}
 
 	public String getSelectedNodeInTreeForSingleClick() {
 		return selectedNodeInTreeForSingleClick;

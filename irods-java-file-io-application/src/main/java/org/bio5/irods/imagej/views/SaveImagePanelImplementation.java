@@ -1,7 +1,8 @@
 package org.bio5.irods.imagej.views;
 
+import ij.IJ;
+
 import java.awt.Component;
-import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -40,6 +41,8 @@ public class SaveImagePanelImplementation extends JFrame {
 	private JTextField textField_irodsDestinationPath;
 	private JFileChooser fileChooser;
 	private PutFileToIrodsSwingWorker putFile;
+	private JLabel lbl_localFileName;
+	private JLabel lbl_irodsDestinationPath;
 
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(SaveImagePanelImplementation.class
@@ -50,33 +53,22 @@ public class SaveImagePanelImplementation extends JFrame {
 	 * 
 	 * @param saveDetails
 	 */
-	public SaveImagePanelImplementation(IPlugin iplugin) {
+	public SaveImagePanelImplementation(IPlugin ipluginInstance) {
 		setTitle("iRODS ImageJ - Save Image");
-		this.iplugin = iplugin;
+		this.iplugin = ipluginInstance;
 
 		/* Screen Design */
+		init();
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 526, 332);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-
-		textField_FileName = new JTextField();
-		textField_FileName.setColumns(10);
-
-		JLabel lbl_localFileName = new JLabel("Local File Name : ");
-
-		JLabel lbl_irodsDestinationPath = new JLabel("iRODS Destination Path :");
-
-		textField_irodsDestinationPath = new JTextField();
-		textField_irodsDestinationPath.setColumns(10);
+		/* Assign variables to fields */
+		assignVariablesToFields();
 
 		JButton btn_saveButton = new JButton("Save");
 		btn_saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				log.info("Save to iRODS Server - Button Clicked");
-				saveExecution();
+				saveCurrentEditedImageFileToLocal();
+				// saveCurrentEditedFileToIrods();
 			}
 		});
 
@@ -84,7 +76,9 @@ public class SaveImagePanelImplementation extends JFrame {
 		btn_Cancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				/* Edit functionality - pending */
-				System.exit(0);
+				if (null != iplugin.getSaveImagePanelImplementation()) {
+					iplugin.getSaveImagePanelImplementation().dispose();
+				}
 			}
 		});
 
@@ -187,7 +181,77 @@ public class SaveImagePanelImplementation extends JFrame {
 				textField_irodsDestinationPath, btn_saveButton, btn_Cancel }));
 	}
 
-	private void saveExecution() {
+	private void init() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 526, 332);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+
+		textField_FileName = new JTextField();
+		textField_FileName.setColumns(10);
+
+		lbl_localFileName = new JLabel("Local File Name : ");
+
+		lbl_irodsDestinationPath = new JLabel("iRODS Destination Path :");
+
+		textField_irodsDestinationPath = new JTextField();
+		textField_irodsDestinationPath.setColumns(10);
+
+	}
+
+	private void assignVariablesToFields() {
+
+		/* Setting user selected path as destination path to save files */
+		if (null != iplugin.getSelectedNodeInTreeForSingleClick()
+				&& iplugin.getSelectedNodeInTreeForSingleClick() != "") {
+			textField_irodsDestinationPath.setText(iplugin
+					.getSelectedNodeInTreeForSingleClick());
+		} else if (null != iplugin.getSelectedNodeInTreeForDoubleClick()
+				&& iplugin.getSelectedNodeInTreeForDoubleClick() != "") {
+			log.info("Inside assignVariablesToFields() and SelectedNodeInTreeForDoubleClick is not null"
+					+ iplugin.getSelectedNodeInTreeForDoubleClick());
+			textField_irodsDestinationPath.setText(iplugin
+					.getSelectedNodeInTreeForDoubleClick());
+		}
+
+		/* Setting current edited file */
+
+	}
+
+	private void saveCurrentEditedImageFileToLocal() {
+		if (null != iplugin.getImagePlus()) {
+			// FileSaver fileSaver = new FileSaver(iplugin.getImagePlus());
+			// fileSaver.save();
+			if (null != iplugin.getImageJCacheFolder()
+					&& null != iplugin.getSelectedNodeInTreeForDoubleClick()) {
+				String fileName = IrodsUtilities
+						.getFileNameFromDirectoryPath(iplugin
+								.getSelectedNodeInTreeForDoubleClick());
+				if (null != fileName) {
+					String savePathWithFileName = iplugin
+							.getImageJCacheFolder()
+							+ IrodsUtilities.getPathSeperator() + fileName;
+					log.info("savePathWithFileName" + savePathWithFileName);
+					IJ.save(iplugin.getImagePlus(), savePathWithFileName);
+					/*
+					 * IJ.saveAs(iplugin.getImagePlus(), "tiff",
+					 * savePathWithFileName);
+					 */
+					log.info("File save to local with filename and extention");
+					JOptionPane.showMessageDialog(null,
+							"File save to local with filename and extention");
+				}
+
+			} else {
+				log.error("ImageJCacheFolder or ImagePlus is null");
+			}
+
+		}
+
+	}
+
+	private void saveCurrentEditedFileToIrods() {
 		try {
 
 			String sourceFilePath = null;
@@ -233,8 +297,6 @@ public class SaveImagePanelImplementation extends JFrame {
 									targetResourceName);
 							putFile.execute();
 							log.info("Executed PutFile method!");
-							JOptionPane.showMessageDialog(contentPane,
-									"Saving file completed!");
 						}
 					} catch (Exception exception) {
 						log.error(exception.getMessage());

@@ -9,6 +9,7 @@ import java.security.MessageDigest;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+
 import org.apache.log4j.Logger;
 
 public final class IrodsUtilities {
@@ -124,5 +125,23 @@ public final class IrodsUtilities {
 			isDirectoryCreated = false;
 		}
 		return isDirectoryCreated;
+	}
+
+	public static String getFileNameFromDirectoryPath(String directoryPath) {
+		String fileName = null;
+		try {
+			if (null != directoryPath && directoryPath != "") {
+				String fullPath = directoryPath;
+				int index = fullPath.lastIndexOf("\\");
+				fileName = fullPath.substring(index + 1);
+				log.info("File name extracted from given directory path: "
+						+ fileName);
+			} else {
+				log.error("Given directoryPath is either empty or null!");
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
+		return fileName;
 	}
 }

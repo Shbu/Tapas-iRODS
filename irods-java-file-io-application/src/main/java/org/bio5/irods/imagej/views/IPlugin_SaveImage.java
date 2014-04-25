@@ -17,7 +17,7 @@ public class IPlugin_SaveImage extends PlugInFrame {
 	static Logger log = Logger.getLogger(IPlugin_SaveImage.class.getName());
 
 	public IPlugin iplugin;
-	private SaveImagePanelImplementation savePanelFrame;
+	private SaveImagePanelImplementation saveImagePanelImplementation;
 
 	public IPlugin_SaveImage() {
 		super("Saving Image");
@@ -48,8 +48,14 @@ public class IPlugin_SaveImage extends PlugInFrame {
 	private void setVisibility(boolean isVisibility) {
 		if (isVisibility) {
 			log.info("Inside setVisibility method");
-			savePanelFrame = new SaveImagePanelImplementation(iplugin);
-			savePanelFrame.setVisible(true);
+			saveImagePanelImplementation = new SaveImagePanelImplementation(
+					iplugin);
+			if (null != iplugin.getSaveImagePanelImplementation()) {
+				iplugin.setSaveImagePanelImplementation(saveImagePanelImplementation);
+			} else {
+				log.error("saveImagePanelImplementation instance is null");
+			}
+			saveImagePanelImplementation.setVisible(true);
 		} else {
 			log.error("Save Panel Visibility is set to false !");
 		}
