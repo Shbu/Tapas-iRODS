@@ -1,6 +1,5 @@
 package org.bio5.irods.imagej.views;
 
-import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -26,7 +25,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
-import org.bio5.irods.imagej.bean.IrodsImageJBean;
+import org.bio5.irods.imagej.bean.IPlugin;
 import org.bio5.irods.imagej.connection.IrodsConnection;
 import org.bio5.irods.imagej.fileoperations.FileOperations;
 import org.bio5.irods.imagej.utilities.Constants;
@@ -50,12 +49,8 @@ public class MainWindow extends JFrame {
 	public IRODSFileSystem irodsFileSystem;
 
 	/* Logger instantiation */
-	static Logger log = Logger.getLogger(Irods_Plugin_OpenImage.class.getName());
-
-	public MainWindow(String title) {
-		super("iRODS File IO");
-		// TODO Auto-generated constructor stub
-	}
+	static Logger log = Logger
+			.getLogger(IPlugin_OpenImage.class.getName());
 
 	private JPanel contentPanePanel;
 	private JTextField textbox_LoginId;
@@ -63,8 +58,8 @@ public class MainWindow extends JFrame {
 	private JTextField textField_Port;
 	private JTextField textField_Zone;
 	private JTextField textField_Host;
-	private DirectoryContentsPane directoryContentsPane;
-	private IrodsImageJBean irodsImagejInstance;
+	private DirectoryContentsWindow directoryContentsPane;
+	private IPlugin irodsImagejInstance;
 	private JCheckBox HomeDirectory_CheckBox;
 
 	public JFileChooser localImageJFileChooser;
@@ -77,11 +72,10 @@ public class MainWindow extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MainWindow(IrodsImageJBean irodsImagej) {
-		//super();
+	public MainWindow(IPlugin irodsImagej) {
+		// super();
 		this.irodsImagejInstance = irodsImagej;
-		
-		
+
 		mainWindowInit();
 
 		setTitle("iRODS");
@@ -173,7 +167,8 @@ public class MainWindow extends JFrame {
 				{
 					try {
 						if (HomeDirectory_CheckBox.isSelected()) {
-							irodsImagejInstance.setHomeDirectoryTheRootNode(true);
+							irodsImagejInstance
+									.setHomeDirectoryTheRootNode(true);
 						}
 
 						IRODSAccount irodsAccount = IrodsConnection
@@ -192,8 +187,8 @@ public class MainWindow extends JFrame {
 						if (irodsImagejInstance.getIrodsAccount() != null
 								&& irodsImagejInstance.getiRODSSession() != null) {
 							iRODSFileSystemAOImpl = new IRODSFileSystemAOImpl(
-									irodsImagejInstance.getiRODSSession(), irodsImagejInstance
-											.getIrodsAccount());
+									irodsImagejInstance.getiRODSSession(),
+									irodsImagejInstance.getIrodsAccount());
 							irodsImagejInstance
 									.setiRODSFileSystemAOImpl(iRODSFileSystemAOImpl);
 						}
@@ -207,11 +202,12 @@ public class MainWindow extends JFrame {
 						 */
 
 						List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = FileOperations
-								.setIrodsFile(null, irodsImagejInstance, irodsImagejInstance
-										.isHomeDirectoryTheRootNode());
+								.setIrodsFile(null, irodsImagejInstance,
+										irodsImagejInstance
+												.isHomeDirectoryTheRootNode());
 						irodsImagejInstance
 								.setCollectionsUnderGivenAbsolutePath(collectionsUnderGivenAbsolutePath);
-						directoryContentsPane = new DirectoryContentsPane(
+						directoryContentsPane = new DirectoryContentsWindow(
 								irodsImagejInstance);
 						irodsImagejInstance
 								.setDirectoryContentsPane(directoryContentsPane);
@@ -499,7 +495,6 @@ public class MainWindow extends JFrame {
 		contentPanePanel.setLayout(gl_contentPane);
 	}
 
-
 	public void setVisibilityOfForm() {
 		setContentPane(directoryContentsPane);
 		validate();
@@ -509,7 +504,7 @@ public class MainWindow extends JFrame {
 	}
 
 	private void mainWindowInit() {
-		//irodsImagejInstance = new IrodsImageJBean();
+		// irodsImagejInstance = new IrodsImageJBean();
 
 		/* Setting iRODS file system */
 		try {

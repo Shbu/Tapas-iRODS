@@ -7,24 +7,24 @@ import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
-import org.bio5.irods.imagej.bean.IrodsImageJBean;
-import org.bio5.irods.imagej.views.DirectoryContentsPane;
+import org.bio5.irods.imagej.bean.IPlugin;
+import org.bio5.irods.imagej.views.DirectoryContentsWindow;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.io.IRODSFile;
 
 public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 
-	private IrodsImageJBean irodsImagej;
+	private IPlugin irodsImagej;
 	private DataTransferOperations dataTransferOperationsAO;
 	private File sourceLocalfile = null;
 	private IRODSFile destinaitonIrodsFile = null;
 	private String targetResourceName = "";
 
 	/* Logger instantiation */
-	static Logger log = Logger.getLogger(DirectoryContentsPane.class.getName());
+	static Logger log = Logger.getLogger(DirectoryContentsWindow.class.getName());
 
-	public PutFileToIrodsSwingWorker(IrodsImageJBean irodsImagej, File sourceLocalfile,
+	public PutFileToIrodsSwingWorker(IPlugin irodsImagej, File sourceLocalfile,
 			IRODSFile destinaitonIrodsFile, String targetResourceName) {
 		super();
 		this.irodsImagej = irodsImagej;

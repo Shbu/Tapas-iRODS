@@ -8,7 +8,7 @@ import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
-import org.bio5.irods.imagej.bean.IrodsImageJBean;
+import org.bio5.irods.imagej.bean.IPlugin;
 import org.bio5.irods.imagej.utilities.IrodsUtilities;
 import org.irods.jargon.core.connection.SettableJargonProperties;
 import org.irods.jargon.core.pub.io.IRODSFile;
@@ -19,12 +19,12 @@ public class RetrieveInternalNodesSwingWorker extends
 		SwingWorker<Void, Integer> {
 
 	private Object[] pathForInternalFiles;
-	private IrodsImageJBean irodsImageJ;
+	private IPlugin irodsImageJ;
 	private static IRODSFile iRodsFile;
 	List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = null;
 
 	public RetrieveInternalNodesSwingWorker(Object[] elements,
-			IrodsImageJBean irodsImageJ) {
+			IPlugin irodsImageJ) {
 		super();
 		this.pathForInternalFiles = elements;
 		this.irodsImageJ = irodsImageJ;

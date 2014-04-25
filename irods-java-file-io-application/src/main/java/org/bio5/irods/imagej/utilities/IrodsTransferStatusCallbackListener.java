@@ -5,7 +5,7 @@ import javax.swing.JProgressBar;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.bio5.irods.imagej.bean.IrodsImageJBean;
+import org.bio5.irods.imagej.bean.IPlugin;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.transfer.TransferStatus;
 import org.irods.jargon.core.transfer.TransferStatusCallbackListener;
@@ -15,9 +15,9 @@ public class IrodsTransferStatusCallbackListener implements
 
 	private JProgressBar jprogressbar;
 	@SuppressWarnings("unused")
-	private IrodsImageJBean irodsImagej;
+	private IPlugin irodsImagej;
 
-	public IrodsTransferStatusCallbackListener(IrodsImageJBean irodsImagej) {
+	public IrodsTransferStatusCallbackListener(IPlugin irodsImagej) {
 		super();
 		this.irodsImagej = irodsImagej;
 		this.jprogressbar = irodsImagej.getJprogressbar();

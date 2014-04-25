@@ -11,10 +11,10 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import org.apache.log4j.Logger;
-import org.bio5.irods.imagej.bean.IrodsImageJBean;
+import org.bio5.irods.imagej.bean.IPlugin;
 import org.bio5.irods.imagej.utilities.Constants;
 import org.bio5.irods.imagej.utilities.IrodsUtilities;
-import org.bio5.irods.imagej.views.DirectoryContentsPane;
+import org.bio5.irods.imagej.views.DirectoryContentsWindow;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.exception.OverwriteException;
 import org.irods.jargon.core.pub.DataObjectAO;
@@ -28,17 +28,17 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	private IRODSFileFactory iRODSFileFactory;
 	private String treePath;
 	private DataTransferOperations dataTransferOperationsAO;
-	private IrodsImageJBean irodsImagej;
+	private IPlugin irodsImagej;
 	private DataObjectAO dataObjectAO;
 	private TransferControlBlock transferControlBlock;
 	IRODSFile sourceIrodsFilePath = null;
 
 	/* Logger instantiation */
-	static Logger log = Logger.getLogger(DirectoryContentsPane.class.getName());
+	static Logger log = Logger.getLogger(DirectoryContentsWindow.class.getName());
 
 	/* Get files from iRODS Server */
 	public GetFileFromIrodsSwingWorker(IRODSFileFactory iRODSFileFactory,
-			String treePath, IrodsImageJBean irodsImagej,
+			String treePath, IPlugin irodsImagej,
 			JProgressBar progressbar) {
 		this.iRODSFileFactory = iRODSFileFactory;
 		this.treePath = treePath;

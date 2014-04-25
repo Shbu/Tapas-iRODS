@@ -3,7 +3,7 @@ package org.bio5.irods.imagej.fileoperations;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.bio5.irods.imagej.bean.IrodsImageJBean;
+import org.bio5.irods.imagej.bean.IPlugin;
 import org.bio5.irods.imagej.utilities.Constants;
 import org.bio5.irods.imagej.utilities.IrodsUtilities;
 import org.irods.jargon.core.connection.IRODSAccount;
@@ -36,7 +36,7 @@ public class FileOperations {
 	}
 
 	public static List<CollectionAndDataObjectListingEntry> setIrodsFile(
-			String pathForInternalFiles, IrodsImageJBean irodsImagej,
+			String pathForInternalFiles, IPlugin irodsImagej,
 			boolean isHomeDirectoryFlagOn) throws JargonException {
 
 		/* Setting jargon properties */
@@ -91,7 +91,7 @@ public class FileOperations {
 	}
 
 	public static List<CollectionAndDataObjectListingEntry> retrieveCollectionsUnderGivenPath(
-			IRODSFile irodsFileForAbsolutePath, IrodsImageJBean irodsImagej) {
+			IRODSFile irodsFileForAbsolutePath, IPlugin irodsImagej) {
 
 		CollectionAndDataObjectListAndSearchAO collectionAO;
 		List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = null;
