@@ -3,6 +3,7 @@ package org.bio5.irods.imagej.views;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
@@ -80,6 +81,18 @@ public class MainWindow extends JFrame {
 		setTitle("iRODS");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 682, 454);
+		
+		setFocusable(true);
+		addKeyListener(new KeyAdapter(){
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+					System.exit(0);
+				}
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					loginMethod();
+				}
+			}
+		});
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -123,6 +136,14 @@ public class MainWindow extends JFrame {
 		textbox_LoginId.setHorizontalAlignment(SwingConstants.LEFT);
 		textbox_LoginId.setToolTipText("User Id");
 		textbox_LoginId.setColumns(13);
+		
+		textbox_LoginId.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					loginMethod();
+				}
+			}
+		});
 
 		final JButton button_Login = new JButton("Login");
 		button_Login.setToolTipText("Click to Login");
@@ -138,113 +159,7 @@ public class MainWindow extends JFrame {
 
 		button_Login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String username = textbox_LoginId.getText();
-				char[] password = textField_passwordField.getPassword();
-				String password_full = "";
-				if (null != textField_ImageJCacheFolderPath.getText()) {
-					boolean isDirectoryCreated = IrodsUtilities
-							.createDirectoryIfDoesntExist(textField_ImageJCacheFolderPath
-									.getText());
-					if (!isDirectoryCreated) {
-						log.info("isDirectoryCreated: " + isDirectoryCreated);
-						JOptionPane.showMessageDialog(null,
-								"Error while creating path!");
-					} else {
-						log.info("ImageJ cache folder path specified by user:"
-								+ textField_ImageJCacheFolderPath.getText());
-						irodsImagejInstance
-								.setImageJCacheFolder(textField_ImageJCacheFolderPath
-										.getText());
-					}
-				}
-
-				for (char chars : password)
-					password_full += chars;
-				int port = Integer.parseInt(textField_Port.getText());
-				String host = textField_Host.getText();
-				String zone = textField_Zone.getText();
-				{
-					try {
-						if (HomeDirectory_CheckBox.isSelected()) {
-							irodsImagejInstance
-									.setHomeDirectoryTheRootNode(true);
-						}
-
-						IRODSAccount irodsAccount = IrodsConnection
-								.irodsConnection(username, password_full, zone,
-										host, port);
-						irodsImagejInstance.setIrodsAccount(irodsAccount);
-
-						if (null != irodsFileSystem) {
-							IRODSSession iRODSSession = irodsFileSystem
-									.getIrodsSession();
-							irodsImagejInstance.setiRODSSession(iRODSSession);
-						} else {
-							log.error("iRODSSession is null");
-						}
-
-						if (irodsImagejInstance.getIrodsAccount() != null
-								&& irodsImagejInstance.getiRODSSession() != null) {
-							iRODSFileSystemAOImpl = new IRODSFileSystemAOImpl(
-									irodsImagejInstance.getiRODSSession(),
-									irodsImagejInstance.getIrodsAccount());
-							irodsImagejInstance
-									.setiRODSFileSystemAOImpl(iRODSFileSystemAOImpl);
-						}
-
-						/*
-						 * IRODSFileSystem irodsFileSystem=
-						 * IRODSFileSystem.instance(); UserAO userAccount =
-						 * irodsFileSystem
-						 * .getIRODSAccessObjectFactory().getUserAO
-						 * (irodsAccount);
-						 */
-
-						List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = FileOperations
-								.setIrodsFile(null, irodsImagejInstance,
-										irodsImagejInstance
-												.isHomeDirectoryTheRootNode());
-						irodsImagejInstance
-								.setCollectionsUnderGivenAbsolutePath(collectionsUnderGivenAbsolutePath);
-						directoryContentsPane = new DirectoryContentsWindow(
-								irodsImagejInstance);
-						irodsImagejInstance
-								.setDirectoryContentsPane(directoryContentsPane);
-						directoryContentsPane.init();
-						directoryContentsPane.implementation();
-						setVisibilityOfForm();
-						show();
-					}
-					/* Exception when username/password is empty */
-					catch (CatalogSQLException catalogSQLException) {
-						log.error(catalogSQLException.getMessage(),
-								catalogSQLException);
-						JOptionPane.showMessageDialog(null,
-								"Invalid Username or password!");
-						catalogSQLException.printStackTrace();
-					}
-					/* Exception when username is invalid */
-					catch (InvalidUserException invalidUserException) {
-						log.error(invalidUserException.getMessage(),
-								invalidUserException);
-						JOptionPane
-								.showMessageDialog(null, "Invalid Username!");
-						invalidUserException.printStackTrace();
-					}
-
-					/* Exception when password is invalid */
-					catch (AuthenticationException authenticationException) {
-						log.error(authenticationException.getMessage(),
-								authenticationException);
-						JOptionPane
-								.showMessageDialog(null, "Invalid password!");
-						authenticationException.printStackTrace();
-					} catch (Exception e1) {
-						log.error(e1.getMessage(), e1);
-						JOptionPane.showMessageDialog(null, "Unknown Error!");
-						e1.printStackTrace();
-					}
-				}
+				loginMethod();
 			}
 		});
 
@@ -264,11 +179,27 @@ public class MainWindow extends JFrame {
 		textField_passwordField = new JPasswordField();
 		textField_passwordField.setHorizontalAlignment(SwingConstants.LEFT);
 		textField_passwordField.setToolTipText("Password");
+		
+		textField_passwordField.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					loginMethod();
+				}
+			}
+		});
 
 		textField_Port = new JTextField();
 		textField_Port.setText(Constants.PORT);
 		textField_Port.setToolTipText("Port No.");
 		textField_Port.setColumns(10);
+		
+		textField_Port.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					loginMethod();
+				}
+			}
+		});
 
 		JLabel Label_Port = new JLabel("Port:");
 		Label_Port.setHorizontalAlignment(SwingConstants.CENTER);
@@ -280,12 +211,28 @@ public class MainWindow extends JFrame {
 		textField_Zone.setText(Constants.ZONE);
 		textField_Zone.setToolTipText("Zone");
 		textField_Zone.setColumns(10);
+		
+		textField_Zone.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					loginMethod();
+				}
+			}
+		});
 
 		textField_Host = new JTextField();
 		textField_Host.setHorizontalAlignment(SwingConstants.LEFT);
 		textField_Host.setToolTipText("Host Address");
 		textField_Host.setText(Constants.HOST);
 		textField_Host.setColumns(10);
+		
+		textField_Host.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					loginMethod();
+				}
+			}
+		});
 
 		JLabel label_Host = new JLabel("Host:");
 		label_Host.setHorizontalAlignment(SwingConstants.CENTER);
@@ -298,6 +245,14 @@ public class MainWindow extends JFrame {
 		textField_ImageJCacheFolderPath.setColumns(10);
 		textField_ImageJCacheFolderPath.setText(irodsImagej
 				.getImageJCacheFolder());
+		
+		textField_ImageJCacheFolderPath.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					loginMethod();
+				}
+			}
+		});
 
 		JLabel lblImagejCacheFolder = new JLabel("ImageJ Cache Folder:");
 		GroupLayout gl_contentPane = new GroupLayout(contentPanePanel);
@@ -518,6 +473,116 @@ public class MainWindow extends JFrame {
 	private void isEnterkeyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			JOptionPane.showMessageDialog(null, "Enter key pressed!");
+		}
+	}
+	
+	private void loginMethod(){
+		String username = textbox_LoginId.getText();
+		char[] password = textField_passwordField.getPassword();
+		String password_full = "";
+		if (null != textField_ImageJCacheFolderPath.getText()) {
+			boolean isDirectoryCreated = IrodsUtilities
+					.createDirectoryIfDoesntExist(textField_ImageJCacheFolderPath
+							.getText());
+			if (!isDirectoryCreated) {
+				log.info("isDirectoryCreated: " + isDirectoryCreated);
+				JOptionPane.showMessageDialog(null,
+						"Error while creating path!");
+			} else {
+				log.info("ImageJ cache folder path specified by user:"
+						+ textField_ImageJCacheFolderPath.getText());
+				irodsImagejInstance
+						.setImageJCacheFolder(textField_ImageJCacheFolderPath
+								.getText());
+			}
+		}
+
+		for (char chars : password)
+			password_full += chars;
+		int port = Integer.parseInt(textField_Port.getText());
+		String host = textField_Host.getText();
+		String zone = textField_Zone.getText();
+		{
+			try {
+				if (HomeDirectory_CheckBox.isSelected()) {
+					irodsImagejInstance
+							.setHomeDirectoryTheRootNode(true);
+				}
+
+				IRODSAccount irodsAccount = IrodsConnection
+						.irodsConnection(username, password_full, zone,
+								host, port);
+				irodsImagejInstance.setIrodsAccount(irodsAccount);
+
+				if (null != irodsFileSystem) {
+					IRODSSession iRODSSession = irodsFileSystem
+							.getIrodsSession();
+					irodsImagejInstance.setiRODSSession(iRODSSession);
+				} else {
+					log.error("iRODSSession is null");
+				}
+
+				if (irodsImagejInstance.getIrodsAccount() != null
+						&& irodsImagejInstance.getiRODSSession() != null) {
+					iRODSFileSystemAOImpl = new IRODSFileSystemAOImpl(
+							irodsImagejInstance.getiRODSSession(),
+							irodsImagejInstance.getIrodsAccount());
+					irodsImagejInstance
+							.setiRODSFileSystemAOImpl(iRODSFileSystemAOImpl);
+				}
+
+				/*
+				 * IRODSFileSystem irodsFileSystem=
+				 * IRODSFileSystem.instance(); UserAO userAccount =
+				 * irodsFileSystem
+				 * .getIRODSAccessObjectFactory().getUserAO
+				 * (irodsAccount);
+				 */
+
+				List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = FileOperations
+						.setIrodsFile(null, irodsImagejInstance,
+								irodsImagejInstance
+										.isHomeDirectoryTheRootNode());
+				irodsImagejInstance
+						.setCollectionsUnderGivenAbsolutePath(collectionsUnderGivenAbsolutePath);
+				directoryContentsPane = new DirectoryContentsWindow(
+						irodsImagejInstance);
+				irodsImagejInstance
+						.setDirectoryContentsPane(directoryContentsPane);
+				directoryContentsPane.init();
+				directoryContentsPane.implementation();
+				setVisibilityOfForm();
+				show();
+			}
+			/* Exception when username/password is empty */
+			catch (CatalogSQLException catalogSQLException) {
+				log.error(catalogSQLException.getMessage(),
+						catalogSQLException);
+				JOptionPane.showMessageDialog(null,
+						"Invalid Username or password!");
+				catalogSQLException.printStackTrace();
+			}
+			/* Exception when username is invalid */
+			catch (InvalidUserException invalidUserException) {
+				log.error(invalidUserException.getMessage(),
+						invalidUserException);
+				JOptionPane
+						.showMessageDialog(null, "Invalid Username!");
+				invalidUserException.printStackTrace();
+			}
+
+			/* Exception when password is invalid */
+			catch (AuthenticationException authenticationException) {
+				log.error(authenticationException.getMessage(),
+						authenticationException);
+				JOptionPane
+						.showMessageDialog(null, "Invalid password!");
+				authenticationException.printStackTrace();
+			} catch (Exception e1) {
+				log.error(e1.getMessage(), e1);
+				JOptionPane.showMessageDialog(null, "Unknown Error!");
+				e1.printStackTrace();
+			}
 		}
 	}
 }
