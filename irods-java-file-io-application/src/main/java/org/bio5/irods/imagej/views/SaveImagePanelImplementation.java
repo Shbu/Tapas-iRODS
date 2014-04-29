@@ -36,7 +36,7 @@ public class SaveImagePanelImplementation extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private HashMap<String, Object> saveDetails;
-	private JTextField textField_FileName;
+	private JTextField textField_LocalFileName;
 	private IPlugin iplugin;
 	private JTextField textField_irodsDestinationPath;
 	private JFileChooser fileChooser;
@@ -62,13 +62,14 @@ public class SaveImagePanelImplementation extends JFrame {
 
 		/* Assign variables to fields */
 		assignVariablesToFields();
+		saveCurrentEditedImageFileToLocal();
 
 		JButton btn_saveButton = new JButton("Save");
 		btn_saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				log.info("Save to iRODS Server - Button Clicked");
-				saveCurrentEditedImageFileToLocal();
-				// saveCurrentEditedFileToIrods();
+				//saveCurrentEditedImageFileToLocal();
+				 saveCurrentEditedFileToIrods();
 			}
 		});
 
@@ -122,7 +123,7 @@ public class SaveImagePanelImplementation extends JFrame {
 																gl_contentPane
 																		.createSequentialGroup()
 																		.addComponent(
-																				textField_FileName,
+																				textField_LocalFileName,
 																				GroupLayout.PREFERRED_SIZE,
 																				181,
 																				GroupLayout.PREFERRED_SIZE)
@@ -144,7 +145,7 @@ public class SaveImagePanelImplementation extends JFrame {
 														.createParallelGroup(
 																Alignment.BASELINE)
 														.addComponent(
-																textField_FileName,
+																textField_LocalFileName,
 																GroupLayout.PREFERRED_SIZE,
 																GroupLayout.DEFAULT_SIZE,
 																GroupLayout.PREFERRED_SIZE)
@@ -176,7 +177,7 @@ public class SaveImagePanelImplementation extends JFrame {
 										.addContainerGap(81, Short.MAX_VALUE)));
 		contentPane.setLayout(gl_contentPane);
 		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[] {
-				contentPane, lbl_localFileName, textField_FileName,
+				contentPane, lbl_localFileName, textField_LocalFileName,
 				btn_select_local_file, lbl_irodsDestinationPath,
 				textField_irodsDestinationPath, btn_saveButton, btn_Cancel }));
 	}
@@ -188,8 +189,8 @@ public class SaveImagePanelImplementation extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 
-		textField_FileName = new JTextField();
-		textField_FileName.setColumns(10);
+		textField_LocalFileName = new JTextField();
+		textField_LocalFileName.setColumns(10);
 
 		lbl_localFileName = new JLabel("Local File Name : ");
 
@@ -238,9 +239,12 @@ public class SaveImagePanelImplementation extends JFrame {
 					 * IJ.saveAs(iplugin.getImagePlus(), "tiff",
 					 * savePathWithFileName);
 					 */
-					log.info("File save to local with filename and extention");
+					log.info("File save to local with filename and extention" +savePathWithFileName);
 					JOptionPane.showMessageDialog(null,
 							"File save to local with filename and extention");
+					
+					textField_LocalFileName.setText(savePathWithFileName);
+					log.info("textField_LocalFileName set to savePathWithFileName" +textField_LocalFileName.getText());
 				}
 
 			} else {
@@ -261,7 +265,83 @@ public class SaveImagePanelImplementation extends JFrame {
 					.getDefaultStorageResource();
 			File sourceLocalfile = null;
 			IRODSFile destinaitonIrodsFile = null;
+			
+			
+			
+			if(textField_LocalFileName!=null){
+				sourceLocalfile = new File(textField_LocalFileName.getText());
+				log.info("sourceLocalfile is not null and setting to textField_LocalFileName: " +sourceLocalfile);
+			}
+			else{
+				log.error("textField_LocalFileName is null");
+			}
+			
 			if (fileChooser.getSelectedFile().getAbsolutePath() != null
+					&& fileChooser.getSelectedFile().getAbsolutePath() != "") {
+				sourceFilePath = fileChooser.getSelectedFile()
+						.getAbsolutePath();
+				log.info("sourceFilePath of fileChoose" + sourceFilePath);
+				sourceLocalfile = new File(sourceFilePath);
+			}
+			else{
+				log.error("fileChooser.getSelectedFile().getAbsolutePath() is null or empty");
+			}
+			
+			/*SingleClick is not set properly--- below code is not working -- fix it..chck logger for execution*/
+			
+			if (iplugin.getSelectedNodeInTreeForSingleClick() != null
+					&& iplugin.getSelectedNodeInTreeForSingleClick() != ""
+					&& null != textField_irodsDestinationPath
+					&& textField_irodsDestinationPath.getText() != "") {
+				String SelectedNodeInTreeForSingleClick = iplugin
+						.getSelectedNodeInTreeForSingleClick();
+				log.info("destination path || selectedNodeInTreeForSingleClick"
+						+ SelectedNodeInTreeForSingleClick);
+				destinationFilePath = IrodsUtilities.getPathSeperator()
+						+ iplugin.getIrodsAccount().getZone()
+						+ IrodsUtilities.getPathSeperator()
+						+ Constants.HOME
+						+ IrodsUtilities.getPathSeperator()
+						+ textField_irodsDestinationPath.getText();
+				log.info("Final destinationFilePath: "+ destinationFilePath);
+				destinaitonIrodsFile = iplugin.getiRODSFileFactory()
+						.instanceIRODSFile(destinationFilePath);
+				log.info("sourceLocalfile absolute path: "
+						+ sourceLocalfile.getAbsolutePath() + "\n"
+						+ "destinaitonIrodsFile absolutepath: "
+						+ destinaitonIrodsFile.getAbsoluteFile());
+			
+				
+				try {
+					// dataTransferOperationsAO.putOperation(sourceLocalfile.getAbsolutePath(),destinaitonIrodsFile.getAbsolutePath(),targetResourceName,irodsTransferStatusCallbackListener,transferControlBlock);
+					if (null != iplugin && null != sourceLocalfile
+							&& null != destinaitonIrodsFile
+							&& null != targetResourceName) {
+						log.info("Inside core save functionality - just before executing PutFileToIrodsSwingWorker method");
+						putFile = new PutFileToIrodsSwingWorker(iplugin,
+								sourceLocalfile, destinaitonIrodsFile,
+								targetResourceName);
+						putFile.execute();
+						log.info("Executed PutFile method!");
+					}
+					else{
+						log.error("sourceLocalfile or destinaitonIrodsFile or targetResourceName are null");
+					}
+				} catch (Exception excetionPutFile) {
+					log.error(excetionPutFile.getMessage());
+					JOptionPane.showMessageDialog(null,
+							excetionPutFile.getMessage());
+				}
+				
+			}
+			else{
+				log.error("SelectedNodeInTreeForSingleClick or textField_irodsDestinationPath is null");
+			}
+			}
+			
+			/*Delete below*/
+			
+			/*if (fileChooser.getSelectedFile().getAbsolutePath() != null
 					&& fileChooser.getSelectedFile().getAbsolutePath() != "") {
 				sourceFilePath = fileChooser.getSelectedFile()
 						.getAbsolutePath();
@@ -309,9 +389,11 @@ public class SaveImagePanelImplementation extends JFrame {
 				log.error("Source is empty!");
 			}
 
-		} catch (JargonException jargonException) {
-			log.error(jargonException.getMessage());
-			jargonException.printStackTrace();
+		}*/ 
+		
+		catch (JargonException ExceptionInSaveButtonClicked) {
+			log.error(ExceptionInSaveButtonClicked.getMessage());
+			ExceptionInSaveButtonClicked.printStackTrace();
 		}
 
 	}
@@ -323,12 +405,12 @@ public class SaveImagePanelImplementation extends JFrame {
 		int option = fileChooser
 				.showOpenDialog(SaveImagePanelImplementation.this);
 		if (option == JFileChooser.APPROVE_OPTION) {
-			textField_FileName
+			textField_LocalFileName
 					.setText(((fileChooser.getSelectedFile() != null) ? fileChooser
 							.getSelectedFile().getAbsolutePath()
 							: "nothing is selected"));
 		} else {
-			textField_FileName.setName("File selection canceled !");
+			textField_LocalFileName.setName("File selection canceled !");
 		}
 	}
 
