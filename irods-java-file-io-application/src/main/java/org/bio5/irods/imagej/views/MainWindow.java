@@ -46,6 +46,7 @@ public class MainWindow extends JFrame {
 	/**
 	 * 
 	 */
+	
 	private static final long serialVersionUID = 393011043100419159L;
 	public IRODSFileSystem irodsFileSystem;
 
