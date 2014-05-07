@@ -72,8 +72,9 @@ public class RetrieveInternalNodesSwingWorker extends
 				irodsImageJ
 						.setChildNodesListAfterLazyLoading(childNodesListAfterLazyLoading);
 			} else {
-				log.error("Child Nodes doesn't exist");
-				JOptionPane.showMessageDialog(null, "Empty Folder!");
+				log.error("Child Nodes doesn't exist, empty folder!");
+				JOptionPane.showMessageDialog(null, "Empty Folder!", "Error",
+						JOptionPane.ERROR_MESSAGE);
 				log.info("Removing childNodesListAfterLazyLoading from irodsImageJ");
 				irodsImageJ.getChildNodesListAfterLazyLoading().clear();
 				log.info("size of irodsImageJ.getChildNodesListAfterLazyLoading() "

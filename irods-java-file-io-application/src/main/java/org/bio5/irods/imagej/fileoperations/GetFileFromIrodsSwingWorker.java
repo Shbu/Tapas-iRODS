@@ -95,6 +95,11 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 			} catch (Exception e) {
 				log.info("Error while reading MD5 checksum of md5ChecksumServerFile"
 						+ e.getMessage());
+				JOptionPane
+						.showMessageDialog(
+								null,
+								"Error while reading MD5 checksum of md5ChecksumServerFile!",
+								"Error", JOptionPane.ERROR_MESSAGE);
 			}
 			File destinationLocalFilePath = new File(
 					iPlugin.getImageJCacheFolder());
@@ -144,8 +149,10 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 				log.error("File with same name already exist in local directory! "
 						+ oe.getMessage());
 				JOptionPane
-						.showMessageDialog(null,
-								"File with same name already exist in local directory!");
+						.showMessageDialog(
+								null,
+								"File with same name already exist in local directory!",
+								"Error", JOptionPane.ERROR_MESSAGE);
 
 				/* Getting MD5 checksum of local file, if exists */
 				File localFile2 = new File(
@@ -167,7 +174,8 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 				oe.printStackTrace();
 			} catch (JargonException je) {
 				JOptionPane.showMessageDialog(null,
-						"Error while pulling files!");
+						"Error while pulling files!", "Error",
+						JOptionPane.ERROR_MESSAGE);
 				log.info("Error while pulling files!");
 			}
 		}
@@ -193,12 +201,20 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 				iPlugin.setImageOpened(true);
 				log.info("irodsImagej.isImageOpened is set to true");
 			} else {
-				log.error("imagePlus instance in GetFileFromIrodsSwingWorker is null and irodsImagej.isImageOpened is false");
+				log.error("ImagePlus instance in GetFileFromIrodsSwingWorker is null and irodsImagej.isImageOpened is false");
+				JOptionPane
+						.showMessageDialog(
+								null,
+								"ImagePlus instance in GetFileFromIrodsSwingWorker is null and irodsImagej.isImageOpened is false!",
+								"Error", JOptionPane.ERROR_MESSAGE);
 			}
 		} else {
 			IJ.showMessage("ImageJ is not able to open requested file!");
 			IJ.showStatus("ImageJ is not able to open requested file!");
 			log.error("ImagePlus instance is null and opening file Failed.");
+			JOptionPane.showMessageDialog(null,
+					"ImagePlus instance is null and opening file Failed!",
+					"Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }

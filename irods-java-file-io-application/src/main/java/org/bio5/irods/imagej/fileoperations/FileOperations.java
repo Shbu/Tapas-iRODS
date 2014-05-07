@@ -2,6 +2,8 @@ package org.bio5.irods.imagej.fileoperations;
 
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.bean.IPlugin;
 import org.bio5.irods.imagej.utilities.Constants;
@@ -112,6 +114,8 @@ public class FileOperations {
 		} catch (JargonException e) {
 			log.error("Error while retrieving collectionsUnderGivenAbsolutePath: "
 					+ e.getMessage());
+			JOptionPane.showMessageDialog(null, "Error while retrieving collectionsUnderGivenAbsolutePath!", "Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 		return collectionsUnderGivenAbsolutePath;
 	}

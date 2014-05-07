@@ -44,6 +44,7 @@ public class SaveImagePanelImplementation extends JFrame {
 	private JLabel lbl_localFileName;
 	private JLabel lbl_irodsDestinationPath;
 	private String destinationFilePath = null;
+	private String savePathWithFileName=null;
 
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(SaveImagePanelImplementation.class
@@ -232,15 +233,13 @@ public class SaveImagePanelImplementation extends JFrame {
 
 	private void saveCurrentEditedImageFileToLocal() {
 		if (null != iplugin.getImagePlus()) {
-			// FileSaver fileSaver = new FileSaver(iplugin.getImagePlus());
-			// fileSaver.save();
 			if (null != iplugin.getImageJCacheFolder()
 					&& null != iplugin.getSelectedNodeInTreeForDoubleClick()) {
 				String fileName = IrodsUtilities
 						.getFileNameFromDirectoryPath(iplugin
 								.getSelectedNodeInTreeForDoubleClick());
 				if (null != fileName) {
-					String savePathWithFileName = iplugin
+					savePathWithFileName = iplugin
 							.getImageJCacheFolder()
 							+ IrodsUtilities.getPathSeperator() + fileName;
 					log.info("savePathWithFileName" + savePathWithFileName);
@@ -275,18 +274,14 @@ public class SaveImagePanelImplementation extends JFrame {
 			IRODSFile destinationIrodsFile = null;
 			
 			
-			if (textField_LocalFileName != null) {
-				sourceLocalfile = new File(textField_LocalFileName.getText());
-				log.info("sourceLocalfile is not null and setting to textField_LocalFileName: "
+			if (savePathWithFileName != null) {
+				sourceLocalfile = new File(savePathWithFileName);
+				log.info("savePathWithFileName is set into sourceLocalfile: "
 						+ sourceLocalfile);
 			}
 			else {
-				log.error("textField_LocalFileName is null");
+				log.error("savePathWithFileName is null");
 				}
-			
-			/*SingleClick is not set properly--- below code is not working -- fix it..chck logger for execution*/
-			
-			log.info("Just beffore checking if SelectedNodeInTreeForSingleClick is null");
 			
 			if (null != destinationFilePath
 					&& destinationFilePath != ""
@@ -311,12 +306,12 @@ public class SaveImagePanelImplementation extends JFrame {
 						JOptionPane.showMessageDialog(null, "Uploading file completed!");
 					}
 					else{
-						log.error("sourceLocalfile or destinaitonIrodsFile or targetResourceName are null");
+						log.error("sourceLocalfile or destinaitonIrodsFile or targetResourceName is null");
 					}
-				} catch (Exception execeptionPutFile) {
-					log.error(execeptionPutFile.getMessage());
+				} catch (Exception execeptionWhileExecutingPutFile) {
+					log.error(execeptionWhileExecutingPutFile.getMessage());
 					JOptionPane.showMessageDialog(null,
-							execeptionPutFile.getMessage());
+							execeptionWhileExecutingPutFile.getMessage());
 				}
 			}
 			else{
@@ -324,9 +319,9 @@ public class SaveImagePanelImplementation extends JFrame {
 			}
 			}
 		
-		catch (JargonException ExceptionInSaveButtonClicked) {
-			log.error(ExceptionInSaveButtonClicked.getMessage());
-			ExceptionInSaveButtonClicked.printStackTrace();
+		catch (JargonException ExceptionInExecutingSaveButton) {
+			log.error(ExceptionInExecutingSaveButton.getMessage());
+			ExceptionInExecutingSaveButton.printStackTrace();
 		}
 
 	}

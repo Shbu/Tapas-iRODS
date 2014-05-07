@@ -512,7 +512,7 @@ public class DirectoryContentsWindow extends JPanel implements
 		});
 
 		userDirectoryTree.setShowsRootHandles(true);
-		userDirectoryTree.setEditable(true);
+		userDirectoryTree.setEditable(false);
 		userDirectoryTree.setVisible(true);
 		viewport.add(userDirectoryTree);
 

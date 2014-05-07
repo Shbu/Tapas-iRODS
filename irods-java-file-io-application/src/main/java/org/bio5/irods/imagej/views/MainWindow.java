@@ -23,6 +23,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
@@ -46,7 +47,7 @@ public class MainWindow extends JFrame {
 	/**
 	 * 
 	 */
-	
+
 	private static final long serialVersionUID = 393011043100419159L;
 	public IRODSFileSystem irodsFileSystem;
 
@@ -82,9 +83,9 @@ public class MainWindow extends JFrame {
 		setTitle("iRODS");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 682, 454);
-		
+
 		setFocusable(true);
-		addKeyListener(new KeyAdapter(){
+		addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					System.exit(0);
@@ -137,7 +138,8 @@ public class MainWindow extends JFrame {
 		textbox_LoginId.setHorizontalAlignment(SwingConstants.LEFT);
 		textbox_LoginId.setToolTipText("User Id");
 		textbox_LoginId.setColumns(13);
-		
+
+
 		textbox_LoginId.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -145,18 +147,16 @@ public class MainWindow extends JFrame {
 				}
 			}
 		});
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				textbox_LoginId.requestFocus();
+			}
+		});
 
 		final JButton button_Login = new JButton("Login");
 		button_Login.setToolTipText("Click to Login");
 		button_Login.setEnabled(true);
-		/*
-		 * contentPane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER
-		 * ,0), button_Login);
-		 * contentPane.getRootPane().getActionMap().put(button_Login, new
-		 * AbstractAction(){ public void actionPerformed(ActionEvent ae) {
-		 * button_Login.doClick(); System.out.println("Login button-clicked"); }
-		 * });
-		 */
 
 		button_Login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -180,7 +180,7 @@ public class MainWindow extends JFrame {
 		textField_passwordField = new JPasswordField();
 		textField_passwordField.setHorizontalAlignment(SwingConstants.LEFT);
 		textField_passwordField.setToolTipText("Password");
-		
+
 		textField_passwordField.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -193,7 +193,7 @@ public class MainWindow extends JFrame {
 		textField_Port.setText(Constants.PORT);
 		textField_Port.setToolTipText("Port No.");
 		textField_Port.setColumns(10);
-		
+
 		textField_Port.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -212,7 +212,7 @@ public class MainWindow extends JFrame {
 		textField_Zone.setText(Constants.ZONE);
 		textField_Zone.setToolTipText("Zone");
 		textField_Zone.setColumns(10);
-		
+
 		textField_Zone.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -226,7 +226,7 @@ public class MainWindow extends JFrame {
 		textField_Host.setToolTipText("Host Address");
 		textField_Host.setText(Constants.HOST);
 		textField_Host.setColumns(10);
-		
+
 		textField_Host.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -246,7 +246,7 @@ public class MainWindow extends JFrame {
 		textField_ImageJCacheFolderPath.setColumns(10);
 		textField_ImageJCacheFolderPath.setText(irodsImagej
 				.getImageJCacheFolder());
-		
+
 		textField_ImageJCacheFolderPath.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -471,13 +471,7 @@ public class MainWindow extends JFrame {
 
 	}
 
-	private void isEnterkeyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			JOptionPane.showMessageDialog(null, "Enter key pressed!");
-		}
-	}
-	
-	private void loginMethod(){
+	private void loginMethod() {
 		String username = textbox_LoginId.getText();
 		char[] password = textField_passwordField.getPassword();
 		String password_full = "";
@@ -506,13 +500,11 @@ public class MainWindow extends JFrame {
 		{
 			try {
 				if (HomeDirectory_CheckBox.isSelected()) {
-					irodsImagejInstance
-							.setHomeDirectoryTheRootNode(true);
+					irodsImagejInstance.setHomeDirectoryTheRootNode(true);
 				}
 
-				IRODSAccount irodsAccount = IrodsConnection
-						.irodsConnection(username, password_full, zone,
-								host, port);
+				IRODSAccount irodsAccount = IrodsConnection.irodsConnection(
+						username, password_full, zone, host, port);
 				irodsImagejInstance.setIrodsAccount(irodsAccount);
 
 				if (null != irodsFileSystem) {
@@ -533,11 +525,9 @@ public class MainWindow extends JFrame {
 				}
 
 				/*
-				 * IRODSFileSystem irodsFileSystem=
-				 * IRODSFileSystem.instance(); UserAO userAccount =
-				 * irodsFileSystem
-				 * .getIRODSAccessObjectFactory().getUserAO
-				 * (irodsAccount);
+				 * IRODSFileSystem irodsFileSystem= IRODSFileSystem.instance();
+				 * UserAO userAccount = irodsFileSystem
+				 * .getIRODSAccessObjectFactory().getUserAO (irodsAccount);
 				 */
 
 				List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = FileOperations
@@ -557,8 +547,7 @@ public class MainWindow extends JFrame {
 			}
 			/* Exception when username/password is empty */
 			catch (CatalogSQLException catalogSQLException) {
-				log.error(catalogSQLException.getMessage(),
-						catalogSQLException);
+				log.error(catalogSQLException.getMessage(), catalogSQLException);
 				JOptionPane.showMessageDialog(null,
 						"Invalid Username or password!");
 				catalogSQLException.printStackTrace();
@@ -567,8 +556,7 @@ public class MainWindow extends JFrame {
 			catch (InvalidUserException invalidUserException) {
 				log.error(invalidUserException.getMessage(),
 						invalidUserException);
-				JOptionPane
-						.showMessageDialog(null, "Invalid Username!");
+				JOptionPane.showMessageDialog(null, "Invalid Username!");
 				invalidUserException.printStackTrace();
 			}
 
@@ -576,8 +564,7 @@ public class MainWindow extends JFrame {
 			catch (AuthenticationException authenticationException) {
 				log.error(authenticationException.getMessage(),
 						authenticationException);
-				JOptionPane
-						.showMessageDialog(null, "Invalid password!");
+				JOptionPane.showMessageDialog(null, "Invalid password!");
 				authenticationException.printStackTrace();
 			} catch (Exception e1) {
 				log.error(e1.getMessage(), e1);

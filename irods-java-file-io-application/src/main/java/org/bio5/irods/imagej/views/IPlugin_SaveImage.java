@@ -3,11 +3,8 @@ package org.bio5.irods.imagej.views;
 import ij.IJ;
 import ij.plugin.frame.PlugInFrame;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.bio5.irods.imagej.bean.IPlugin;
-import org.bio5.irods.imagej.utilities.Constants;
 
 public class IPlugin_SaveImage extends PlugInFrame {
 
@@ -30,21 +27,24 @@ public class IPlugin_SaveImage extends PlugInFrame {
 			iplugin = IPlugin_OpenImage.getIrodsImagej();
 			if (iplugin.isImageOpened()) {
 				log.info("irodsImagej.isImageOpened() is true");
-				HashMap<String, Object> saveDetails = iplugin.getSaveDetails();
 
-				setVisibility(Constants.SAVE_PANEL_VISIBILITY);
+				// setVisibility(Constants.SAVE_PANEL_VISIBILITY);
+				new SaveImageImplementation(iplugin);
 
 			} else {
 				log.error("irodsImagej.isImageOpened() is false");
-				IJ.error("No image available to save !");
+				IJ.error("Error while saving file",
+						"No image available to save !");
 			}
 
 		} else {
 			log.error("Irods_Plugin_OpenImage.getIrodsImagej() is null");
-			IJ.error("Irods ImageJ instance is null !");
+			IJ.error("Error while saving file",
+					"Irods ImageJ instance is null !");
 		}
 	}
 
+	/* suing this will lead to new panel - not required as of now */
 	private void setVisibility(boolean isVisibility) {
 		if (isVisibility) {
 			log.info("Inside setVisibility method");
