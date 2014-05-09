@@ -18,8 +18,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
-import org.bio5.irods.imagej.bean.IPlugin;
-import org.bio5.irods.imagej.views.DirectoryContentsWindow;
+import org.bio5.irods.iplugin.bean.IPlugin;
+import org.bio5.irods.iplugin.views.DirectoryContentsWindow;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
