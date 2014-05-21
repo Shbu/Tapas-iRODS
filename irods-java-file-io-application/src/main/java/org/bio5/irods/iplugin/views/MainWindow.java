@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.List;
 
 import javax.swing.GroupLayout;
@@ -67,6 +68,8 @@ public class MainWindow extends JFrame {
 	public JFileChooser localImageJFileChooser;
 	private JTextField textField_ImageJCacheFolderPath;
 	private IRODSFileSystemAOImpl iRODSFileSystemAOImpl;
+	private JFileChooser fileChooserForImageJCacheFolder;
+	private File selectedFileForImageJCacheFolder;
 
 	/**
 	 * Launch the application.
@@ -81,7 +84,7 @@ public class MainWindow extends JFrame {
 		mainWindowInit();
 
 		setTitle("iRODS");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 682, 454);
 
 		setFocusable(true);
@@ -192,6 +195,7 @@ public class MainWindow extends JFrame {
 		});
 
 		textField_Port = new JTextField();
+		textField_Port.setEditable(false);
 		textField_Port.setText(Constants.PORT);
 		textField_Port.setToolTipText("Port No.");
 		textField_Port.setColumns(10);
@@ -245,6 +249,8 @@ public class MainWindow extends JFrame {
 		HomeDirectory_CheckBox = new JCheckBox("Home Directory");
 
 		textField_ImageJCacheFolderPath = new JTextField();
+		textField_ImageJCacheFolderPath
+				.setToolTipText("Enter ImageJ Cache folder path");
 		textField_ImageJCacheFolderPath.setColumns(10);
 		textField_ImageJCacheFolderPath.setText(irodsImagej
 				.getImageJCacheFolder());
@@ -258,6 +264,33 @@ public class MainWindow extends JFrame {
 		});
 
 		JLabel lblImagejCacheFolder = new JLabel("ImageJ Cache Folder:");
+		JButton btnChooseFolder = new JButton("Choose folder");
+		btnChooseFolder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				fileChooserForImageJCacheFolder = new JFileChooser(
+						IrodsUtilities.getUserHomeFolderFromSystemProperty());
+				fileChooserForImageJCacheFolder
+						.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				int returnVal = fileChooserForImageJCacheFolder
+						.showOpenDialog(MainWindow.this);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					selectedFileForImageJCacheFolder = fileChooserForImageJCacheFolder
+							.getSelectedFile();
+					log.info("Opening: "
+							+ selectedFileForImageJCacheFolder
+									.getAbsolutePath() + "."
+							+ Constants.NEW_LINE_STRING);
+					irodsImagejInstance
+							.setImageJCacheFolder(selectedFileForImageJCacheFolder
+									.getAbsolutePath());
+					textField_ImageJCacheFolderPath.setText(irodsImagejInstance
+							.getImageJCacheFolder());
+				} else {
+					log.info("User cancelled file selection window: "
+							+ Constants.NEW_LINE_STRING);
+				}
+			}
+		});
 		GroupLayout gl_contentPane = new GroupLayout(contentPanePanel);
 		gl_contentPane
 				.setHorizontalGroup(gl_contentPane
@@ -266,7 +299,7 @@ public class MainWindow extends JFrame {
 								gl_contentPane.createSequentialGroup()
 										.addGap(269).addComponent(button_Login)
 										.addGap(18).addComponent(button_Cancel)
-										.addContainerGap(237, Short.MAX_VALUE))
+										.addContainerGap(257, Short.MAX_VALUE))
 						.addGroup(
 								gl_contentPane
 										.createSequentialGroup()
@@ -331,24 +364,30 @@ public class MainWindow extends JFrame {
 																																		.addComponent(
 																																				textField_Host,
 																																				GroupLayout.DEFAULT_SIZE,
-																																				378,
+																																				359,
 																																				Short.MAX_VALUE)
 																																		.addComponent(
 																																				textField_passwordField,
 																																				GroupLayout.DEFAULT_SIZE,
-																																				378,
+																																				359,
 																																				Short.MAX_VALUE)
 																																		.addComponent(
 																																				textbox_LoginId,
 																																				GroupLayout.DEFAULT_SIZE,
-																																				378,
+																																				359,
 																																				Short.MAX_VALUE)
-																																		.addComponent(
-																																				textField_ImageJCacheFolderPath,
+																																		.addGroup(
 																																				Alignment.LEADING,
-																																				GroupLayout.DEFAULT_SIZE,
-																																				378,
-																																				Short.MAX_VALUE))
+																																				gl_contentPane
+																																						.createSequentialGroup()
+																																						.addComponent(
+																																								textField_ImageJCacheFolderPath,
+																																								GroupLayout.PREFERRED_SIZE,
+																																								251,
+																																								GroupLayout.PREFERRED_SIZE)
+																																						.addGap(18)
+																																						.addComponent(
+																																								btnChooseFolder)))
 																														.addGap(10))))
 																		.addGap(85)))));
 		gl_contentPane
@@ -429,7 +468,9 @@ public class MainWindow extends JFrame {
 																GroupLayout.DEFAULT_SIZE,
 																GroupLayout.PREFERRED_SIZE)
 														.addComponent(
-																lblImagejCacheFolder))
+																lblImagejCacheFolder)
+														.addComponent(
+																btnChooseFolder))
 										.addGap(15)
 										.addGroup(
 												gl_contentPane
@@ -547,18 +588,20 @@ public class MainWindow extends JFrame {
 				setVisibilityOfForm();
 				show();
 			}
-			/* Exception when username/password is empty */
+			/* Exception when Username/Password is empty */
 			catch (CatalogSQLException catalogSQLException) {
 				log.error(catalogSQLException.getMessage(), catalogSQLException);
 				JOptionPane.showMessageDialog(null,
-						"Invalid Username or password!");
+						"Invalid Username or password!", "Error",
+						JOptionPane.ERROR_MESSAGE);
 				catalogSQLException.printStackTrace();
 			}
-			/* Exception when username is invalid */
+			/* Exception when Username is invalid */
 			catch (InvalidUserException invalidUserException) {
 				log.error(invalidUserException.getMessage(),
 						invalidUserException);
-				JOptionPane.showMessageDialog(null, "Invalid Username!");
+				JOptionPane.showMessageDialog(null, "Invalid Username!",
+						"Error", JOptionPane.ERROR_MESSAGE);
 				invalidUserException.printStackTrace();
 			}
 
@@ -566,12 +609,16 @@ public class MainWindow extends JFrame {
 			catch (AuthenticationException authenticationException) {
 				log.error(authenticationException.getMessage(),
 						authenticationException);
-				JOptionPane.showMessageDialog(null, "Invalid password!");
+				JOptionPane.showMessageDialog(null, "Invalid password!",
+						"Error", JOptionPane.ERROR_MESSAGE);
 				authenticationException.printStackTrace();
-			} catch (Exception e1) {
-				log.error(e1.getMessage(), e1);
-				JOptionPane.showMessageDialog(null, "Unknown Error!");
-				e1.printStackTrace();
+			}
+			/* Unknown Exception */
+			catch (Exception unknownException) {
+				log.error(unknownException.getMessage(), unknownException);
+				JOptionPane.showMessageDialog(null, "Unknown Error!", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				unknownException.printStackTrace();
 			}
 		}
 	}

@@ -34,7 +34,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	IRODSFile sourceIrodsFilePath = null;
 
 	/* Logger instantiation */
-	static Logger log = Logger.getLogger(DirectoryContentsWindow.class
+	static Logger log = Logger.getLogger(GetFileFromIrodsSwingWorker.class
 			.getName());
 
 	/* Get files from iRODS Server */
@@ -202,11 +202,9 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 				log.info("irodsImagej.isImageOpened is set to true");
 			} else {
 				log.error("ImagePlus instance in GetFileFromIrodsSwingWorker is null and irodsImagej.isImageOpened is false");
-				JOptionPane
-						.showMessageDialog(
-								null,
-								"ImagePlus instance in GetFileFromIrodsSwingWorker is null and irodsImagej.isImageOpened is false!",
-								"Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null,
+						"File format is not supported by ImageJ!", "Error",
+						JOptionPane.ERROR_MESSAGE);
 			}
 		} else {
 			IJ.showMessage("ImageJ is not able to open requested file!");

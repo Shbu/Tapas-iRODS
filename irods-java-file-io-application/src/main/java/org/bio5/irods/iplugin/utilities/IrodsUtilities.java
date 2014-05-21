@@ -132,7 +132,7 @@ public final class IrodsUtilities {
 		try {
 			if (null != directoryPath && directoryPath != "") {
 				String fullPath = directoryPath;
-				int index = fullPath.lastIndexOf("\\");
+				int index = fullPath.lastIndexOf(getPathSeperator());
 				fileName = fullPath.substring(index + 1);
 				log.info("File name extracted from given directory path: "
 						+ fileName);
@@ -143,5 +143,11 @@ public final class IrodsUtilities {
 			log.error(e.getMessage());
 		}
 		return fileName;
+	}
+
+	public static String getUserHomeFolderFromSystemProperty() {
+		String userHomeFolderFromSystemProperty = null;
+		userHomeFolderFromSystemProperty = System.getProperty("user.home");
+		return userHomeFolderFromSystemProperty;
 	}
 }

@@ -1,7 +1,7 @@
 package org.bio5.irods.iplugin.utilities;
 
 public class Constants {
-
+	public static final String NEW_LINE_STRING = "\n";
 	public static final String HOME_DIR = "/iplant/";
 	public static final String DEFAULT_STORAGE_RESOURCE = "";
 	public static final String HOME_DIR_IPLANT_HOME = "/iplant/home/";

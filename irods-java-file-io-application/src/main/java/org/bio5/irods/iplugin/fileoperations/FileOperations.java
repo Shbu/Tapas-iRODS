@@ -114,8 +114,8 @@ public class FileOperations {
 		} catch (JargonException e) {
 			log.error("Error while retrieving collectionsUnderGivenAbsolutePath: "
 					+ e.getMessage());
-			JOptionPane.showMessageDialog(null, "Error while retrieving collectionsUnderGivenAbsolutePath!", "Error",
-					JOptionPane.ERROR_MESSAGE);
+			/*JOptionPane.showMessageDialog(null, "Error while retrieving collectionsUnderGivenAbsolutePath!", "Error",
+					JOptionPane.ERROR_MESSAGE);*/
 		}
 		return collectionsUnderGivenAbsolutePath;
 	}

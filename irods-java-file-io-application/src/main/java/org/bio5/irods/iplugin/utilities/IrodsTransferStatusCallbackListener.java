@@ -11,7 +11,7 @@ import org.irods.jargon.core.transfer.TransferStatus;
 import org.irods.jargon.core.transfer.TransferStatusCallbackListener;
 
 public class IrodsTransferStatusCallbackListener implements
-		TransferStatusCallbackListener {
+TransferStatusCallbackListener {
 
 	private JProgressBar jprogressbar;
 	@SuppressWarnings("unused")
@@ -30,51 +30,68 @@ public class IrodsTransferStatusCallbackListener implements
 	public void overallStatusCallback(TransferStatus ts) throws JargonException {
 	}
 
-	public void statusCallback(TransferStatus ts) throws JargonException {
+	public void statusCallback(TransferStatus transferStatus)
+			throws JargonException {
 
-		log.info("transfer status callback details: " + ts);
+		log.info("transfer status callback details: " + transferStatus);
 
-		if (ts.getTransferState() == TransferStatus.TransferState.FAILURE) {
-			log.error("error occurred in transfer:" + ts);
-			JOptionPane.showMessageDialog(null, ts.getTransferState());
+		if (transferStatus.getTransferState() == TransferStatus.TransferState.FAILURE) {
+			log.error("error occurred in transfer:" + transferStatus);
+			JOptionPane.showMessageDialog(null,
+					"Error occured while transferring file to server!",
+					"Error", JOptionPane.ERROR_MESSAGE);
 			return;
 
-		} else if (ts.isIntraFileStatusReport()) {
-			log.info("Transfer state: " + ts.getTransferState()
-					+ " | Bytes Transferred so far:" + ts.getBytesTransfered()
-					+ "| Total file size inf bytes:" + ts.getTotalSize()
+		} else if (transferStatus.isIntraFileStatusReport()) {
+			log.info("Transfer state: " + transferStatus.getTransferState()
+					+ " | Bytes Transferred so far:"
+					+ transferStatus.getBytesTransfered()
+					+ "| Total file size inf bytes:"
+					+ transferStatus.getTotalSize()
 					+ "| Transfer percentage out of 100: "
-					+ ts.getBytesTransfered() * 100 / ts.getTotalSize());
+					+ transferStatus.getBytesTransfered() * 100
+					/ transferStatus.getTotalSize());
 			jprogressbar.setMinimum(0);
 			jprogressbar.setMaximum(100);
-			jprogressbar.setValue((int) (ts.getBytesTransfered() * 100 / ts
+			jprogressbar
+			.setValue((int) (transferStatus.getBytesTransfered() * 100 / transferStatus
 					.getTotalSize()));
 			if (Constants.JPROGRESS_SET_STRING_PAINTED) {
 				jprogressbar.setString("Progress: "
-						+ FileUtils.byteCountToDisplaySize(ts
-								.getBytesTransfered()) + "/"
-						+ FileUtils.byteCountToDisplaySize(ts.getTotalSize()));
+						+ FileUtils.byteCountToDisplaySize(transferStatus
+								.getBytesTransfered())
+								+ "/"
+								+ FileUtils.byteCountToDisplaySize(transferStatus
+										.getTotalSize()));
 			}
-		} else if (ts.getTransferState() == TransferStatus.TransferState.IN_PROGRESS_COMPLETE_FILE) {
-			log.info("Transfer state: " + ts.getTransferState()
-					+ " | Bytes Transferred so far:" + ts.getBytesTransfered()
-					+ "| Total file size inf bytes:" + ts.getTotalSize()
+		} else if (transferStatus.getTransferState() == TransferStatus.TransferState.IN_PROGRESS_COMPLETE_FILE) {
+			log.info("Transfer state: " + transferStatus.getTransferState()
+					+ " | Bytes Transferred so far:"
+					+ transferStatus.getBytesTransfered()
+					+ "| Total file size inf bytes:"
+					+ transferStatus.getTotalSize()
 					+ "| Transfer percentage out of 100: "
-					+ ts.getBytesTransfered() * 100 / ts.getTotalSize());
+					+ transferStatus.getBytesTransfered() * 100
+					/ transferStatus.getTotalSize());
 			jprogressbar.setMinimum(0);
 			jprogressbar.setMaximum(100);
-			jprogressbar.setValue((int) (ts.getBytesTransfered() * 100 / ts
+			jprogressbar
+			.setValue((int) (transferStatus.getBytesTransfered() * 100 / transferStatus
 					.getTotalSize()));
 			if (Constants.JPROGRESS_SET_STRING_PAINTED) {
 				jprogressbar.setString("Progress: "
-						+ FileUtils.byteCountToDisplaySize(ts
-								.getBytesTransfered()) + "/"
-						+ FileUtils.byteCountToDisplaySize(ts.getTotalSize()));
+						+ FileUtils.byteCountToDisplaySize(transferStatus
+								.getBytesTransfered())
+								+ "/"
+								+ FileUtils.byteCountToDisplaySize(transferStatus
+										.getTotalSize()));
 			}
-		} else if (ts.getTransferException() != null) {
-			log.info("Exception in file transfer: " + ts.getTransferState());
+		} else if (transferStatus.getTransferException() != null) {
+			log.info("Exception in file transfer: "
+					+ transferStatus.getTransferState());
 		} else {
-			log.info("Something else is going on!" + ts.getTransferState());
+			log.info("Something else is going on!"
+					+ transferStatus.getTransferState());
 		}
 	}
 
