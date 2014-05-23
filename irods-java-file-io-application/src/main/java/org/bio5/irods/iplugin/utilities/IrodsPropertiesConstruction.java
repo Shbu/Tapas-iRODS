@@ -30,8 +30,13 @@ public class IrodsPropertiesConstruction {
 				.setIntraFileStatusCallbacks(true);
 		defaultTransferControlBlock.getTransferOptions().setMaxThreads(
 				Constants.MAX_THREADS);
-		defaultTransferControlBlock.getTransferOptions()
-				.setUseParallelTransfer(true);
+		defaultTransferControlBlock
+				.getTransferOptions()
+				.setUseParallelTransfer(Constants.USE_PARALLEL_TRANSFERS_OPTION);
+		defaultTransferControlBlock
+				.getTransferOptions()
+				.setComputeAndVerifyChecksumAfterTransfer(
+						Constants.COMPUTE_AND_VERIFY_CHECKSUM_AFTER_TRANSFER_OPTION);
 		return defaultTransferControlBlock;
 	}
 

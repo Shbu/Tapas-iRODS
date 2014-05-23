@@ -82,6 +82,8 @@ public class IPlugin implements Serializable {
 
 	private DefaultMutableTreeNode rootTreeNodeForDirectoryContents = null;
 
+	private boolean errorWhileUsingGetOperation = false;
+
 	/*
 	 * true - if you want to pull everything from home directory (This includes
 	 * shared files too). False- if you want to pull collections from only your
@@ -108,6 +110,15 @@ public class IPlugin implements Serializable {
 	private boolean isImageOpened = false;
 
 	private ImagePlus imagePlus;
+
+	public boolean isErrorWhileUsingGetOperation() {
+		return errorWhileUsingGetOperation;
+	}
+
+	public void setErrorWhileUsingGetOperation(
+			boolean errorWhileUsingGetOperation) {
+		this.errorWhileUsingGetOperation = errorWhileUsingGetOperation;
+	}
 
 	public ImagePlus getImagePlus() {
 		return imagePlus;

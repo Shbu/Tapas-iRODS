@@ -29,6 +29,10 @@ public class IPlugin_SaveImage extends PlugInFrame {
 				log.info("irodsImagej.isImageOpened() is true");
 
 				// setVisibility(Constants.SAVE_PANEL_VISIBILITY);
+				/*
+				 * As we don't need any panel, just use SaveImageImplementation
+				 * without panel - Requirement update 5/21/2014
+				 */
 				new SaveImageImplementation(iplugin);
 
 			} else {
@@ -44,7 +48,7 @@ public class IPlugin_SaveImage extends PlugInFrame {
 		}
 	}
 
-	/* suing this will lead to new panel - not required as of now */
+	/* Using this will lead to new panel - not required as of now */
 	private void setVisibility(boolean isVisibility) {
 		if (isVisibility) {
 			log.info("Inside setVisibility method");

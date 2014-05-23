@@ -304,6 +304,12 @@ public class DirectoryContentsWindow extends JPanel implements
 				jButton_saveToIrodsServer.setEnabled(true);
 			}
 		});
+		
+		JButton btnDownload = new JButton("Download");
+		btnDownload.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 
 		jTextField_destinationPath.setEnabled(false);
 
@@ -486,7 +492,13 @@ public class DirectoryContentsWindow extends JPanel implements
 
 				} else if (mouseEvent.getClickCount() == 1) {
 
-					/* resetting progress bar to 0 if a single click is detected */
+					/* Multiple files selection is still pending */
+					TreePath[] treePaths = userDirectoryTree
+							.getSelectionPaths();
+					for (int i = 0; i < treePaths.length; i++) {
+						System.out.println("Path" + i + ":" + treePaths[i]);
+					}
+
 					selectedNodeInTreeForSingleClick = IrodsUtilities
 							.getJtreeSelectionForSingleClick(mouseEvent,
 									userDirectoryTree);
@@ -515,7 +527,6 @@ public class DirectoryContentsWindow extends JPanel implements
 		userDirectoryTree.setEditable(false);
 		userDirectoryTree.setVisible(true);
 		viewport.add(userDirectoryTree);
-
 	}
 
 	public void setFileInformationFromObjStat(ObjStat objstatWithFileInformation) {

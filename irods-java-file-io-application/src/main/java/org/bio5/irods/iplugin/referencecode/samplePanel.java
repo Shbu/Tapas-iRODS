@@ -21,6 +21,9 @@ import javax.swing.JLabel;
 import java.awt.FlowLayout;
 import javax.swing.border.LineBorder;
 import java.awt.Dimension;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class samplePanel extends JPanel {
 	private JTable table;
@@ -49,14 +52,26 @@ public class samplePanel extends JPanel {
 		
 		JPanel panel = new JPanel();
 		tabbedPane.addTab("New tab", null, panel, null);
+		
+		JButton btnDownload = new JButton("Download");
+		btnDownload.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 565, Short.MAX_VALUE)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(btnDownload)
+					.addContainerGap(466, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 375, Short.MAX_VALUE)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGap(114)
+					.addComponent(btnDownload)
+					.addContainerGap(240, Short.MAX_VALUE))
 		);
 		panel.setLayout(gl_panel);
 		

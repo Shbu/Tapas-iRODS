@@ -11,16 +11,16 @@ import org.irods.jargon.core.transfer.TransferStatus;
 import org.irods.jargon.core.transfer.TransferStatusCallbackListener;
 
 public class IrodsTransferStatusCallbackListener implements
-TransferStatusCallbackListener {
+		TransferStatusCallbackListener {
 
 	private JProgressBar jprogressbar;
 	@SuppressWarnings("unused")
-	private IPlugin irodsImagej;
+	private IPlugin iPlugin;
 
-	public IrodsTransferStatusCallbackListener(IPlugin irodsImagej) {
+	public IrodsTransferStatusCallbackListener(IPlugin iPlugin) {
 		super();
-		this.irodsImagej = irodsImagej;
-		this.jprogressbar = irodsImagej.getJprogressbar();
+		this.iPlugin = iPlugin;
+		this.jprogressbar = iPlugin.getJprogressbar();
 	}
 
 	/* Logger instantiation */
@@ -36,10 +36,13 @@ TransferStatusCallbackListener {
 		log.info("transfer status callback details: " + transferStatus);
 
 		if (transferStatus.getTransferState() == TransferStatus.TransferState.FAILURE) {
-			log.error("error occurred in transfer:" + transferStatus);
+			log.error("Error occurred in transfer :" + transferStatus);
 			JOptionPane.showMessageDialog(null,
-					"Error occured while transferring file to server!",
-					"Error", JOptionPane.ERROR_MESSAGE);
+					"Error occured while transferring file!", "Error",
+					JOptionPane.ERROR_MESSAGE);
+			log.info("Setting setErrorWhileUsingGetOperation in iPlugin :"
+					+ "True");
+			iPlugin.setErrorWhileUsingGetOperation(true);
 			return;
 
 		} else if (transferStatus.isIntraFileStatusReport()) {
@@ -54,15 +57,15 @@ TransferStatusCallbackListener {
 			jprogressbar.setMinimum(0);
 			jprogressbar.setMaximum(100);
 			jprogressbar
-			.setValue((int) (transferStatus.getBytesTransfered() * 100 / transferStatus
-					.getTotalSize()));
+					.setValue((int) (transferStatus.getBytesTransfered() * 100 / transferStatus
+							.getTotalSize()));
 			if (Constants.JPROGRESS_SET_STRING_PAINTED) {
 				jprogressbar.setString("Progress: "
 						+ FileUtils.byteCountToDisplaySize(transferStatus
 								.getBytesTransfered())
-								+ "/"
-								+ FileUtils.byteCountToDisplaySize(transferStatus
-										.getTotalSize()));
+						+ "/"
+						+ FileUtils.byteCountToDisplaySize(transferStatus
+								.getTotalSize()));
 			}
 		} else if (transferStatus.getTransferState() == TransferStatus.TransferState.IN_PROGRESS_COMPLETE_FILE) {
 			log.info("Transfer state: " + transferStatus.getTransferState()
@@ -76,15 +79,15 @@ TransferStatusCallbackListener {
 			jprogressbar.setMinimum(0);
 			jprogressbar.setMaximum(100);
 			jprogressbar
-			.setValue((int) (transferStatus.getBytesTransfered() * 100 / transferStatus
-					.getTotalSize()));
+					.setValue((int) (transferStatus.getBytesTransfered() * 100 / transferStatus
+							.getTotalSize()));
 			if (Constants.JPROGRESS_SET_STRING_PAINTED) {
 				jprogressbar.setString("Progress: "
 						+ FileUtils.byteCountToDisplaySize(transferStatus
 								.getBytesTransfered())
-								+ "/"
-								+ FileUtils.byteCountToDisplaySize(transferStatus
-										.getTotalSize()));
+						+ "/"
+						+ FileUtils.byteCountToDisplaySize(transferStatus
+								.getTotalSize()));
 			}
 		} else if (transferStatus.getTransferException() != null) {
 			log.info("Exception in file transfer: "
@@ -98,7 +101,8 @@ TransferStatusCallbackListener {
 	public CallbackResponse transferAsksWhetherToForceOperation(
 			String irodsAbsolutePath, boolean isCollection) {
 
-		CallbackResponse response = CallbackResponse.YES_FOR_ALL;
+		// CallbackResponse response = CallbackResponse.YES_FOR_ALL;
+		CallbackResponse response = null;
 		StringBuilder stringBuilder = new StringBuilder(
 				isCollection ? "Folder '" : "File'");
 		stringBuilder.append(irodsAbsolutePath);
@@ -110,6 +114,14 @@ TransferStatusCallbackListener {
 				JOptionPane.QUESTION_MESSAGE,
 				javax.swing.UIManager.getIcon("OptionPane.questionIcon"),
 				options, options[2]);
+
+		/*
+		 * Fix issue - Imagej shouldn't open images when X button is clicked on
+		 * OptionDialogue
+		 */
+
+		if (answer == JOptionPane.CLOSED_OPTION) {
+		}
 
 		switch (answer) {
 		case 0:

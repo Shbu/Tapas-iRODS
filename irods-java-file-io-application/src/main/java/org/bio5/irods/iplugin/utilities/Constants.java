@@ -13,7 +13,6 @@ public class Constants {
 	public static final String HOST = "data.iplantcollaborative.org";
 	public static String PORT = "1247";
 	public static String HOME = "home";
-	public static int MAX_THREADS = 10;
 	public static String FOLDER_SELECTION_CANCELED = "Folder Selection is canceled";
 	public static String JTABBEDPANE_SELECTED_TAB_FILE_INFORMATION = "File Information";
 
@@ -39,5 +38,10 @@ public class Constants {
 																	 * your
 																	 * account
 																	 */
+
+	/* Enhanced jargon Properties */
+	public static boolean COMPUTE_AND_VERIFY_CHECKSUM_AFTER_TRANSFER_OPTION = false;
+	public static int MAX_THREADS = 10;
+	public static boolean USE_PARALLEL_TRANSFERS_OPTION = true;
 
 }

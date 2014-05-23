@@ -12,9 +12,11 @@ import javax.swing.SwingWorker;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
+import org.bio5.irods.iplugin.exception.AbendTransaction;
 import org.bio5.irods.iplugin.utilities.Constants;
 import org.bio5.irods.iplugin.utilities.IrodsUtilities;
 import org.bio5.irods.iplugin.views.DirectoryContentsWindow;
+import org.irods.jargon.core.exception.DataNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.exception.OverwriteException;
 import org.irods.jargon.core.pub.DataObjectAO;
@@ -51,7 +53,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	 * background
 	 */
 	@Override
-	public Void doInBackground() throws Exception {
+	public Void doInBackground() throws JargonException {
 
 		log.info("finalTreePath:" + treePath);
 
@@ -129,38 +131,51 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 					JOptionPane
 							.showMessageDialog(
 									null,
-									"Local cache directory have files with same name but MD5 checksum is different!");
+									"Local cache directory have files with same name but MD5 checksum is different!",
+									"Information",
+									JOptionPane.INFORMATION_MESSAGE);
 			}
 			try {
 				if (null != sourceIrodsFilePath) {
 					if (null != iPlugin) {
-						log.info("IntraFileStatusCallBack: "
-								+ transferControlBlock.getTransferOptions()
-										.isIntraFileStatusCallbacks());
+
+						log.error("Defaulting ErrorWhileUsingGetOperation value to :"
+								+ "False");
+						iPlugin.setErrorWhileUsingGetOperation(false);
+
+						log.info("Transfer Options in IntraFileStatusCallBack status: "
+								+ transferControlBlock.getTransferOptions());
 						dataTransferOperationsAO
 								.getOperation(
 										sourceIrodsFilePath,
 										destinationLocalFilePath,
 										iPlugin.getIrodsTransferStatusCallbackListener(),
 										transferControlBlock);
+
+						if (!iPlugin.isErrorWhileUsingGetOperation()) {
+							log.info("Executing openImageUsingImageJ method");
+							openImageUsingImageJ();
+						} else {
+							log.error("Error while using GetOperation in GetFileFromIrodsSwingWorker");
+						}
 					}
 				}
-			} catch (OverwriteException oe) {
+			} catch (OverwriteException overwriteException) {
 				log.error("File with same name already exist in local directory! "
-						+ oe.getMessage());
+						+ overwriteException.getMessage());
 				JOptionPane
 						.showMessageDialog(
 								null,
 								"File with same name already exist in local directory!",
-								"Error", JOptionPane.ERROR_MESSAGE);
+								"Information", JOptionPane.INFORMATION_MESSAGE);
 
 				/* Getting MD5 checksum of local file, if exists */
-				File localFile2 = new File(
+				File fileInLocal = new File(
 						destinationLocalFilePath.getAbsolutePath()
 								+ IrodsUtilities.getPathSeperator()
 								+ sourceIrodsFilePath.getName());
 				md5ChecksumLocalFile = IrodsUtilities
-						.calculateMD5CheckSum(localFile2);
+						.calculateMD5CheckSum(fileInLocal);
 				log.info("MD5checksum of local file: " + md5ChecksumLocalFile);
 
 				log.info("MD5 checksum compared - Similar files:"
@@ -171,19 +186,34 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 							.showMessageDialog(null,
 									"File names are same but MD5 checksum is different!");
 
-				oe.printStackTrace();
-			} catch (JargonException je) {
+				overwriteException.printStackTrace();
+			} catch (DataNotFoundException dataNotFoundException) {
+				JOptionPane.showMessageDialog(null, "dataNotFoundException!",
+						"Error", JOptionPane.ERROR_MESSAGE);
+				log.info("Error while pulling files!"
+						+ dataNotFoundException.getMessage());
+			} catch (JargonException jargonException) {
 				JOptionPane.showMessageDialog(null,
 						"Error while pulling files!", "Error",
 						JOptionPane.ERROR_MESSAGE);
-				log.info("Error while pulling files!");
+				log.info("Error while pulling files!"
+						+ jargonException.getMessage());
 			}
+
 		}
 		return null;
 	}
 
 	@Override
 	public void done() {
+		/*
+		 * Source code in done() method is shifted to openImageUsingImageJ()
+		 * method
+		 */
+	}
+
+	private void openImageUsingImageJ() {
+
 		/* Opening the selected ImageJ */
 		Opener imagejOpener = new Opener();
 		if (null != iPlugin.getImageJCacheFolder()) {
