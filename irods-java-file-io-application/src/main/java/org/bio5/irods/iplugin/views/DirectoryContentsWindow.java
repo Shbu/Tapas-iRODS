@@ -361,6 +361,7 @@ public class DirectoryContentsWindow extends JPanel implements
 											destinaitonIrodsFile,
 											targetResourceName);
 									putFile.execute();
+									log.info("PutFile operation is executed!");
 
 								}
 							} catch (Exception exception) {

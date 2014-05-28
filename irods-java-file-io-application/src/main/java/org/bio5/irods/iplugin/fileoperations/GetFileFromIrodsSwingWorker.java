@@ -156,7 +156,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 							log.info("Executing openImageUsingImageJ method");
 							openImageUsingImageJ();
 						} else {
-							log.error("Error while using GetOperation in GetFileFromIrodsSwingWorker");
+							log.error("Error while transfering files");
 						}
 					}
 				}

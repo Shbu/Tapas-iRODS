@@ -19,6 +19,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.ComponentOrientation;
 import java.awt.Cursor;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JSplitPane;
+import javax.swing.JTextField;
+import javax.swing.JTree;
+import java.awt.Component;
 
 public class samplePanel extends JPanel {
 	/**
@@ -26,7 +30,6 @@ public class samplePanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 5527815157916844473L;
 	private JTable table;
-	private JTable table_1;
 
 	/**
 	 * Create the panel.
@@ -137,29 +140,32 @@ public class samplePanel extends JPanel {
 				JPanel panel = new JPanel();
 				
 				tabbedPane.addTab("New tab", null, panel, null);
-				
-						table_1 = new JTable();
-						table_1.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-						table_1.setRowHeight(20);
-						table_1.setIntercellSpacing(new Dimension(3, 3));
-						table_1.setToolTipText("Cache folder contents");
-						table_1.setModel(new DefaultTableModel(data,columnNames));
-						table_1.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
+						
+						JSplitPane splitPane = new JSplitPane();
 						GroupLayout gl_panel = new GroupLayout(panel);
 						gl_panel.setHorizontalGroup(
 							gl_panel.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panel.createSequentialGroup()
 									.addContainerGap()
-									.addComponent(table_1, GroupLayout.PREFERRED_SIZE, 363, GroupLayout.PREFERRED_SIZE)
-									.addContainerGap(192, Short.MAX_VALUE))
+									.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
+									.addContainerGap())
 						);
 						gl_panel.setVerticalGroup(
 							gl_panel.createParallelGroup(Alignment.TRAILING)
-								.addGroup(gl_panel.createSequentialGroup()
-									.addContainerGap(177, Short.MAX_VALUE)
-									.addComponent(table_1, GroupLayout.PREFERRED_SIZE, 189, GroupLayout.PREFERRED_SIZE)
+								.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
+									.addContainerGap()
+									.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 355, Short.MAX_VALUE)
 									.addContainerGap())
 						);
+						
+						JTree tree = new JTree();
+						tree.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+						tree.setAlignmentX(Component.RIGHT_ALIGNMENT);
+						tree.setAutoscrolls(true);
+						splitPane.setLeftComponent(tree);
+						
+						JPanel panel_2 = new JPanel();
+						splitPane.setRightComponent(panel_2);
 						panel.setLayout(gl_panel);
 		setLayout(groupLayout);
 

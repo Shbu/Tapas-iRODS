@@ -93,10 +93,10 @@ public class FileOperations {
 	public static List<CollectionAndDataObjectListingEntry> retrieveCollectionsUnderGivenPath(
 			IRODSFile irodsFileForAbsolutePath, IPlugin irodsImagej) {
 
-		CollectionAndDataObjectListAndSearchAO collectionAO;
+		CollectionAndDataObjectListAndSearchAO CollectionAndDataObjectListAndSearchAO;
 		List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = null;
 		try {
-			collectionAO = irodsImagej
+			CollectionAndDataObjectListAndSearchAO = irodsImagej
 					.getIrodsFileSystem()
 					.getIRODSAccessObjectFactory()
 					.getCollectionAndDataObjectListAndSearchAO(
@@ -105,7 +105,7 @@ public class FileOperations {
 					+ irodsFileForAbsolutePath.getAbsolutePath());
 			// collectionsUnderGivenAbsolutePath =
 			// collectionAO.listDataObjectsAndCollectionsUnderPath(path);
-			collectionsUnderGivenAbsolutePath = collectionAO
+			collectionsUnderGivenAbsolutePath = CollectionAndDataObjectListAndSearchAO
 					.listDataObjectsAndCollectionsUnderPath(irodsFileForAbsolutePath
 							.getAbsolutePath());
 

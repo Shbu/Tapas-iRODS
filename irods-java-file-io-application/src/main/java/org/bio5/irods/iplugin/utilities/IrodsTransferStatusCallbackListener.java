@@ -35,6 +35,19 @@ public class IrodsTransferStatusCallbackListener implements
 
 		log.info("transfer status callback details: " + transferStatus);
 
+		if (transferStatus.getTransferException() != null) {
+			log.info("Exception in file transfer: "
+					+ transferStatus.getTransferState());
+			iPlugin.setErrorWhileUsingGetOperation(true);
+			return;
+		}
+
+		if (transferStatus.getTransferState() == TransferStatus.TransferState.CANCELLED) {
+			log.info("Transfer cancelled: " + transferStatus.getTransferState());
+			iPlugin.setErrorWhileUsingGetOperation(true);
+			return;
+		}
+
 		if (transferStatus.getTransferState() == TransferStatus.TransferState.FAILURE) {
 			log.error("Error occurred in transfer :" + transferStatus);
 			JOptionPane.showMessageDialog(null,
@@ -45,6 +58,32 @@ public class IrodsTransferStatusCallbackListener implements
 			iPlugin.setErrorWhileUsingGetOperation(true);
 			return;
 
+		} else if (transferStatus.getTransferState() == TransferStatus.TransferState.IN_PROGRESS_START_FILE) {
+			if (!iPlugin.isErrorWhileUsingGetOperation()) {
+				log.info("Transfer state: " + transferStatus.getTransferState()
+						+ " | Bytes Transferred so far:"
+						+ transferStatus.getBytesTransfered()
+						+ "| Total file size inf bytes:"
+						+ transferStatus.getTotalSize()
+						+ "| Transfer percentage out of 100: "
+						+ transferStatus.getBytesTransfered() * 100
+						/ transferStatus.getTotalSize());
+				jprogressbar.setMinimum(0);
+				jprogressbar.setMaximum(100);
+				jprogressbar.setValue((int) (transferStatus
+						.getBytesTransfered() * 100 / transferStatus
+						.getTotalSize()));
+				if (Constants.JPROGRESS_SET_STRING_PAINTED) {
+					jprogressbar.setString("Progress: "
+							+ FileUtils.byteCountToDisplaySize(transferStatus
+									.getBytesTransfered())
+							+ "/"
+							+ FileUtils.byteCountToDisplaySize(transferStatus
+									.getTotalSize()));
+				}
+			} else {
+				log.info("Skipped displaying progress as file transfer is cancelled!");
+			}
 		} else if (transferStatus.isIntraFileStatusReport()) {
 			log.info("Transfer state: " + transferStatus.getTransferState()
 					+ " | Bytes Transferred so far:"
@@ -68,31 +107,34 @@ public class IrodsTransferStatusCallbackListener implements
 								.getTotalSize()));
 			}
 		} else if (transferStatus.getTransferState() == TransferStatus.TransferState.IN_PROGRESS_COMPLETE_FILE) {
-			log.info("Transfer state: " + transferStatus.getTransferState()
-					+ " | Bytes Transferred so far:"
-					+ transferStatus.getBytesTransfered()
-					+ "| Total file size inf bytes:"
-					+ transferStatus.getTotalSize()
-					+ "| Transfer percentage out of 100: "
-					+ transferStatus.getBytesTransfered() * 100
-					/ transferStatus.getTotalSize());
-			jprogressbar.setMinimum(0);
-			jprogressbar.setMaximum(100);
-			jprogressbar
-					.setValue((int) (transferStatus.getBytesTransfered() * 100 / transferStatus
-							.getTotalSize()));
-			if (Constants.JPROGRESS_SET_STRING_PAINTED) {
-				jprogressbar.setString("Progress: "
-						+ FileUtils.byteCountToDisplaySize(transferStatus
-								.getBytesTransfered())
-						+ "/"
-						+ FileUtils.byteCountToDisplaySize(transferStatus
-								.getTotalSize()));
+			if (!iPlugin.isErrorWhileUsingGetOperation()) {
+				log.info("Transfer state: " + transferStatus.getTransferState()
+						+ " | Bytes Transferred so far:"
+						+ transferStatus.getBytesTransfered()
+						+ "| Total file size inf bytes:"
+						+ transferStatus.getTotalSize()
+						+ "| Transfer percentage out of 100: "
+						+ transferStatus.getBytesTransfered() * 100
+						/ transferStatus.getTotalSize());
+				jprogressbar.setMinimum(0);
+				jprogressbar.setMaximum(100);
+				jprogressbar.setValue((int) (transferStatus
+						.getBytesTransfered() * 100 / transferStatus
+						.getTotalSize()));
+				if (Constants.JPROGRESS_SET_STRING_PAINTED) {
+					jprogressbar.setString("Progress: "
+							+ FileUtils.byteCountToDisplaySize(transferStatus
+									.getBytesTransfered())
+							+ "/"
+							+ FileUtils.byteCountToDisplaySize(transferStatus
+									.getTotalSize()));
+				}
+			} else {
+				log.info("Skipped displaying progress as file transfer is cancelled!");
 			}
-		} else if (transferStatus.getTransferException() != null) {
-			log.info("Exception in file transfer: "
-					+ transferStatus.getTransferState());
-		} else {
+		}
+
+		else {
 			log.info("Something else is going on!"
 					+ transferStatus.getTransferState());
 		}
@@ -121,6 +163,8 @@ public class IrodsTransferStatusCallbackListener implements
 		 */
 
 		if (answer == JOptionPane.CLOSED_OPTION) {
+			response = CallbackResponse.CANCEL;
+			iPlugin.setErrorWhileUsingGetOperation(true);
 		}
 
 		switch (answer) {

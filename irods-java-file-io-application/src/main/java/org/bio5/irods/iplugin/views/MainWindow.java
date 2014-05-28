@@ -53,7 +53,7 @@ public class MainWindow extends JFrame {
 	public IRODSFileSystem irodsFileSystem;
 
 	/* Logger instantiation */
-	static Logger log = Logger.getLogger(IPlugin_OpenImage.class.getName());
+	static Logger log = Logger.getLogger(MainWindow.class.getName());
 
 	private JPanel contentPanePanel;
 	private JTextField textbox_LoginId;
@@ -62,7 +62,7 @@ public class MainWindow extends JFrame {
 	private JTextField textField_Zone;
 	private JTextField textField_Host;
 	private DirectoryContentsWindow directoryContentsPane;
-	private IPlugin irodsImagejInstance;
+	private IPlugin iplugin;
 	private JCheckBox HomeDirectory_CheckBox;
 
 	public JFileChooser localImageJFileChooser;
@@ -79,7 +79,7 @@ public class MainWindow extends JFrame {
 	 */
 	public MainWindow(IPlugin irodsImagej) {
 		// super();
-		this.irodsImagejInstance = irodsImagej;
+		this.iplugin = irodsImagej;
 
 		mainWindowInit();
 
@@ -280,10 +280,10 @@ public class MainWindow extends JFrame {
 							+ selectedFileForImageJCacheFolder
 									.getAbsolutePath() + "."
 							+ Constants.NEW_LINE_STRING);
-					irodsImagejInstance
+					iplugin
 							.setImageJCacheFolder(selectedFileForImageJCacheFolder
 									.getAbsolutePath());
-					textField_ImageJCacheFolderPath.setText(irodsImagejInstance
+					textField_ImageJCacheFolderPath.setText(iplugin
 							.getImageJCacheFolder());
 				} else {
 					log.info("User cancelled file selection window: "
@@ -510,7 +510,7 @@ public class MainWindow extends JFrame {
 		} catch (JargonException e) {
 			log.error("Error while retrieving irodsFileSystem" + e.getMessage());
 		}
-		irodsImagejInstance.setIrodsFileSystem(irodsFileSystem);
+		iplugin.setIrodsFileSystem(irodsFileSystem);
 
 	}
 
@@ -529,7 +529,7 @@ public class MainWindow extends JFrame {
 			} else {
 				log.info("ImageJ cache folder path specified by user:"
 						+ textField_ImageJCacheFolderPath.getText());
-				irodsImagejInstance
+				iplugin
 						.setImageJCacheFolder(textField_ImageJCacheFolderPath
 								.getText());
 			}
@@ -543,27 +543,27 @@ public class MainWindow extends JFrame {
 		{
 			try {
 				if (HomeDirectory_CheckBox.isSelected()) {
-					irodsImagejInstance.setHomeDirectoryTheRootNode(true);
+					iplugin.setHomeDirectoryTheRootNode(true);
 				}
 
 				IRODSAccount irodsAccount = IrodsConnection.irodsConnection(
 						username, password_full, zone, host, port);
-				irodsImagejInstance.setIrodsAccount(irodsAccount);
+				iplugin.setIrodsAccount(irodsAccount);
 
 				if (null != irodsFileSystem) {
 					IRODSSession iRODSSession = irodsFileSystem
 							.getIrodsSession();
-					irodsImagejInstance.setiRODSSession(iRODSSession);
+					iplugin.setiRODSSession(iRODSSession);
 				} else {
 					log.error("iRODSSession is null");
 				}
 
-				if (irodsImagejInstance.getIrodsAccount() != null
-						&& irodsImagejInstance.getiRODSSession() != null) {
+				if (iplugin.getIrodsAccount() != null
+						&& iplugin.getiRODSSession() != null) {
 					iRODSFileSystemAOImpl = new IRODSFileSystemAOImpl(
-							irodsImagejInstance.getiRODSSession(),
-							irodsImagejInstance.getIrodsAccount());
-					irodsImagejInstance
+							iplugin.getiRODSSession(),
+							iplugin.getIrodsAccount());
+					iplugin
 							.setiRODSFileSystemAOImpl(iRODSFileSystemAOImpl);
 				}
 
@@ -574,14 +574,14 @@ public class MainWindow extends JFrame {
 				 */
 
 				List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = FileOperations
-						.setIrodsFile(null, irodsImagejInstance,
-								irodsImagejInstance
+						.setIrodsFile(null, iplugin,
+								iplugin
 										.isHomeDirectoryTheRootNode());
-				irodsImagejInstance
+				iplugin
 						.setCollectionsUnderGivenAbsolutePath(collectionsUnderGivenAbsolutePath);
 				directoryContentsPane = new DirectoryContentsWindow(
-						irodsImagejInstance);
-				irodsImagejInstance
+						iplugin);
+				iplugin
 						.setDirectoryContentsPane(directoryContentsPane);
 				directoryContentsPane.init();
 				directoryContentsPane.implementation();

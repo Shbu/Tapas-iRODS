@@ -16,7 +16,7 @@ import org.irods.jargon.core.pub.io.IRODSFile;
 
 public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 
-	private IPlugin irodsImagej;
+	private IPlugin iPlugin;
 	private DataTransferOperations dataTransferOperationsAO;
 	private File sourceLocalfile = null;
 	private IRODSFile destinaitonIrodsFile = null;
@@ -29,7 +29,7 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	public PutFileToIrodsSwingWorker(IPlugin irodsImagej, File sourceLocalfile,
 			IRODSFile destinaitonIrodsFile, String targetResourceName) {
 		super();
-		this.irodsImagej = irodsImagej;
+		this.iPlugin = irodsImagej;
 		this.sourceLocalfile = sourceLocalfile;
 		this.destinaitonIrodsFile = destinaitonIrodsFile;
 		this.targetResourceName = targetResourceName;
@@ -38,17 +38,15 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	@Override
 	protected Void doInBackground() {
 		// TODO Auto-generated method stub
-		if (null != irodsImagej.getIrodsAccount()
-				&& null != irodsImagej.getIrodsTransferStatusCallbackListener()
-				&& null != irodsImagej.getTransferControlBlock()) {
+		if (null != iPlugin.getIrodsAccount()
+				&& null != iPlugin.getIrodsTransferStatusCallbackListener()
+				&& null != iPlugin.getTransferControlBlock()) {
 			try {
-				dataTransferOperationsAO = irodsImagej
-						.getIrodsFileSystem()
+				dataTransferOperationsAO = iPlugin.getIrodsFileSystem()
 						.getIRODSAccessObjectFactory()
-						.getDataTransferOperations(
-								irodsImagej.getIrodsAccount());
+						.getDataTransferOperations(iPlugin.getIrodsAccount());
 			} catch (JargonException jargonException) {
-				log.error("Error while getting dataTransferOperationsAO object from FileSystem !"
+				log.info("Error while getting dataTransferOperationsAO object from FileSystem !"
 						+ jargonException.getMessage());
 			}
 			if (null != dataTransferOperationsAO) {
@@ -56,17 +54,29 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 						&& null != destinaitonIrodsFile.getAbsolutePath()) {
 					/* Option -1 - Absolute path */
 					try {
-						dataTransferOperationsAO
-								.putOperation(
-										sourceLocalfile.getAbsolutePath(),
-										destinaitonIrodsFile.getAbsolutePath(),
-										targetResourceName,
-										irodsImagej
-												.getIrodsTransferStatusCallbackListener(),
-										irodsImagej.getTransferControlBlock());
-						log.info("file Transfer successfull!!");
-						JOptionPane.showMessageDialog(null,
-								"File Transfer done successfully");
+						log.error("Defaulting ErrorWhileUsingGetOperation value to :"
+								+ "False");
+						iPlugin.setErrorWhileUsingGetOperation(false);
+
+						dataTransferOperationsAO.putOperation(sourceLocalfile
+								.getAbsolutePath(), destinaitonIrodsFile
+								.getAbsolutePath(), targetResourceName, iPlugin
+								.getIrodsTransferStatusCallbackListener(),
+								iPlugin.getTransferControlBlock());
+
+						if (!iPlugin.isErrorWhileUsingGetOperation()) {
+							log.info("file Transfer successfull!!");
+							JOptionPane.showMessageDialog(null,
+									"File Transfer done successfully");
+							reloadChildNodeAfterUploading();
+						} else {
+							log.error("Error while transfering files");
+							JOptionPane.showMessageDialog(null,
+									"Error while transferring files!",
+									"Error in uploading file",
+									JOptionPane.ERROR_MESSAGE);
+						}
+
 					} catch (DataNotFoundException dataNotFoundException) {
 						log.error("DataNotFoundException while uploading file to irods"
 								+ dataNotFoundException.getMessage());
@@ -111,26 +121,30 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 
 	@Override
 	public void done() {
-		if (null != irodsImagej.getUserDirectoryTree()
-				&& null != sourceLocalfile) {
+	}
+
+	private void reloadChildNodeAfterUploading() {
+		if (null != iPlugin.getUserDirectoryTree() && null != sourceLocalfile) {
 			DefaultMutableTreeNode parentNode = null;
 
 			/*
 			 * Destination selection - Fetching parent path if leaf node is
 			 * selected
 			 */
-			parentNode = (DefaultMutableTreeNode) irodsImagej
+			parentNode = (DefaultMutableTreeNode) iPlugin
 					.getUserDirectoryTree().getLastSelectedPathComponent();
 			if (null != parentNode) {
 				if (parentNode.isLeaf()) {
 					parentNode = (DefaultMutableTreeNode) parentNode
 							.getParent();
+
+					iPlugin.getDirectoryContentsPane().addObject(parentNode,
+							sourceLocalfile.getName(), true);
 				}
 			} else {
 				log.error("parentNode in PutFileToIrodsSwingWorker is null");
 			}
-			irodsImagej.getDirectoryContentsPane().addObject(parentNode,
-					sourceLocalfile.getName(), true);
+
 		} else {
 			log.error("1. UserDirectoryTree value is null in irodsImageJ bean or 2.sourceLocalFile is empty");
 		}
