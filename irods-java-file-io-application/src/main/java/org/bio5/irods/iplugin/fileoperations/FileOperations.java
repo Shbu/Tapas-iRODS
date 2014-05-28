@@ -2,8 +2,6 @@ package org.bio5.irods.iplugin.fileoperations;
 
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
 import org.bio5.irods.iplugin.utilities.Constants;
@@ -59,8 +57,8 @@ public class FileOperations {
 					iRodsFile, irodsImagej);
 		} else if (pathForInternalFiles == null && isHomeDirectoryFlagOn) {
 
-			pathForInternalFiles = irodsImagej.getIrodsAccount()
-					.getHomeDirectory()
+			pathForInternalFiles = IrodsUtilities.getPathSeperator() + irodsImagej.getIrodsAccount()
+					.getZone()
 					+ IrodsUtilities.getPathSeperator()
 					+ Constants.HOME;
 			irodsImagej.setPathTillHome(pathForInternalFiles);
@@ -72,8 +70,8 @@ public class FileOperations {
 			collectionsUnderGivenAbsolutePath = retrieveCollectionsUnderGivenPath(
 					iRodsFile, irodsImagej);
 		} else if (pathForInternalFiles == null && !isHomeDirectoryFlagOn) {
-			pathForInternalFiles = irodsImagej.getIrodsAccount()
-					.getHomeDirectory()
+			pathForInternalFiles = IrodsUtilities.getPathSeperator() +irodsImagej.getIrodsAccount()
+					.getZone()
 					+ IrodsUtilities.getPathSeperator()
 					+ Constants.HOME
 					+ IrodsUtilities.getPathSeperator()

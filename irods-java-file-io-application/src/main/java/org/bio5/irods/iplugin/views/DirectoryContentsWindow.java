@@ -95,6 +95,8 @@ public class DirectoryContentsWindow extends JPanel implements
 	private IrodsPropertiesConstruction irodsPropertiesConstruction;
 	private JTable table;
 	private JLabel label_ProgressBar_BytesTrasferredOutofTotalFileSize;
+	private String imageJCacheFolder;
+	private Long imageJCacheFolderSize;
 
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(DirectoryContentsWindow.class
@@ -107,23 +109,17 @@ public class DirectoryContentsWindow extends JPanel implements
 	 * @throws MalformedURLException
 	 */
 
-	public DirectoryContentsWindow(final IPlugin irodsImageJ)
+	public DirectoryContentsWindow(final IPlugin iPlugin)
 			throws JargonException, MalformedURLException {
 		FlowLayout flowLayout = (FlowLayout) getLayout();
 		flowLayout.setAlignment(FlowLayout.LEFT);
-		this.iPlugin = irodsImageJ;
+		this.iPlugin = iPlugin;
 	}
 
 	/**
 	 * @throws JargonException
 	 */
 	public void init() throws JargonException {
-		log.info("Local path before refactoring: "
-				+ iPlugin.getImageJCacheFolder());
-		// Constants.IMAGEJ_LOCAL_WORKING_DIRECTORY.replaceAll(IrodsUtilities.pathSeperator(),
-		// "//");
-		log.info("Local directory to store ImageJ files: "
-				+ iPlugin.getImageJCacheFolder());
 		irodsAccount = iPlugin.getIrodsAccount();
 		iRODSFileFactory = FileOperations.getIrodsAccountFileFactory(iPlugin
 				.getIrodsAccount());
@@ -185,6 +181,14 @@ public class DirectoryContentsWindow extends JPanel implements
 		irodsPropertiesConstruction
 				.constructIrodsTransferStatusCallbackListener(iPlugin);
 
+		imageJCacheFolder = iPlugin.getImageJCacheFolder();
+		log.info("ImageJ cache folder: " + iPlugin.getImageJCacheFolder());
+		if (null != imageJCacheFolder && "" != imageJCacheFolder) {
+			File cacheFolder = new File(imageJCacheFolder);
+			imageJCacheFolderSize = IrodsUtilities.getFolderSize(cacheFolder);
+			log.info("Cache folder size:"
+					+ FileUtils.byteCountToDisplaySize(imageJCacheFolderSize));
+		}
 		/* Creating model */
 		setVisible(true);
 	}
@@ -304,7 +308,7 @@ public class DirectoryContentsWindow extends JPanel implements
 				jButton_saveToIrodsServer.setEnabled(true);
 			}
 		});
-		
+
 		JButton btnDownload = new JButton("Download");
 		btnDownload.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -495,8 +499,11 @@ public class DirectoryContentsWindow extends JPanel implements
 					/* Multiple files selection is still pending */
 					TreePath[] treePaths = userDirectoryTree
 							.getSelectionPaths();
-					for (int i = 0; i < treePaths.length; i++) {
-						System.out.println("Path" + i + ":" + treePaths[i]);
+					if (null != treePaths) {
+						for (int i = 0; i < treePaths.length; i++) {
+							log.info("Single click Path" + i + ":"
+									+ treePaths[i]);
+						}
 					}
 
 					selectedNodeInTreeForSingleClick = IrodsUtilities

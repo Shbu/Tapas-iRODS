@@ -12,7 +12,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jargon.version>3.3.3-SNAPSHOT</jargon.version>
 		<imagej.version>1.47</imagej.version>
-		<imagej.path>C:\Program Files (x86)\ImageJ</imagej.path>
+		<imagej.path>C:\Program Files\ImageJ\</imagej.path>
 	</properties>
 	<dependencies>
 		<dependency>

@@ -61,14 +61,14 @@ public class IPlugin_OpenImage extends PlugInFrame {
 				- clazz.getName().length() - 6);
 		System.setProperty("plugins.dir", pluginsDir);
 
-		// open a sample bio5 image
+		// Open a sample bio5 image
 		/*
 		 * ImagePlus image = IJ.openImage(
 		 * "http://www.bio5.org/sites/default/files/homepage/slides/5_areas_circle_300pxWidth.png"
 		 * ); image.show();
 		 */
 
-		// run the plugin
+		// Run the plugin
 		IJ.runPlugIn(clazz.getName(), "");
 	}
 }
