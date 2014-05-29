@@ -14,7 +14,6 @@ public class IrodsTransferStatusCallbackListener implements
 		TransferStatusCallbackListener {
 
 	private JProgressBar jprogressbar;
-	@SuppressWarnings("unused")
 	private IPlugin iPlugin;
 
 	public IrodsTransferStatusCallbackListener(IPlugin iPlugin) {
@@ -38,6 +37,11 @@ public class IrodsTransferStatusCallbackListener implements
 		if (transferStatus.getTransferException() != null) {
 			log.info("Exception in file transfer: "
 					+ transferStatus.getTransferState());
+			log.error("Exception occured:"
+					+ transferStatus.getTransferException());
+			JOptionPane.showMessageDialog(null, "Exception occured : "
+					+ transferStatus.getTransferException(), "Error",
+					JOptionPane.ERROR_MESSAGE);
 			iPlugin.setErrorWhileUsingGetOperation(true);
 			return;
 		}
@@ -58,33 +62,35 @@ public class IrodsTransferStatusCallbackListener implements
 			iPlugin.setErrorWhileUsingGetOperation(true);
 			return;
 
-		} else if (transferStatus.getTransferState() == TransferStatus.TransferState.IN_PROGRESS_START_FILE) {
-			if (!iPlugin.isErrorWhileUsingGetOperation()) {
-				log.info("Transfer state: " + transferStatus.getTransferState()
-						+ " | Bytes Transferred so far:"
-						+ transferStatus.getBytesTransfered()
-						+ "| Total file size inf bytes:"
-						+ transferStatus.getTotalSize()
-						+ "| Transfer percentage out of 100: "
-						+ transferStatus.getBytesTransfered() * 100
-						/ transferStatus.getTotalSize());
-				jprogressbar.setMinimum(0);
-				jprogressbar.setMaximum(100);
-				jprogressbar.setValue((int) (transferStatus
-						.getBytesTransfered() * 100 / transferStatus
-						.getTotalSize()));
-				if (Constants.JPROGRESS_SET_STRING_PAINTED) {
-					jprogressbar.setString("Progress: "
-							+ FileUtils.byteCountToDisplaySize(transferStatus
-									.getBytesTransfered())
-							+ "/"
-							+ FileUtils.byteCountToDisplaySize(transferStatus
-									.getTotalSize()));
-				}
-			} else {
-				log.info("Skipped displaying progress as file transfer is cancelled!");
-			}
-		} else if (transferStatus.isIntraFileStatusReport()) {
+		}
+		/*
+		 * Below lines are commented to avoid pre-loading of progress bar before
+		 * even knowing the file transfer condition. This helps us to avoid
+		 * showing false progress.
+		 */
+
+		/*
+		 * else if (transferStatus.getTransferState() ==
+		 * TransferStatus.TransferState.IN_PROGRESS_START_FILE) { if
+		 * (!iPlugin.isErrorWhileUsingGetOperation()) {
+		 * log.info("Transfer state: " + transferStatus.getTransferState() +
+		 * " | Bytes Transferred so far:" + transferStatus.getBytesTransfered()
+		 * + "| Total file size inf bytes:" + transferStatus.getTotalSize() +
+		 * "| Transfer percentage out of 100: " +
+		 * transferStatus.getBytesTransfered() * 100 /
+		 * transferStatus.getTotalSize()); jprogressbar.setMinimum(0);
+		 * jprogressbar.setMaximum(100); jprogressbar.setValue((int)
+		 * (transferStatus .getBytesTransfered() * 100 / transferStatus
+		 * .getTotalSize())); if (Constants.JPROGRESS_SET_STRING_PAINTED) {
+		 * jprogressbar.setString("Progress: " +
+		 * FileUtils.byteCountToDisplaySize(transferStatus
+		 * .getBytesTransfered()) + "/" +
+		 * FileUtils.byteCountToDisplaySize(transferStatus .getTotalSize())); }
+		 * } else {
+		 * log.info("Skipped displaying progress as file transfer is cancelled!"
+		 * ); } }
+		 */
+		else if (transferStatus.isIntraFileStatusReport()) {
 			log.info("Transfer state: " + transferStatus.getTransferState()
 					+ " | Bytes Transferred so far:"
 					+ transferStatus.getBytesTransfered()

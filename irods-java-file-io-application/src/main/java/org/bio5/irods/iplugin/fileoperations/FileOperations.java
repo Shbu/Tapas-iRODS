@@ -57,10 +57,9 @@ public class FileOperations {
 					iRodsFile, irodsImagej);
 		} else if (pathForInternalFiles == null && isHomeDirectoryFlagOn) {
 
-			pathForInternalFiles = IrodsUtilities.getPathSeperator() + irodsImagej.getIrodsAccount()
-					.getZone()
-					+ IrodsUtilities.getPathSeperator()
-					+ Constants.HOME;
+			pathForInternalFiles = IrodsUtilities.getPathSeperator()
+					+ irodsImagej.getIrodsAccount().getZone()
+					+ IrodsUtilities.getPathSeperator() + Constants.HOME;
 			irodsImagej.setPathTillHome(pathForInternalFiles);
 			log.info("irods file path if pathForInternalFiles is null and isHomeDirectoryFlagOn is true"
 					+ irodsImagej.getPathTillHome());
@@ -70,10 +69,9 @@ public class FileOperations {
 			collectionsUnderGivenAbsolutePath = retrieveCollectionsUnderGivenPath(
 					iRodsFile, irodsImagej);
 		} else if (pathForInternalFiles == null && !isHomeDirectoryFlagOn) {
-			pathForInternalFiles = IrodsUtilities.getPathSeperator() +irodsImagej.getIrodsAccount()
-					.getZone()
-					+ IrodsUtilities.getPathSeperator()
-					+ Constants.HOME
+			pathForInternalFiles = IrodsUtilities.getPathSeperator()
+					+ irodsImagej.getIrodsAccount().getZone()
+					+ IrodsUtilities.getPathSeperator() + Constants.HOME
 					+ IrodsUtilities.getPathSeperator()
 					+ irodsImagej.getIrodsAccount().getUserName();
 			irodsImagej.setPathTillHome(pathForInternalFiles);
@@ -112,8 +110,11 @@ public class FileOperations {
 		} catch (JargonException e) {
 			log.error("Error while retrieving collectionsUnderGivenAbsolutePath: "
 					+ e.getMessage());
-			/*JOptionPane.showMessageDialog(null, "Error while retrieving collectionsUnderGivenAbsolutePath!", "Error",
-					JOptionPane.ERROR_MESSAGE);*/
+			/*
+			 * JOptionPane.showMessageDialog(null,
+			 * "Error while retrieving collectionsUnderGivenAbsolutePath!",
+			 * "Error", JOptionPane.ERROR_MESSAGE);
+			 */
 		}
 		return collectionsUnderGivenAbsolutePath;
 	}

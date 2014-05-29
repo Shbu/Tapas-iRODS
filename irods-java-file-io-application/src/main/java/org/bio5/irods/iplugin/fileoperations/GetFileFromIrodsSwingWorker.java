@@ -12,10 +12,8 @@ import javax.swing.SwingWorker;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
-import org.bio5.irods.iplugin.exception.AbendTransaction;
 import org.bio5.irods.iplugin.utilities.Constants;
 import org.bio5.irods.iplugin.utilities.IrodsUtilities;
-import org.bio5.irods.iplugin.views.DirectoryContentsWindow;
 import org.irods.jargon.core.exception.DataNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.exception.OverwriteException;
@@ -157,6 +155,11 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 							openImageUsingImageJ();
 						} else {
 							log.error("Error while transfering files");
+							JOptionPane
+							.showMessageDialog(
+									null,
+									"Error while transfering files!",
+									"Error", JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}

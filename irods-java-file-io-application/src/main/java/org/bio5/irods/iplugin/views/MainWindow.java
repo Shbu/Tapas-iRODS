@@ -8,10 +8,12 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.List;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -59,8 +61,6 @@ public class MainWindow extends JFrame {
 	private JTextField textbox_LoginId;
 	private JPasswordField textField_passwordField;
 	private JTextField textField_Port;
-	private JTextField textField_Zone;
-	private JTextField textField_Host;
 	private DirectoryContentsWindow directoryContentsPane;
 	private IPlugin iplugin;
 	private JCheckBox HomeDirectory_CheckBox;
@@ -70,6 +70,8 @@ public class MainWindow extends JFrame {
 	private IRODSFileSystemAOImpl iRODSFileSystemAOImpl;
 	private JFileChooser fileChooserForImageJCacheFolder;
 	private File selectedFileForImageJCacheFolder;
+	private JComboBox<String> comboBox_Zone;
+	private JComboBox<String> comboBox_Host;
 
 	/**
 	 * Launch the application.
@@ -214,33 +216,6 @@ public class MainWindow extends JFrame {
 		JLabel label_Zone = new JLabel("Zone:");
 		label_Zone.setHorizontalAlignment(SwingConstants.CENTER);
 
-		textField_Zone = new JTextField();
-		textField_Zone.setText(Constants.ZONE);
-		textField_Zone.setToolTipText("Zone");
-		textField_Zone.setColumns(10);
-
-		textField_Zone.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					loginMethod();
-				}
-			}
-		});
-
-		textField_Host = new JTextField();
-		textField_Host.setHorizontalAlignment(SwingConstants.LEFT);
-		textField_Host.setToolTipText("Host Address");
-		textField_Host.setText(Constants.HOST);
-		textField_Host.setColumns(10);
-
-		textField_Host.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					loginMethod();
-				}
-			}
-		});
-
 		JLabel label_Host = new JLabel("Host:");
 		label_Host.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -280,9 +255,8 @@ public class MainWindow extends JFrame {
 							+ selectedFileForImageJCacheFolder
 									.getAbsolutePath() + "."
 							+ Constants.NEW_LINE_STRING);
-					iplugin
-							.setImageJCacheFolder(selectedFileForImageJCacheFolder
-									.getAbsolutePath());
+					iplugin.setImageJCacheFolder(selectedFileForImageJCacheFolder
+							.getAbsolutePath());
 					textField_ImageJCacheFolderPath.setText(iplugin
 							.getImageJCacheFolder());
 				} else {
@@ -291,6 +265,30 @@ public class MainWindow extends JFrame {
 				}
 			}
 		});
+
+		comboBox_Zone = new JComboBox<String>();
+		comboBox_Host = new JComboBox<String>();
+		comboBox_Zone.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JComboBox comboBox = (JComboBox) e.getSource();
+				Object selected = comboBox.getSelectedItem();
+				if (selected.toString().equals(Constants.ZONE_IPLANT)) {
+					comboBox_Host.setSelectedItem(Constants.HOST_IPLANT);
+				}
+				if (selected.toString().equals(Constants.ZONE_SPX)) {
+					comboBox_Host.setSelectedItem(Constants.HOST_SPX);
+				}
+			}
+		});
+		comboBox_Zone.setModel(new DefaultComboBoxModel<String>(new String[] {
+				Constants.ZONE_IPLANT, Constants.ZONE_SPX }));
+		comboBox_Zone.setEditable(true);
+		comboBox_Zone.setToolTipText("Select your zone");
+
+		comboBox_Host.setModel(new DefaultComboBoxModel<String>(new String[] {
+				Constants.HOST_IPLANT, Constants.HOST_SPX }));
+		comboBox_Host.setEditable(true);
+
 		GroupLayout gl_contentPane = new GroupLayout(contentPanePanel);
 		gl_contentPane
 				.setHorizontalGroup(gl_contentPane
@@ -331,20 +329,24 @@ public class MainWindow extends JFrame {
 																gl_contentPane
 																		.createSequentialGroup()
 																		.addComponent(
-																				HomeDirectory_CheckBox)
+																				comboBox_Zone,
+																				GroupLayout.PREFERRED_SIZE,
+																				142,
+																				GroupLayout.PREFERRED_SIZE)
 																		.addContainerGap())
 														.addGroup(
 																gl_contentPane
-																		.createSequentialGroup()
+																		.createParallelGroup(
+																				Alignment.LEADING)
 																		.addGroup(
 																				gl_contentPane
-																						.createParallelGroup(
-																								Alignment.LEADING)
+																						.createSequentialGroup()
 																						.addComponent(
-																								textField_Zone,
-																								64,
-																								64,
-																								64)
+																								HomeDirectory_CheckBox)
+																						.addContainerGap())
+																		.addGroup(
+																				gl_contentPane
+																						.createSequentialGroup()
 																						.addGroup(
 																								gl_contentPane
 																										.createParallelGroup(
@@ -360,36 +362,42 @@ public class MainWindow extends JFrame {
 																														.addGroup(
 																																gl_contentPane
 																																		.createParallelGroup(
-																																				Alignment.TRAILING)
-																																		.addComponent(
-																																				textField_Host,
-																																				GroupLayout.DEFAULT_SIZE,
-																																				359,
-																																				Short.MAX_VALUE)
+																																				Alignment.LEADING)
 																																		.addComponent(
 																																				textField_passwordField,
 																																				GroupLayout.DEFAULT_SIZE,
-																																				359,
+																																				368,
 																																				Short.MAX_VALUE)
 																																		.addComponent(
 																																				textbox_LoginId,
 																																				GroupLayout.DEFAULT_SIZE,
-																																				359,
+																																				368,
 																																				Short.MAX_VALUE)
 																																		.addGroup(
-																																				Alignment.LEADING,
 																																				gl_contentPane
 																																						.createSequentialGroup()
-																																						.addComponent(
-																																								textField_ImageJCacheFolderPath,
-																																								GroupLayout.PREFERRED_SIZE,
-																																								251,
-																																								GroupLayout.PREFERRED_SIZE)
+																																						.addGroup(
+																																								gl_contentPane
+																																										.createParallelGroup(
+																																												Alignment.TRAILING,
+																																												false)
+																																										.addComponent(
+																																												comboBox_Host,
+																																												Alignment.LEADING,
+																																												0,
+																																												GroupLayout.DEFAULT_SIZE,
+																																												Short.MAX_VALUE)
+																																										.addComponent(
+																																												textField_ImageJCacheFolderPath,
+																																												Alignment.LEADING,
+																																												GroupLayout.DEFAULT_SIZE,
+																																												251,
+																																												Short.MAX_VALUE))
 																																						.addGap(18)
 																																						.addComponent(
 																																								btnChooseFolder)))
-																														.addGap(10))))
-																		.addGap(85)))));
+																														.addGap(10)))
+																						.addGap(85))))));
 		gl_contentPane
 				.setVerticalGroup(gl_contentPane
 						.createParallelGroup(Alignment.LEADING)
@@ -441,7 +449,7 @@ public class MainWindow extends JFrame {
 														.addComponent(
 																label_Zone)
 														.addComponent(
-																textField_Zone,
+																comboBox_Zone,
 																GroupLayout.PREFERRED_SIZE,
 																GroupLayout.DEFAULT_SIZE,
 																GroupLayout.PREFERRED_SIZE))
@@ -453,7 +461,7 @@ public class MainWindow extends JFrame {
 														.addComponent(
 																label_Host)
 														.addComponent(
-																textField_Host,
+																comboBox_Host,
 																GroupLayout.PREFERRED_SIZE,
 																GroupLayout.DEFAULT_SIZE,
 																GroupLayout.PREFERRED_SIZE))
@@ -514,6 +522,7 @@ public class MainWindow extends JFrame {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	private void loginMethod() {
 		String username = textbox_LoginId.getText();
 		char[] password = textField_passwordField.getPassword();
@@ -529,17 +538,16 @@ public class MainWindow extends JFrame {
 			} else {
 				log.info("ImageJ cache folder path specified by user:"
 						+ textField_ImageJCacheFolderPath.getText());
-				iplugin
-						.setImageJCacheFolder(textField_ImageJCacheFolderPath
-								.getText());
+				iplugin.setImageJCacheFolder(textField_ImageJCacheFolderPath
+						.getText());
 			}
 		}
 
 		for (char chars : password)
 			password_full += chars;
 		int port = Integer.parseInt(textField_Port.getText());
-		String host = textField_Host.getText();
-		String zone = textField_Zone.getText();
+		String host = comboBox_Host.getSelectedItem().toString();
+		String zone = comboBox_Zone.getSelectedItem().toString();
 		{
 			try {
 				if (HomeDirectory_CheckBox.isSelected()) {
@@ -563,8 +571,10 @@ public class MainWindow extends JFrame {
 					iRODSFileSystemAOImpl = new IRODSFileSystemAOImpl(
 							iplugin.getiRODSSession(),
 							iplugin.getIrodsAccount());
-					iplugin
-							.setiRODSFileSystemAOImpl(iRODSFileSystemAOImpl);
+					if (null != iRODSFileSystemAOImpl)
+						iplugin.setiRODSFileSystemAOImpl(iRODSFileSystemAOImpl);
+					else
+						log.error("iRODSFileSystemAOImpl is null");
 				}
 
 				/*
@@ -575,14 +585,10 @@ public class MainWindow extends JFrame {
 
 				List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = FileOperations
 						.setIrodsFile(null, iplugin,
-								iplugin
-										.isHomeDirectoryTheRootNode());
-				iplugin
-						.setCollectionsUnderGivenAbsolutePath(collectionsUnderGivenAbsolutePath);
-				directoryContentsPane = new DirectoryContentsWindow(
-						iplugin);
-				iplugin
-						.setDirectoryContentsPane(directoryContentsPane);
+								iplugin.isHomeDirectoryTheRootNode());
+				iplugin.setCollectionsUnderGivenAbsolutePath(collectionsUnderGivenAbsolutePath);
+				directoryContentsPane = new DirectoryContentsWindow(iplugin);
+				iplugin.setDirectoryContentsPane(directoryContentsPane);
 				directoryContentsPane.init();
 				directoryContentsPane.implementation();
 				setVisibilityOfForm();
@@ -616,10 +622,18 @@ public class MainWindow extends JFrame {
 			/* Unknown Exception */
 			catch (Exception unknownException) {
 				log.error(unknownException.getMessage(), unknownException);
-				JOptionPane.showMessageDialog(null, "Unknown Error!", "Error",
-						JOptionPane.ERROR_MESSAGE);
-				unknownException.printStackTrace();
+				if (unknownException.getLocalizedMessage().toString()
+						.contains(Constants.ERROR_STRING_CONNECTION_REFUSED)) {
+					JOptionPane.showMessageDialog(null,
+							"Connection Refused - Server Down!", "Error",
+							JOptionPane.ERROR_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(null, "Unknown Error!",
+							"Error", JOptionPane.ERROR_MESSAGE);
+				}
+
 			}
+
 		}
 	}
 }

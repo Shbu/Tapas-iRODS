@@ -46,6 +46,7 @@ public class RetrieveInternalNodesSwingWorker extends
 			IRODSFileFactory iRODSFileFactory = irodsImageJ
 					.getiRODSFileFactory();
 			String finalpath = irodsImageJ.getPathTillHome();
+			log.info("ChildPath before adding path seperator" +finalpath);
 
 			for (int i = 1; i < pathForInternalFiles.length; i++) {
 				finalpath += IrodsUtilities.getPathSeperator()

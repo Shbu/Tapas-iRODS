@@ -46,7 +46,7 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 						.getIRODSAccessObjectFactory()
 						.getDataTransferOperations(iPlugin.getIrodsAccount());
 			} catch (JargonException jargonException) {
-				log.info("Error while getting dataTransferOperationsAO object from FileSystem !"
+				log.error("Error while getting dataTransferOperationsAO object from FileSystem !"
 						+ jargonException.getMessage());
 			}
 			if (null != dataTransferOperationsAO) {
@@ -54,7 +54,7 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 						&& null != destinaitonIrodsFile.getAbsolutePath()) {
 					/* Option -1 - Absolute path */
 					try {
-						log.error("Defaulting ErrorWhileUsingGetOperation value to :"
+						log.info("Defaulting ErrorWhileUsingGetOperation value to :"
 								+ "False");
 						iPlugin.setErrorWhileUsingGetOperation(false);
 
