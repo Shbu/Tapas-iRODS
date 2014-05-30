@@ -60,6 +60,12 @@ public class FileOperations {
 			pathForInternalFiles = IrodsUtilities.getPathSeperator()
 					+ irodsImagej.getIrodsAccount().getZone()
 					+ IrodsUtilities.getPathSeperator() + Constants.HOME;
+			
+			/*pathForInternalFiles = IrodsUtilities.getPathSeperator()
+					+ irodsImagej.getIrodsAccount().getZone();*/
+					
+			
+			
 			irodsImagej.setPathTillHome(pathForInternalFiles);
 			log.info("irods file path if pathForInternalFiles is null and isHomeDirectoryFlagOn is true"
 					+ irodsImagej.getPathTillHome());

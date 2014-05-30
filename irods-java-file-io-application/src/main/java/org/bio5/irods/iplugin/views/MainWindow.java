@@ -90,16 +90,6 @@ public class MainWindow extends JFrame {
 		setBounds(100, 100, 682, 454);
 
 		setFocusable(true);
-		addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-					System.exit(0);
-				}
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					loginMethod();
-				}
-			}
-		});
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -147,14 +137,6 @@ public class MainWindow extends JFrame {
 		textbox_LoginId.setToolTipText("User Id");
 		textbox_LoginId.setColumns(13);
 
-		textbox_LoginId.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					loginMethod();
-				}
-			}
-		});
-
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				textbox_LoginId.requestFocus();
@@ -164,6 +146,10 @@ public class MainWindow extends JFrame {
 		final JButton button_Login = new JButton("Login");
 		button_Login.setToolTipText("Click to Login");
 		button_Login.setEnabled(true);
+
+		/* Adding default button_Login as default button for ENTER_KEY */
+		getRootPane().setDefaultButton(button_Login);
+		
 
 		button_Login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -188,27 +174,11 @@ public class MainWindow extends JFrame {
 		textField_passwordField.setHorizontalAlignment(SwingConstants.LEFT);
 		textField_passwordField.setToolTipText("Password");
 
-		textField_passwordField.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					loginMethod();
-				}
-			}
-		});
-
 		textField_Port = new JTextField();
 		textField_Port.setEditable(false);
 		textField_Port.setText(Constants.PORT);
 		textField_Port.setToolTipText("Port No.");
 		textField_Port.setColumns(10);
-
-		textField_Port.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					loginMethod();
-				}
-			}
-		});
 
 		JLabel Label_Port = new JLabel("Port:");
 		Label_Port.setHorizontalAlignment(SwingConstants.CENTER);
@@ -229,14 +199,6 @@ public class MainWindow extends JFrame {
 		textField_ImageJCacheFolderPath.setColumns(10);
 		textField_ImageJCacheFolderPath.setText(irodsImagej
 				.getImageJCacheFolder());
-
-		textField_ImageJCacheFolderPath.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					loginMethod();
-				}
-			}
-		});
 
 		JLabel lblImagejCacheFolder = new JLabel("ImageJ Cache Folder:");
 		JButton btnChooseFolder = new JButton("Choose folder");

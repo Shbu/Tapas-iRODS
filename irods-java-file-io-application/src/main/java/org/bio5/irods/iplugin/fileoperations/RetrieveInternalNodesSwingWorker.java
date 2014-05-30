@@ -48,6 +48,7 @@ public class RetrieveInternalNodesSwingWorker extends
 			String finalpath = irodsImageJ.getPathTillHome();
 			log.info("ChildPath before adding path seperator" +finalpath);
 
+			/*Problem with finalPath - Pending*/
 			for (int i = 1; i < pathForInternalFiles.length; i++) {
 				finalpath += IrodsUtilities.getPathSeperator()
 						+ pathForInternalFiles[i].toString();

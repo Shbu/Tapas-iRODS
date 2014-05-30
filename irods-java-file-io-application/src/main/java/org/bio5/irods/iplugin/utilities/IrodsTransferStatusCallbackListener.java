@@ -149,6 +149,8 @@ public class IrodsTransferStatusCallbackListener implements
 	public CallbackResponse transferAsksWhetherToForceOperation(
 			String irodsAbsolutePath, boolean isCollection) {
 
+		iPlugin.setFileExistFlag(true);
+
 		// CallbackResponse response = CallbackResponse.YES_FOR_ALL;
 		CallbackResponse response = null;
 		StringBuilder stringBuilder = new StringBuilder(

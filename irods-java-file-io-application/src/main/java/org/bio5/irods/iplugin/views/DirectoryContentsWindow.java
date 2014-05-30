@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -17,6 +19,9 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -25,6 +30,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.JViewport;
+import javax.swing.KeyStroke;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
@@ -97,6 +103,7 @@ public class DirectoryContentsWindow extends JPanel implements
 	private JLabel label_ProgressBar_BytesTrasferredOutofTotalFileSize;
 	private String imageJCacheFolder;
 	private Long imageJCacheFolderSize;
+	private MainWindow mainWindowInstance;
 
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(DirectoryContentsWindow.class
@@ -189,6 +196,9 @@ public class DirectoryContentsWindow extends JPanel implements
 			log.info("Cache folder size:"
 					+ FileUtils.byteCountToDisplaySize(imageJCacheFolderSize));
 		}
+		if (null != iPlugin.getMainWindow()) {
+			mainWindowInstance = iPlugin.getMainWindow();
+		}
 		/* Creating model */
 		setVisible(true);
 	}
@@ -210,6 +220,8 @@ public class DirectoryContentsWindow extends JPanel implements
 		} else {
 			log.error("File directory is empty");
 		}
+
+		addNavigateOptionToMenuBar();
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 
@@ -321,63 +333,69 @@ public class DirectoryContentsWindow extends JPanel implements
 		jButton_saveToIrodsServer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					log.info("Save to iRODS Server - Button Clicked");
-					String sourceFilePath = null;
-					String destinationFilePath = null;
-					String targetResourceName = "";
-					targetResourceName = iPlugin.getIrodsAccount()
-							.getDefaultStorageResource();
-					File sourceLocalfile = null;
-					IRODSFile destinaitonIrodsFile = null;
-					if (chooser.getSelectedFile().getAbsolutePath() != null
-							&& chooser.getSelectedFile().getAbsolutePath() != "") {
-						sourceFilePath = chooser.getSelectedFile()
-								.getAbsolutePath();
-						sourceLocalfile = new File(sourceFilePath);
-						if (selectedNodeInTreeForSingleClick != null
-								&& selectedNodeInTreeForSingleClick != "") {
-							log.info("destination path || selectedNodeInTreeForSingleClick"
-									+ selectedNodeInTreeForSingleClick);
-							destinationFilePath = IrodsUtilities
-									.getPathSeperator()
-									+ irodsAccount.getZone()
-									+ IrodsUtilities.getPathSeperator()
-									+ Constants.HOME
-									+ IrodsUtilities.getPathSeperator()
-									+ jTextField_destinationPath.getText();
-							destinaitonIrodsFile = iRODSFileFactory
-									.instanceIRODSFile(destinationFilePath);
-							log.info("sourceLocalfile absolute path: "
-									+ sourceLocalfile.getAbsolutePath() + "\n"
-									+ "destinaitonIrodsFile absolutepath: "
-									+ destinaitonIrodsFile.getAbsoluteFile());
-							try {
-								// dataTransferOperationsAO.putOperation(sourceLocalfile.getAbsolutePath(),destinaitonIrodsFile.getAbsolutePath(),targetResourceName,irodsTransferStatusCallbackListener,transferControlBlock);
-								if (null != iPlugin && null != sourceLocalfile
-										&& null != destinaitonIrodsFile
-										&& null != targetResourceName) {
-									putFile = new PutFileToIrodsSwingWorker(
-											iPlugin, sourceLocalfile,
-											destinaitonIrodsFile,
-											targetResourceName);
-									putFile.execute();
-									log.info("PutFile operation is executed!");
-
-								}
-							} catch (Exception exception) {
-								log.error(exception.getMessage());
-								JOptionPane.showMessageDialog(null,
-										exception.getMessage());
-							}
-						}
-					} else {
-						JOptionPane.showMessageDialog(null, "Source is empty!");
-						log.error("Source is empty!");
-					}
+					implementSaveButton();
 
 				} catch (JargonException jargonException) {
 					log.error(jargonException.getMessage());
 					jargonException.printStackTrace();
+				}
+			}
+
+			/**
+			 * @throws JargonException
+			 */
+			private void implementSaveButton() throws JargonException {
+				log.info("Save to iRODS Server - Button Clicked");
+				String sourceFilePath = null;
+				String destinationFilePath = null;
+				String targetResourceName = "";
+				targetResourceName = iPlugin.getIrodsAccount()
+						.getDefaultStorageResource();
+				File sourceLocalfile = null;
+				IRODSFile destinaitonIrodsFile = null;
+				if (chooser.getSelectedFile().getAbsolutePath() != null
+						&& chooser.getSelectedFile().getAbsolutePath() != "") {
+					sourceFilePath = chooser.getSelectedFile()
+							.getAbsolutePath();
+					sourceLocalfile = new File(sourceFilePath);
+					if (selectedNodeInTreeForSingleClick != null
+							&& selectedNodeInTreeForSingleClick != "") {
+						log.info("destination path || selectedNodeInTreeForSingleClick"
+								+ selectedNodeInTreeForSingleClick);
+						destinationFilePath = IrodsUtilities.getPathSeperator()
+								+ irodsAccount.getZone()
+								+ IrodsUtilities.getPathSeperator()
+								+ Constants.HOME
+								+ IrodsUtilities.getPathSeperator()
+								+ jTextField_destinationPath.getText();
+						destinaitonIrodsFile = iRODSFileFactory
+								.instanceIRODSFile(destinationFilePath);
+						log.info("sourceLocalfile absolute path: "
+								+ sourceLocalfile.getAbsolutePath() + "\n"
+								+ "destinaitonIrodsFile absolutepath: "
+								+ destinaitonIrodsFile.getAbsoluteFile());
+						try {
+							// dataTransferOperationsAO.putOperation(sourceLocalfile.getAbsolutePath(),destinaitonIrodsFile.getAbsolutePath(),targetResourceName,irodsTransferStatusCallbackListener,transferControlBlock);
+							if (null != iPlugin && null != sourceLocalfile
+									&& null != destinaitonIrodsFile
+									&& null != targetResourceName) {
+								putFile = new PutFileToIrodsSwingWorker(
+										iPlugin, sourceLocalfile,
+										destinaitonIrodsFile,
+										targetResourceName);
+								putFile.execute();
+								log.info("PutFile operation is executed!");
+
+							}
+						} catch (Exception exception) {
+							log.error(exception.getMessage());
+							JOptionPane.showMessageDialog(null,
+									exception.getMessage());
+						}
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "Source is empty!");
+					log.error("Source is empty!");
 				}
 			}
 		});
@@ -451,6 +469,8 @@ public class DirectoryContentsWindow extends JPanel implements
 		table.setIntercellSpacing(new Dimension(5, 5));
 		table.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		table.setToolTipText("File Information");
+
+		/* Add to Constants class - Pending */
 		table.setModel(new DefaultTableModel(new Object[][] {
 				{ " Absolute Path", null }, { " Object Size", null },
 				{ " Created Date", null }, { " Modified Date", null },
@@ -535,6 +555,27 @@ public class DirectoryContentsWindow extends JPanel implements
 		userDirectoryTree.setEditable(false);
 		userDirectoryTree.setVisible(true);
 		viewport.add(userDirectoryTree);
+	}
+
+	/**
+	 * 
+	 */
+	private void addNavigateOptionToMenuBar() {
+		/* Adding additional menu items for Main Window */
+		JMenuBar mainWindowMenubar = mainWindowInstance.getJMenuBar();
+		JMenu mnNewMenu_File = new JMenu("Navigate");
+		mnNewMenu_File.setMnemonic('N');
+		mainWindowMenubar.add(mnNewMenu_File);
+
+		JMenuItem mntmNewMenuItem_Home = new JMenuItem("Home");
+		mntmNewMenuItem_Home.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_H, InputEvent.CTRL_MASK));
+		mnNewMenu_File.add(mntmNewMenuItem_Home);
+
+		JMenuItem mntmNewMenuItem_Root = new JMenuItem("Root Folder");
+		mntmNewMenuItem_Root.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_R, InputEvent.CTRL_MASK));
+		mnNewMenu_File.add(mntmNewMenuItem_Root);
 	}
 
 	public void setFileInformationFromObjStat(ObjStat objstatWithFileInformation) {
@@ -695,6 +736,7 @@ public class DirectoryContentsWindow extends JPanel implements
 		 */
 		node.removeAllChildren();
 		treeModel.nodeStructureChanged(node);
+		//DefaultMutableTreeNode lastNode = (DefaultMutableTreeNode) tp.getLastPathComponent();
 		Object[] elements = tp.getPath();/* edit path */
 		// String pathOfInternalNode=builder.toString();
 		RetrieveInternalNodesSwingWorker retrieveInternalNodesSwingWorker = new RetrieveInternalNodesSwingWorker(

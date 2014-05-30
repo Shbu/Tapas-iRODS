@@ -47,6 +47,9 @@ public class IPlugin_OpenImage extends PlugInFrame {
 		irodsImagej = new IPlugin();
 		// irodsImagej.setMainWindow(mainWindow);
 		mainWindow = new MainWindow(irodsImagej);
+		if (null != mainWindow) {
+			irodsImagej.setMainWindow(mainWindow);
+		}
 		mainWindow.setVisible(true);
 	}
 

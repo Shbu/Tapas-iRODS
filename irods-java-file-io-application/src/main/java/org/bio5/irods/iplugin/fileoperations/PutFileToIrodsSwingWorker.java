@@ -125,7 +125,9 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 
 	private void reloadChildNodeAfterUploading() {
 		if (null != iPlugin.getUserDirectoryTree() && null != sourceLocalfile) {
+
 			DefaultMutableTreeNode parentNode = null;
+			log.info("inside reloadChildNodeAfterUploading");
 
 			/*
 			 * Destination selection - Fetching parent path if leaf node is
@@ -135,14 +137,35 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 					.getUserDirectoryTree().getLastSelectedPathComponent();
 			if (null != parentNode) {
 				if (parentNode.isLeaf()) {
-					parentNode = (DefaultMutableTreeNode) parentNode
-							.getParent();
 
-					iPlugin.getDirectoryContentsPane().addObject(parentNode,
-							sourceLocalfile.getName(), true);
+					if (!iPlugin.isFileExistFlag()) {
+						try {
+							parentNode = (DefaultMutableTreeNode) parentNode
+									.getParent();
+
+							iPlugin.getDirectoryContentsPane()
+									.addObject(parentNode,
+											sourceLocalfile.getName(), true);
+						} catch (Exception exception) {
+							log.error("Error:  " + exception.getMessage());
+							exception.printStackTrace();
+						}
+					}
+					else {
+						log.info("File already exists in that directory, so not showing in tree path!");
+					}
+				} else {
+					log.info("parentNode in directory");
+
+					if (!iPlugin.isFileExistFlag()) {
+						iPlugin.getDirectoryContentsPane().addObject(
+								parentNode, sourceLocalfile.getName(), true);
+					} else {
+						log.info("File already exists in that directory, so not showing in tree path!");
+					}
 				}
 			} else {
-				log.error("parentNode in PutFileToIrodsSwingWorker is null");
+				log.error("Parent node is null!");
 			}
 
 		} else {

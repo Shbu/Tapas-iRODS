@@ -111,6 +111,16 @@ public class IPlugin implements Serializable {
 
 	private ImagePlus imagePlus;
 
+	boolean fileExistFlag = false;
+
+	public boolean isFileExistFlag() {
+		return fileExistFlag;
+	}
+
+	public void setFileExistFlag(boolean fileExistFlag) {
+		this.fileExistFlag = fileExistFlag;
+	}
+
 	public boolean isErrorWhileUsingGetOperation() {
 		return errorWhileUsingGetOperation;
 	}
