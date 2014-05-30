@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
+import org.bio5.irods.iplugin.bean.TasselCoreFunctions;
 import org.bio5.irods.iplugin.utilities.Constants;
 import org.bio5.irods.iplugin.utilities.IrodsUtilities;
 import org.irods.jargon.core.connection.IRODSAccount;
@@ -17,8 +18,8 @@ import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 
 public class FileOperations {
 
-	private static IRODSFileSystem irodsFileSystem;
 	private static IRODSFile iRodsFile;
+	private static IRODSFileFactory iRODSFileFactory;
 
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(FileOperations.class.getName());
@@ -28,15 +29,10 @@ public class FileOperations {
 	 * @return
 	 * @throws JargonException
 	 */
-	public static IRODSFileFactory getIrodsAccountFileFactory(
-			IRODSAccount iRODSAccount) throws JargonException {
-
-		irodsFileSystem = IRODSFileSystem.instance();
-		return irodsFileSystem.getIRODSFileFactory(iRODSAccount);
-	}
+	
 
 	public static List<CollectionAndDataObjectListingEntry> setIrodsFile(
-			String pathForInternalFiles, IPlugin irodsImagej,
+			String pathForInternalFiles, IPlugin iPlugin,
 			boolean isHomeDirectoryFlagOn) throws JargonException {
 
 		/* Setting jargon properties */
@@ -45,8 +41,7 @@ public class FileOperations {
 		jp.setMaxParallelThreads(10);
 		log.info("Threads upgraded to : " + jp.getMaxParallelThreads());
 
-		IRODSFileFactory iRODSFileFactory = getIrodsAccountFileFactory(irodsImagej
-				.getIrodsAccount());
+		iRODSFileFactory = iPlugin.getiRODSFileFactory();
 		List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = null;
 
 		if (null != pathForInternalFiles) {
@@ -54,42 +49,54 @@ public class FileOperations {
 			iRodsFile = iRODSFileFactory
 					.instanceIRODSFile(pathForInternalFiles);
 			collectionsUnderGivenAbsolutePath = retrieveCollectionsUnderGivenPath(
-					iRodsFile, irodsImagej);
+					iRodsFile, iPlugin);
 		} else if (pathForInternalFiles == null && isHomeDirectoryFlagOn) {
 
-			pathForInternalFiles = IrodsUtilities.getPathSeperator()
-					+ irodsImagej.getIrodsAccount().getZone()
-					+ IrodsUtilities.getPathSeperator() + Constants.HOME;
-			
-			/*pathForInternalFiles = IrodsUtilities.getPathSeperator()
-					+ irodsImagej.getIrodsAccount().getZone();*/
-					
-			
-			
-			irodsImagej.setPathTillHome(pathForInternalFiles);
+			pathForInternalFiles = TasselCoreFunctions
+					.getHomeDirectoryPath(iPlugin);
+			log.info("pathForInternalFiles till home directory: " + pathForInternalFiles);
+
+			/*
+			 * IrodsUtilities.getPathSeperator() +
+			 * irodsImagej.getIrodsAccount().getZone() +
+			 * IrodsUtilities.getPathSeperator() + Constants.HOME_STRING;
+			 */
+
+			/*
+			 * pathForInternalFiles = IrodsUtilities.getPathSeperator() +
+			 * irodsImagej.getIrodsAccount().getZone();
+			 */
+
+			iPlugin.setPathTillHome(pathForInternalFiles);
 			log.info("irods file path if pathForInternalFiles is null and isHomeDirectoryFlagOn is true"
-					+ irodsImagej.getPathTillHome());
+					+ iPlugin.getPathTillHome());
 
-			iRodsFile = iRODSFileFactory.instanceIRODSFile(irodsImagej
+			iRodsFile = iRODSFileFactory.instanceIRODSFile(iPlugin
 					.getPathTillHome());
 			collectionsUnderGivenAbsolutePath = retrieveCollectionsUnderGivenPath(
-					iRodsFile, irodsImagej);
+					iRodsFile, iPlugin);
 		} else if (pathForInternalFiles == null && !isHomeDirectoryFlagOn) {
-			pathForInternalFiles = IrodsUtilities.getPathSeperator()
-					+ irodsImagej.getIrodsAccount().getZone()
-					+ IrodsUtilities.getPathSeperator() + Constants.HOME
-					+ IrodsUtilities.getPathSeperator()
-					+ irodsImagej.getIrodsAccount().getUserName();
-			irodsImagej.setPathTillHome(pathForInternalFiles);
-			log.info("irods file path if pathForInternalFiles is null and isHomeDirectoryFlagOn is false:"
-					+ irodsImagej.getPathTillHome());
 
-			iRodsFile = iRODSFileFactory.instanceIRODSFile(irodsImagej
+			pathForInternalFiles = TasselCoreFunctions
+					.getAccountDirectoryPath(iPlugin);
+			log.info("pathForInternalFiles till Account directory: "+pathForInternalFiles);
+			/*
+			 * pathForInternalFiles = IrodsUtilities.getPathSeperator() +
+			 * iPlugin.getIrodsAccount().getZone() +
+			 * IrodsUtilities.getPathSeperator() + Constants.HOME_STRING +
+			 * IrodsUtilities.getPathSeperator() +
+			 * iPlugin.getIrodsAccount().getUserName();
+			 */
+			iPlugin.setPathTillHome(pathForInternalFiles);
+			log.info("irods file path if pathForInternalFiles is null and isHomeDirectoryFlagOn is false:"
+					+ iPlugin.getPathTillHome());
+
+			iRodsFile = iRODSFileFactory.instanceIRODSFile(iPlugin
 					.getPathTillHome());
 			collectionsUnderGivenAbsolutePath = retrieveCollectionsUnderGivenPath(
-					iRodsFile, irodsImagej);
+					iRodsFile, iPlugin);
 		}
-		irodsImagej.setiRodsFile(iRodsFile);
+		iPlugin.setiRodsFile(iRodsFile);
 
 		return collectionsUnderGivenAbsolutePath;
 	}

@@ -12,6 +12,7 @@ import javax.swing.SwingWorker;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
+import org.bio5.irods.iplugin.bean.TasselCoreFunctions;
 import org.bio5.irods.iplugin.utilities.Constants;
 import org.bio5.irods.iplugin.utilities.IrodsUtilities;
 import org.irods.jargon.core.exception.DataNotFoundException;
@@ -69,16 +70,23 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 			 * performance degradation.
 			 */
 			if (iPlugin.isHomeDirectoryTheRootNode()) {
-				sourceIrodsFilePath = iRODSFileFactory
+				sourceIrodsFilePath =iRODSFileFactory
+						.instanceIRODSFile(TasselCoreFunctions.getRootDirectoryPath(iPlugin)+ treePath); 
+				log.info("sourceIrodsFilePath" + sourceIrodsFilePath);
+						
+						/*iRODSFileFactory
 						.instanceIRODSFile(IrodsUtilities.getPathSeperator()
 								+ iPlugin.getIrodsAccount().getZone()
-								+ treePath);
+								+ treePath);*/
 			} else {
 				sourceIrodsFilePath = iRODSFileFactory
+						.instanceIRODSFile(TasselCoreFunctions.getHomeDirectoryPath(iPlugin)+ treePath);
+						/*iRODSFileFactory
 						.instanceIRODSFile(IrodsUtilities.getPathSeperator()
 								+ iPlugin.getIrodsAccount().getZone()
 								+ IrodsUtilities.getPathSeperator()
-								+ Constants.HOME + treePath);
+								+ Constants.HOME_STRING + treePath);*/
+				log.info("sourceIrodsFilePath" + sourceIrodsFilePath);
 
 			}
 

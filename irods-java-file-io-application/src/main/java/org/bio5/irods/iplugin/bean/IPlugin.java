@@ -83,7 +83,7 @@ public class IPlugin implements Serializable {
 	private DefaultMutableTreeNode rootTreeNodeForDirectoryContents = null;
 
 	private boolean errorWhileUsingGetOperation = false;
-
+	
 	/*
 	 * true - if you want to pull everything from home directory (This includes
 	 * shared files too). False- if you want to pull collections from only your
@@ -112,6 +112,17 @@ public class IPlugin implements Serializable {
 	private ImagePlus imagePlus;
 
 	boolean fileExistFlag = false;
+	
+	private String pathSeperator=null;
+	
+
+	public String getPathSeperator() {
+		return pathSeperator;
+	}
+
+	public void setPathSeperator(String pathSeperator) {
+		this.pathSeperator = pathSeperator;
+	}
 
 	public boolean isFileExistFlag() {
 		return fileExistFlag;

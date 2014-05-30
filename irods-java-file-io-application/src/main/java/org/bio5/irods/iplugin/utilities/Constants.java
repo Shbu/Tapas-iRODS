@@ -2,7 +2,7 @@ package org.bio5.irods.iplugin.utilities;
 
 public class Constants {
 	public static final String NEW_LINE_STRING = "\n";
-	public static final String HOME_DIR = "/iplant/";
+	public static final String IPLANT_STRING = "/iplant/";
 	public static final String DEFAULT_STORAGE_RESOURCE = "";
 	public static final String HOME_DIR_IPLANT_HOME = "/iplant/home/";
 	// public static String IMAGEJ_CACHE_FOLDER ="D:\\cache folder";
@@ -14,7 +14,7 @@ public class Constants {
 	public static final String HOST_IPLANT = "data.iplantcollaborative.org";
 	public static final String HOST_SPX = "spxirods.dyndns.org";
 	public static String PORT = "1247";
-	public static String HOME = "home";
+	public static String HOME_STRING = "home";
 	public static String FOLDER_SELECTION_CANCELED = "Folder Selection is canceled";
 	public static String JTABBEDPANE_SELECTED_TAB_FILE_INFORMATION = "File Information";
 

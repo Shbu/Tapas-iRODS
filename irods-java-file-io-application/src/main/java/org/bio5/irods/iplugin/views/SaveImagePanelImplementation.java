@@ -345,7 +345,7 @@ public class SaveImagePanelImplementation extends JFrame {
 		String destinationFilePath;
 		destinationFilePath = IrodsUtilities.getPathSeperator()
 				+ iplugin.getIrodsAccount().getZone()
-				+ IrodsUtilities.getPathSeperator() + Constants.HOME
+				+ IrodsUtilities.getPathSeperator() + Constants.HOME_STRING
 				+ IrodsUtilities.getPathSeperator() + destinationPath;
 		return destinationFilePath;
 	}
@@ -396,7 +396,7 @@ public class SaveImagePanelImplementation extends JFrame {
 
 				destinationFilePath = IrodsUtilities.getPathSeperator()
 						+ iplugin.getIrodsAccount().getZone()
-						+ IrodsUtilities.getPathSeperator() + Constants.HOME
+						+ IrodsUtilities.getPathSeperator() + Constants.HOME_STRING
 						+ IrodsUtilities.getPathSeperator()
 						+ textField_irodsDestinationPath.getText();
 				log.info("Final destinationFilePath: " + destinationFilePath);

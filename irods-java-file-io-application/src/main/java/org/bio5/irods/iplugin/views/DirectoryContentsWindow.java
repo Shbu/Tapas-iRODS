@@ -47,6 +47,7 @@ import javax.swing.tree.TreePath;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
+import org.bio5.irods.iplugin.bean.TasselCoreFunctions;
 import org.bio5.irods.iplugin.fileoperations.FileOperations;
 import org.bio5.irods.iplugin.fileoperations.GetFileFromIrodsSwingWorker;
 import org.bio5.irods.iplugin.fileoperations.PutFileToIrodsSwingWorker;
@@ -128,11 +129,9 @@ public class DirectoryContentsWindow extends JPanel implements
 	 */
 	public void init() throws JargonException {
 		irodsAccount = iPlugin.getIrodsAccount();
-		iRODSFileFactory = FileOperations.getIrodsAccountFileFactory(iPlugin
-				.getIrodsAccount());
-		iPlugin.setiRODSFileFactory(iRODSFileFactory);
+		iRODSFileFactory =iPlugin.getiRODSFileFactory();
 
-		homeNode = new DefaultMutableTreeNode(Constants.HOME);
+		homeNode = new DefaultMutableTreeNode(Constants.HOME_STRING);
 		if (!iPlugin.isHomeDirectoryTheRootNode()) {
 			accountNode = new DefaultMutableTreeNode(iPlugin.getIrodsAccount()
 					.getUserName());
@@ -365,7 +364,7 @@ public class DirectoryContentsWindow extends JPanel implements
 						destinationFilePath = IrodsUtilities.getPathSeperator()
 								+ irodsAccount.getZone()
 								+ IrodsUtilities.getPathSeperator()
-								+ Constants.HOME
+								+ Constants.HOME_STRING
 								+ IrodsUtilities.getPathSeperator()
 								+ jTextField_destinationPath.getText();
 						destinaitonIrodsFile = iRODSFileFactory
@@ -736,7 +735,8 @@ public class DirectoryContentsWindow extends JPanel implements
 		 */
 		node.removeAllChildren();
 		treeModel.nodeStructureChanged(node);
-		//DefaultMutableTreeNode lastNode = (DefaultMutableTreeNode) tp.getLastPathComponent();
+		// DefaultMutableTreeNode lastNode = (DefaultMutableTreeNode)
+		// tp.getLastPathComponent();
 		Object[] elements = tp.getPath();/* edit path */
 		// String pathOfInternalNode=builder.toString();
 		RetrieveInternalNodesSwingWorker retrieveInternalNodesSwingWorker = new RetrieveInternalNodesSwingWorker(

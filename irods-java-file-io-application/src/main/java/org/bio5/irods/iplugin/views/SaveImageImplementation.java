@@ -160,7 +160,7 @@ public class SaveImageImplementation {
 		String destinationFilePath;
 		destinationFilePath = IrodsUtilities.getPathSeperator()
 				+ iplugin.getIrodsAccount().getZone()
-				+ IrodsUtilities.getPathSeperator() + Constants.HOME
+				+ IrodsUtilities.getPathSeperator() + Constants.HOME_STRING
 				+ IrodsUtilities.getPathSeperator() + destinationPath;
 		return destinationFilePath;
 	}
