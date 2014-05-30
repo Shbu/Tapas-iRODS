@@ -89,7 +89,7 @@ public class MainWindow extends JFrame {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 682, 454);
 
-		setFocusable(true);
+		//setFocusable(true);
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -149,11 +149,24 @@ public class MainWindow extends JFrame {
 
 		/* Adding default button_Login as default button for ENTER_KEY */
 		getRootPane().setDefaultButton(button_Login);
+		/* Let cursor show into login text filed and user can input string to it.*/
+		//textbox_LoginId.requestFocus();
+		textbox_LoginId.requestFocusInWindow();
 		
 
 		button_Login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				/* When the root panel active, request the this panel focusable, 
+				 * and set key listener for ESC button. */
+				getRootPane().setFocusable(true);
 				loginMethod();
+				getRootPane().addKeyListener(new KeyAdapter(){
+					public void keyPressed(KeyEvent e) {
+						if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+							System.exit(0);
+						}
+					}
+				});
 			}
 		});
 
@@ -570,6 +583,9 @@ public class MainWindow extends JFrame {
 						invalidUserException);
 				JOptionPane.showMessageDialog(null, "Invalid Username!",
 						"Error", JOptionPane.ERROR_MESSAGE);
+				/* If user input wrong username the cursor will let user re-input it. */
+				getRootPane().setFocusable(false);
+				textbox_LoginId.requestFocusInWindow();
 				invalidUserException.printStackTrace();
 			}
 
@@ -579,6 +595,9 @@ public class MainWindow extends JFrame {
 						authenticationException);
 				JOptionPane.showMessageDialog(null, "Invalid password!",
 						"Error", JOptionPane.ERROR_MESSAGE);
+				/* If user input wrong password the cursor will let user re-input it. */
+				getRootPane().setFocusable(false);
+				textField_passwordField.requestFocusInWindow();
 				authenticationException.printStackTrace();
 			}
 			/* Unknown Exception */
