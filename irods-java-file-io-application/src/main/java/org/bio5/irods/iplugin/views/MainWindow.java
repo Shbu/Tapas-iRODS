@@ -31,6 +31,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
+import org.bio5.irods.iplugin.bean.TasselCoreFunctions;
 import org.bio5.irods.iplugin.connection.IrodsConnection;
 import org.bio5.irods.iplugin.fileoperations.FileOperations;
 import org.bio5.irods.iplugin.utilities.Constants;
@@ -43,6 +44,7 @@ import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.IRODSFileSystemAOImpl;
+import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 
 public class MainWindow extends JFrame {
@@ -72,6 +74,7 @@ public class MainWindow extends JFrame {
 	private File selectedFileForImageJCacheFolder;
 	private JComboBox<String> comboBox_Zone;
 	private JComboBox<String> comboBox_Host;
+	private IRODSFileFactory iRODSFileFactory;
 
 	/**
 	 * Launch the application.
@@ -150,9 +153,7 @@ public class MainWindow extends JFrame {
 		/* Adding default button_Login as default button for ENTER_KEY */
 		getRootPane().setDefaultButton(button_Login);
 		/* Let cursor show into login text filed and user can input string to it.*/
-		//textbox_LoginId.requestFocus();
 		textbox_LoginId.requestFocusInWindow();
-		
 
 		button_Login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -164,9 +165,9 @@ public class MainWindow extends JFrame {
 					public void keyPressed(KeyEvent e) {
 						if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 							System.exit(0);
+							}
 						}
-					}
-				});
+					});
 			}
 		});
 
@@ -490,10 +491,10 @@ public class MainWindow extends JFrame {
 		/* Setting iRODS file system */
 		try {
 			irodsFileSystem = IRODSFileSystem.instance();
+			iplugin.setIrodsFileSystem(irodsFileSystem);
 		} catch (JargonException e) {
 			log.error("Error while retrieving irodsFileSystem" + e.getMessage());
 		}
-		iplugin.setIrodsFileSystem(irodsFileSystem);
 
 	}
 
@@ -502,21 +503,7 @@ public class MainWindow extends JFrame {
 		String username = textbox_LoginId.getText();
 		char[] password = textField_passwordField.getPassword();
 		String password_full = "";
-		if (null != textField_ImageJCacheFolderPath.getText()) {
-			boolean isDirectoryCreated = IrodsUtilities
-					.createDirectoryIfDoesntExist(textField_ImageJCacheFolderPath
-							.getText());
-			if (!isDirectoryCreated) {
-				log.info("isDirectoryCreated: " + isDirectoryCreated);
-				JOptionPane.showMessageDialog(null,
-						"Error while creating path!");
-			} else {
-				log.info("ImageJ cache folder path specified by user:"
-						+ textField_ImageJCacheFolderPath.getText());
-				iplugin.setImageJCacheFolder(textField_ImageJCacheFolderPath
-						.getText());
-			}
-		}
+		cacheDirectoryCreation();
 
 		for (char chars : password)
 			password_full += chars;
@@ -532,6 +519,10 @@ public class MainWindow extends JFrame {
 				IRODSAccount irodsAccount = IrodsConnection.irodsConnection(
 						username, password_full, zone, host, port);
 				iplugin.setIrodsAccount(irodsAccount);
+
+				if (iplugin.getIrodsAccount() != null) {
+					irodsFileFactoryCreation();
+				}
 
 				if (null != irodsFileSystem) {
 					IRODSSession iRODSSession = irodsFileSystem
@@ -615,6 +606,37 @@ public class MainWindow extends JFrame {
 
 			}
 
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void cacheDirectoryCreation() {
+		if (null != textField_ImageJCacheFolderPath.getText()) {
+			boolean isDirectoryCreated = IrodsUtilities
+					.createDirectoryIfDoesntExist(textField_ImageJCacheFolderPath
+							.getText());
+			if (!isDirectoryCreated) {
+				log.info("isDirectoryCreated: " + isDirectoryCreated);
+				JOptionPane.showMessageDialog(null,
+						"Error while creating path!");
+			} else {
+				log.info("ImageJ cache folder path specified by user:"
+						+ textField_ImageJCacheFolderPath.getText());
+				iplugin.setImageJCacheFolder(textField_ImageJCacheFolderPath
+						.getText());
+			}
+		}
+	}
+
+	private void irodsFileFactoryCreation() {
+		try {
+			iRODSFileFactory = TasselCoreFunctions
+					.getIrodsAccountFileFactory(iplugin);
+			iplugin.setiRODSFileFactory(iRODSFileFactory);
+		} catch (JargonException e) {
+			log.error("Error while creating irodsFileFactory" + e.getMessage());
 		}
 	}
 }

@@ -5,8 +5,6 @@ import javax.swing.SwingWorker;
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
 import org.bio5.irods.iplugin.bean.TasselCoreFunctions;
-import org.bio5.irods.iplugin.utilities.Constants;
-import org.bio5.irods.iplugin.utilities.IrodsUtilities;
 import org.bio5.irods.iplugin.views.DirectoryContentsWindow;
 import org.irods.jargon.core.pub.IRODSFileSystemAOImpl;
 import org.irods.jargon.core.pub.domain.ObjStat;
