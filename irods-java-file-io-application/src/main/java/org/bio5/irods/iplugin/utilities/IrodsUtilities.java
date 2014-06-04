@@ -3,13 +3,20 @@ package org.bio5.irods.iplugin.utilities;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.security.MessageDigest;
+import java.util.Properties;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 public final class IrodsUtilities {
@@ -161,5 +168,85 @@ public final class IrodsUtilities {
 				size += getFolderSize(file);
 		}
 		return size;
+	}
+
+	/*
+	 * This method will load Tapas properties from either of below two file - 1.
+	 * Local Property file in cache directory or 2. Property file in Jar. If
+	 * local file is not available, then property file available in jar is
+	 * loaded and then a copy is left in local path for future availability.
+	 */
+
+	public static Properties getTapasLoginConfiguration(
+			String propertyFileName, String localPathForPropertyFile) {
+
+		FileReader reader = null;
+		if (null == propertyFileName) {
+			propertyFileName = Constants.PROPERTY_FILE_NAME;
+		}
+		if (null == localPathForPropertyFile) {
+			localPathForPropertyFile = Constants.IMAGEJ_CACHE_FOLDER;
+		}
+		Properties tapasConfigurationProperties = new Properties();
+		tapasConfigurationProperties = loadLocalTapasPropertyFiles(localPathForPropertyFile);
+
+		if (null != tapasConfigurationProperties) {
+			return tapasConfigurationProperties;
+		} else {
+			try {
+				reader = new FileReader(propertyFileName);
+				if (null != reader) {
+					File propertyFile = new File(propertyFileName);
+					copyFileToNewPhysicalLocation(propertyFile,
+							localPathForPropertyFile);
+				}
+
+			} catch (FileNotFoundException fileNotFoundException) {
+				log.error("tapas.property file is not found"
+						+ fileNotFoundException.getMessage());
+			}
+
+			try {
+				tapasConfigurationProperties = new Properties();
+				tapasConfigurationProperties.load(reader);
+			} catch (IOException ioException) {
+				log.error("Error while loading property file"
+						+ ioException.getMessage());
+			}
+		}
+		return tapasConfigurationProperties;
+	}
+
+	public static void copyFileToNewPhysicalLocation(File sourceFile,
+			String destination) {
+		File destinationFile = new File(destination);
+		try {
+			FileUtils.copyFileToDirectory(sourceFile, destinationFile);
+		} catch (IOException e) {
+			log.error("Error while copying file from source to destination"
+					+ e.getMessage());
+		}
+	}
+
+	public static Properties loadLocalTapasPropertyFiles(String filePath) {
+		Properties tapasLocalConfigurationProperties = null;
+
+		if (null != filePath) {
+			String propertyFileName = filePath
+					+ IrodsUtilities.getPathSeperator()
+					+ Constants.PROPERTY_FILE_NAME;
+			try {
+				Reader reader = new FileReader(propertyFileName);
+				tapasLocalConfigurationProperties = new Properties();
+				tapasLocalConfigurationProperties.load(reader);
+			} catch (FileNotFoundException e) {
+				log.error("Error while reading localPropertyFileName "
+						+ e.getMessage());
+			} catch (IOException ioException) {
+				log.error("Error while loading local property file"
+						+ ioException.getMessage());
+			}
+		}
+		return tapasLocalConfigurationProperties;
 	}
 }

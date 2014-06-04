@@ -84,6 +84,17 @@ public class IPlugin implements Serializable {
 
 	private boolean errorWhileUsingGetOperation = false;
 	
+	private String destinationPath =null;
+	
+	
+	public String getDestinationPath() {
+		return destinationPath;
+	}
+
+	public void setDestinationPath(String destinationPath) {
+		this.destinationPath = destinationPath;
+	}
+
 	/*
 	 * true - if you want to pull everything from home directory (This includes
 	 * shared files too). False- if you want to pull collections from only your

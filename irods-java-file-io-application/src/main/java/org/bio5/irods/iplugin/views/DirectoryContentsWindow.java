@@ -124,12 +124,23 @@ public class DirectoryContentsWindow extends JPanel implements
 		this.iPlugin = iPlugin;
 	}
 
+	
+	public DefaultTreeModel getTreeModel() {
+		return treeModel;
+	}
+
+
+	public void setTreeModel(DefaultTreeModel treeModel) {
+		this.treeModel = treeModel;
+	}
+
+
 	/**
 	 * @throws JargonException
 	 */
 	public void init() throws JargonException {
 		irodsAccount = iPlugin.getIrodsAccount();
-		iRODSFileFactory =iPlugin.getiRODSFileFactory();
+		iRODSFileFactory = iPlugin.getiRODSFileFactory();
 
 		homeNode = new DefaultMutableTreeNode(Constants.HOME_STRING);
 		if (!iPlugin.isHomeDirectoryTheRootNode()) {
@@ -361,12 +372,20 @@ public class DirectoryContentsWindow extends JPanel implements
 							&& selectedNodeInTreeForSingleClick != "") {
 						log.info("destination path || selectedNodeInTreeForSingleClick"
 								+ selectedNodeInTreeForSingleClick);
-						destinationFilePath = IrodsUtilities.getPathSeperator()
-								+ irodsAccount.getZone()
-								+ IrodsUtilities.getPathSeperator()
-								+ Constants.HOME_STRING
-								+ IrodsUtilities.getPathSeperator()
-								+ jTextField_destinationPath.getText();
+						if (iPlugin.isHomeDirectoryTheRootNode()) {
+							destinationFilePath = TasselCoreFunctions
+									.getRootDirectoryPath(iPlugin)
+									+ jTextField_destinationPath.getText();
+							log.info("Destination Path if home directory is checked:"
+									+ destinationFilePath);
+						}
+						if (!iPlugin.isHomeDirectoryTheRootNode()) {
+							destinationFilePath = TasselCoreFunctions
+									.getHomeDirectoryPath(iPlugin)
+									+ jTextField_destinationPath.getText();
+							log.info("Destination Path if home directory is not checked:"
+									+ destinationFilePath);
+						}
 						destinaitonIrodsFile = iRODSFileFactory
 								.instanceIRODSFile(destinationFilePath);
 						log.info("sourceLocalfile absolute path: "
@@ -691,7 +710,7 @@ public class DirectoryContentsWindow extends JPanel implements
 	}
 
 	public DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent,
-			Object child, boolean shouldBeVisible) {
+			Object child, boolean shouldBeVisible,TreePath path) {
 		DefaultMutableTreeNode childNode = null;
 		try {
 			childNode = new DefaultMutableTreeNode(child, false);
@@ -700,11 +719,11 @@ public class DirectoryContentsWindow extends JPanel implements
 			}
 
 			treeModel.insertNodeInto(childNode, parent, parent.getChildCount());
+			userDirectoryTree.makeVisible(path);
 
-			if (shouldBeVisible) {
-				userDirectoryTree.scrollPathToVisible(new TreePath(childNode
-						.getPath()));
-			}
+			/*if (shouldBeVisible) {
+				userDirectoryTree.scrollPathToVisible(path);
+			}*/
 		} catch (IllegalStateException illegalStateException) {
 			log.error(illegalStateException.getMessage());
 			JOptionPane.showMessageDialog(null, "node does not allow children");
@@ -728,6 +747,7 @@ public class DirectoryContentsWindow extends JPanel implements
 		TreePath tp = treeExpansionEvent.getPath();
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tp
 				.getLastPathComponent();
+		log.info("last node: " + node.toString());
 		/*
 		 * Removing children of a node and re-inserting them back - This avoids
 		 * the risk of re-adding the same children if handle is tree is expanded
@@ -739,6 +759,7 @@ public class DirectoryContentsWindow extends JPanel implements
 		// tp.getLastPathComponent();
 		Object[] elements = tp.getPath();/* edit path */
 		// String pathOfInternalNode=builder.toString();
+
 		RetrieveInternalNodesSwingWorker retrieveInternalNodesSwingWorker = new RetrieveInternalNodesSwingWorker(
 				elements, iPlugin);
 		try {

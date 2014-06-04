@@ -5,13 +5,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
 import org.bio5.irods.iplugin.bean.TasselCoreFunctions;
-import org.bio5.irods.iplugin.utilities.Constants;
-import org.bio5.irods.iplugin.utilities.IrodsUtilities;
-import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.SettableJargonProperties;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
-import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
@@ -119,6 +115,10 @@ public class FileOperations {
 			collectionsUnderGivenAbsolutePath = CollectionAndDataObjectListAndSearchAO
 					.listDataObjectsAndCollectionsUnderPath(irodsFileForAbsolutePath
 							.getAbsolutePath());
+			if(null==collectionsUnderGivenAbsolutePath){
+				log.error("No files retrieved from given path: " +irodsFileForAbsolutePath
+						.getAbsolutePath());
+			}
 
 		} catch (JargonException e) {
 			log.error("Error while retrieving collectionsUnderGivenAbsolutePath: "

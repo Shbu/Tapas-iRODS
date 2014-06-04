@@ -6,7 +6,10 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.net.UnknownHostException;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -75,6 +78,9 @@ public class MainWindow extends JFrame {
 	private JComboBox<String> comboBox_Zone;
 	private JComboBox<String> comboBox_Host;
 	private IRODSFileFactory iRODSFileFactory;
+	private String usernamePickedFromPropertyFiles = null;
+	private String zonePickedFromPropertyFiles = null;
+	private String hostPickedFromPropertyFiles = null;
 
 	/**
 	 * Launch the application.
@@ -92,7 +98,7 @@ public class MainWindow extends JFrame {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 682, 454);
 
-		//setFocusable(true);
+		// setFocusable(true);
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -152,22 +158,27 @@ public class MainWindow extends JFrame {
 
 		/* Adding default button_Login as default button for ENTER_KEY */
 		getRootPane().setDefaultButton(button_Login);
-		/* Let cursor show into login text filed and user can input string to it.*/
+		/*
+		 * Let cursor show into login text filed and user can input string to
+		 * it.
+		 */
 		textbox_LoginId.requestFocusInWindow();
 
 		button_Login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				/* When the root panel active, request the this panel focusable, 
-				 * and set key listener for ESC button. */
+				/*
+				 * When the root panel active, request the this panel focusable,
+				 * and set key listener for ESC button.
+				 */
 				getRootPane().setFocusable(true);
 				loginMethod();
-				getRootPane().addKeyListener(new KeyAdapter(){
+				getRootPane().addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent e) {
 						if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 							System.exit(0);
-							}
 						}
-					});
+					}
+				});
 			}
 		});
 
@@ -242,8 +253,18 @@ public class MainWindow extends JFrame {
 			}
 		});
 
+		/* Initializing values */
 		comboBox_Zone = new JComboBox<String>();
 		comboBox_Host = new JComboBox<String>();
+
+		/* Pulling tapas login configuration from properties */
+
+		Properties tapasProperties = IrodsUtilities.getTapasLoginConfiguration(
+				Constants.PROPERTY_FILE_NAME, Constants.IMAGEJ_CACHE_FOLDER);
+		if (null != tapasProperties) {
+			setPropertyFileDataToLoginPanel(tapasProperties);
+		}
+
 		comboBox_Zone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JComboBox comboBox = (JComboBox) e.getSource();
@@ -256,13 +277,10 @@ public class MainWindow extends JFrame {
 				}
 			}
 		});
-		comboBox_Zone.setModel(new DefaultComboBoxModel<String>(new String[] {
-				Constants.ZONE_IPLANT, Constants.ZONE_SPX }));
+
 		comboBox_Zone.setEditable(true);
 		comboBox_Zone.setToolTipText("Select your zone");
-
-		comboBox_Host.setModel(new DefaultComboBoxModel<String>(new String[] {
-				Constants.HOST_IPLANT, Constants.HOST_SPX }));
+		comboBox_Host.setToolTipText("Select your host");
 		comboBox_Host.setEditable(true);
 
 		GroupLayout gl_contentPane = new GroupLayout(contentPanePanel);
@@ -500,6 +518,7 @@ public class MainWindow extends JFrame {
 
 	@SuppressWarnings("deprecation")
 	private void loginMethod() {
+
 		String username = textbox_LoginId.getText();
 		char[] password = textField_passwordField.getPassword();
 		String password_full = "";
@@ -574,7 +593,10 @@ public class MainWindow extends JFrame {
 						invalidUserException);
 				JOptionPane.showMessageDialog(null, "Invalid Username!",
 						"Error", JOptionPane.ERROR_MESSAGE);
-				/* If user input wrong username the cursor will let user re-input it. */
+				/*
+				 * If user input wrong username the cursor will let user
+				 * re-input it.
+				 */
 				getRootPane().setFocusable(false);
 				textbox_LoginId.requestFocusInWindow();
 				invalidUserException.printStackTrace();
@@ -586,7 +608,10 @@ public class MainWindow extends JFrame {
 						authenticationException);
 				JOptionPane.showMessageDialog(null, "Invalid password!",
 						"Error", JOptionPane.ERROR_MESSAGE);
-				/* If user input wrong password the cursor will let user re-input it. */
+				/*
+				 * If user input wrong password the cursor will let user
+				 * re-input it.
+				 */
 				getRootPane().setFocusable(false);
 				textField_passwordField.requestFocusInWindow();
 				authenticationException.printStackTrace();
@@ -599,9 +624,16 @@ public class MainWindow extends JFrame {
 					JOptionPane.showMessageDialog(null,
 							"Connection Refused - Server Down!", "Error",
 							JOptionPane.ERROR_MESSAGE);
+				}
+				if (unknownException.getLocalizedMessage().toString()
+						.contains(Constants.ERROR_STRING_UNKNOWN_HOST)) {
+					JOptionPane.showMessageDialog(null, "Unknown Host",
+							"Error", JOptionPane.ERROR_MESSAGE);
 				} else {
 					JOptionPane.showMessageDialog(null, "Unknown Error!",
 							"Error", JOptionPane.ERROR_MESSAGE);
+					log.error("Unknown Error: "
+							+ unknownException.getLocalizedMessage());
 				}
 
 			}
@@ -638,5 +670,34 @@ public class MainWindow extends JFrame {
 		} catch (JargonException e) {
 			log.error("Error while creating irodsFileFactory" + e.getMessage());
 		}
+	}
+
+	private boolean setPropertyFileDataToLoginPanel(Properties tapasProperties) {
+		Boolean isSet = false;
+
+		if (null != tapasProperties) {
+			log.info("Tapas Properties"
+					+ tapasProperties.getProperty("login.username"));
+			usernamePickedFromPropertyFiles = tapasProperties
+					.getProperty(Constants.PROPERTY_USER_NAME);
+			if (null != usernamePickedFromPropertyFiles) {
+				textbox_LoginId.setText(usernamePickedFromPropertyFiles);
+			}
+			zonePickedFromPropertyFiles = tapasProperties
+					.getProperty(Constants.PROPERTY_ZONE_NAME);
+			if (null != zonePickedFromPropertyFiles) {
+				comboBox_Zone.setModel(new DefaultComboBoxModel<String>(
+						new String[] { zonePickedFromPropertyFiles }));
+
+			}
+			hostPickedFromPropertyFiles = tapasProperties
+					.getProperty(Constants.PROPERTY_HOST_NAME);
+			if (null != hostPickedFromPropertyFiles) {
+				comboBox_Host.setModel(new DefaultComboBoxModel<String>(
+						new String[] { hostPickedFromPropertyFiles }));
+
+			}
+		}
+		return isSet;
 	}
 }

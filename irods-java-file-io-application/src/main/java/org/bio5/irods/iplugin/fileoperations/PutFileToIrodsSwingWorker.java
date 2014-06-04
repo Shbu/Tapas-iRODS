@@ -5,6 +5,7 @@ import java.io.File;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
@@ -57,6 +58,8 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 						log.info("Defaulting ErrorWhileUsingGetOperation value to :"
 								+ "False");
 						iPlugin.setErrorWhileUsingGetOperation(false);
+						iPlugin.setDestinationPath(destinaitonIrodsFile
+								.getAbsolutePath());
 
 						dataTransferOperationsAO.putOperation(sourceLocalfile
 								.getAbsolutePath(), destinaitonIrodsFile
@@ -135,14 +138,44 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 			 */
 			parentNode = (DefaultMutableTreeNode) iPlugin
 					.getUserDirectoryTree().getLastSelectedPathComponent();
+			
+			TreePath tp = iPlugin
+					.getUserDirectoryTree().getSelectionPath();
+			log.info("TreePath: "+tp.toString());
+			
+			/*Pending*/
+			iPlugin.getDirectoryContentsPane().getTreeModel().reload(parentNode);
+			
+			/*RetrieveInternalNodesSwingWorker retrieve = new RetrieveInternalNodesSwingWorker(tp.getParentPath().getPath(), iPlugin);
+		
+			try {
+				retrieve.doInBackground();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}*/
+			
+			/*if (null != iPlugin.getDestinationPath()) {
+				String fileName = new File(iPlugin.getDestinationPath())
+						.getName();
+				parentNode = new DefaultMutableTreeNode(fileName);
+			}
 			if (null != parentNode) {
+				
+				iPlugin.getDirectoryContentsPane()
+				.addObject(parentNode,
+						sourceLocalfile.getName(), true, tp);
+				
+				
 				if (parentNode.isLeaf()) {
 
 					if (!iPlugin.isFileExistFlag()) {
 						try {
+							log.info("last selected path component:"
+									+ parentNode);
 							parentNode = (DefaultMutableTreeNode) parentNode
 									.getParent();
-
+							log.info("Parent node of last selected component: "
+									+ parentNode);
 							iPlugin.getDirectoryContentsPane()
 									.addObject(parentNode,
 											sourceLocalfile.getName(), true);
@@ -150,12 +183,11 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 							log.error("Error:  " + exception.getMessage());
 							exception.printStackTrace();
 						}
-					}
-					else {
+					} else {
 						log.info("File already exists in that directory, so not showing in tree path!");
 					}
 				} else {
-					log.info("parentNode in directory");
+					log.info("parentNode is a directory");
 
 					if (!iPlugin.isFileExistFlag()) {
 						iPlugin.getDirectoryContentsPane().addObject(
@@ -166,7 +198,7 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 				}
 			} else {
 				log.error("Parent node is null!");
-			}
+			}*/
 
 		} else {
 			log.error("1. UserDirectoryTree value is null in irodsImageJ bean or 2.sourceLocalFile is empty");
