@@ -12,7 +12,7 @@ New Requirements - Received on 6/1/2014
 1. Implement a technique to preserve user login details to help avoid retyping for same details in each login session. User should be able to customize this functionality and specify values pertaining to his own account. 
 2. After loggin in, user should be able to download multiple files depending on his selection.
 
-New Requirements - Received on 4/2/2014 - Completed on 5/6/2014
+New Requirements - Received on 4/2/2014 | Completed on 5/6/2014
 ----------------------
 1. User should be able to enter directory path for his landing page. This should happen before application successfully authenticates credentials. If path specified is wrong, then default it to user account folder.
 
