@@ -4,11 +4,13 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Properties;
 
@@ -16,6 +18,11 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationConverter;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.FileConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -180,37 +187,74 @@ public final class IrodsUtilities {
 	public static Properties getTapasLoginConfiguration(
 			String propertyFileName, String localPathForPropertyFile) {
 
-		FileReader reader = null;
+		Properties tapasConfigurationProperties = null;
 		if (null == propertyFileName) {
+			/* pending - change the final path */
 			propertyFileName = Constants.PROPERTY_FILE_NAME;
+			/*
+			 * propertyFileName =
+			 * "/irods-java-file-io-application/src/main/resources/" +
+			 * Constants.PROPERTY_FILE_NAME;
+			 */
 		}
 		if (null == localPathForPropertyFile) {
 			localPathForPropertyFile = Constants.IMAGEJ_CACHE_FOLDER;
 		}
-		Properties tapasConfigurationProperties = new Properties();
+		tapasConfigurationProperties = new Properties();
+
 		tapasConfigurationProperties = loadLocalTapasPropertyFiles(localPathForPropertyFile);
 
 		if (null != tapasConfigurationProperties) {
+			log.info("tapas configuration properties is not null - Returning values after first null check");
 			return tapasConfigurationProperties;
 		} else {
+			/* Pulling property file from jar */
+			Configuration propertyConfiguration = null;
+			URL propFileURL = null;
 			try {
-				reader = new FileReader(propertyFileName);
-				if (null != reader) {
-					File propertyFile = new File(propertyFileName);
-					copyFileToNewPhysicalLocation(propertyFile,
-							localPathForPropertyFile);
-				}
+				propFileURL = IrodsUtilities.class.getClassLoader()
+						.getResource(propertyFileName);
+				propertyConfiguration = new PropertiesConfiguration(propFileURL);
 
+			} catch (ConfigurationException configurationException) {
+				log.error("Exception while loading configuration of property files"
+						+ configurationException.getMessage());
+			}
+
+			if (null != propertyConfiguration) {
+				log.info("propertyConfiguration is not null");
+				tapasConfigurationProperties = ConfigurationConverter
+						.getProperties(propertyConfiguration);
+			} else {
+				log.error("propertyConfiguration is null");
+			}
+
+			/* Creating outputStreamForPropertiesFile */
+			OutputStream outputStreamForPropertiesFile = null;
+			try {
+				String filePath = Constants.IMAGEJ_CACHE_FOLDER
+						+ IrodsUtilities.getPathSeperator()
+						+ "config.properties";
+				if (null != filePath && "" != filePath) {
+					outputStreamForPropertiesFile = new FileOutputStream(
+							filePath);
+				}
 			} catch (FileNotFoundException fileNotFoundException) {
-				log.error("tapas.property file is not found"
+				log.error("fileNotFound Exception while creating output stream of properties file"
 						+ fileNotFoundException.getMessage());
 			}
 
+			/* Storing properties file to local disk */
 			try {
-				tapasConfigurationProperties = new Properties();
-				tapasConfigurationProperties.load(reader);
+				if (null != outputStreamForPropertiesFile) {
+					tapasConfigurationProperties.store(
+							outputStreamForPropertiesFile,
+							"Tapas proeprties file");
+				} else {
+					log.error("outputStreamForPropertiesFile is null");
+				}
 			} catch (IOException ioException) {
-				log.error("Error while loading property file"
+				log.error("IOException while storing properties file to local disk"
 						+ ioException.getMessage());
 			}
 		}
@@ -221,6 +265,7 @@ public final class IrodsUtilities {
 			String destination) {
 		File destinationFile = new File(destination);
 		try {
+			log.info("Inside copyFileToDirectory");
 			FileUtils.copyFileToDirectory(sourceFile, destinationFile);
 		} catch (IOException e) {
 			log.error("Error while copying file from source to destination"
@@ -240,7 +285,7 @@ public final class IrodsUtilities {
 				tapasLocalConfigurationProperties = new Properties();
 				tapasLocalConfigurationProperties.load(reader);
 			} catch (FileNotFoundException e) {
-				log.error("Error while reading localPropertyFileName "
+				log.error("Error while reading localPropertyFile "
 						+ e.getMessage());
 			} catch (IOException ioException) {
 				log.error("Error while loading local property file"
@@ -249,4 +294,30 @@ public final class IrodsUtilities {
 		}
 		return tapasLocalConfigurationProperties;
 	}
+
+	/*
+	 * Replaces more than one slash with single slash in a given string -
+	 * Applicable for both FORWARD SLASH and BACKWARD SLASH
+	 */
+
+	public static String refactorSlashInFilePaths(String filepath) {
+		String finalPath = null;
+
+		if (null != filepath && "" != filepath) {
+			log.info("Path before refactoring: " + filepath);
+			if (filepath.contains("/")) {
+				finalPath = filepath.replaceAll("/+", "/");
+				log.info("Path after refactoring: " + finalPath);
+			}
+			if (filepath.contains("\\")) {
+				finalPath = filepath.replaceAll("\\+", "\\");
+				log.info("Path after refactoring: " + finalPath);
+			}
+
+		} else {
+			log.error("Given filePath is null");
+		}
+		return finalPath;
+	}
+
 }

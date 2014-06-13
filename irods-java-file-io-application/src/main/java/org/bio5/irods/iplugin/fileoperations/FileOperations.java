@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
-import org.bio5.irods.iplugin.bean.TasselCoreFunctions;
+import org.bio5.irods.iplugin.bean.TapasCoreFunctions;
 import org.irods.jargon.core.connection.SettableJargonProperties;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
@@ -48,7 +48,7 @@ public class FileOperations {
 					iRodsFile, iPlugin);
 		} else if (pathForInternalFiles == null && isHomeDirectoryFlagOn) {
 
-			pathForInternalFiles = TasselCoreFunctions
+			pathForInternalFiles = TapasCoreFunctions
 					.getHomeDirectoryPath(iPlugin);
 			log.info("pathForInternalFiles till home directory: " + pathForInternalFiles);
 
@@ -73,7 +73,7 @@ public class FileOperations {
 					iRodsFile, iPlugin);
 		} else if (pathForInternalFiles == null && !isHomeDirectoryFlagOn) {
 
-			pathForInternalFiles = TasselCoreFunctions
+			pathForInternalFiles = TapasCoreFunctions
 					.getAccountDirectoryPath(iPlugin);
 			log.info("pathForInternalFiles till Account directory: "+pathForInternalFiles);
 			/*

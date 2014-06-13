@@ -48,6 +48,12 @@
 			<version>1.7.5</version>
 		</dependency>
 
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>1.2</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -96,7 +102,8 @@
 									<classpathPrefix>../org/</classpathPrefix>
 								</manifest>
 								<manifestEntries>
-									<Class-Path>../org/</Class-Path>
+									<!-- <Class-Path>../org/</Class-Path> -->
+									<Class-Path>/src/main/</Class-Path>
 								</manifestEntries>
 							</archive>
 						</configuration>

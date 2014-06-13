@@ -23,7 +23,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.JPanel;	
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -47,8 +47,7 @@ import javax.swing.tree.TreePath;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
-import org.bio5.irods.iplugin.bean.TasselCoreFunctions;
-import org.bio5.irods.iplugin.fileoperations.FileOperations;
+import org.bio5.irods.iplugin.bean.TapasCoreFunctions;
 import org.bio5.irods.iplugin.fileoperations.GetFileFromIrodsSwingWorker;
 import org.bio5.irods.iplugin.fileoperations.PutFileToIrodsSwingWorker;
 import org.bio5.irods.iplugin.fileoperations.RetrieveInternalNodesSwingWorker;
@@ -124,16 +123,13 @@ public class DirectoryContentsWindow extends JPanel implements
 		this.iPlugin = iPlugin;
 	}
 
-	
 	public DefaultTreeModel getTreeModel() {
 		return treeModel;
 	}
 
-
 	public void setTreeModel(DefaultTreeModel treeModel) {
 		this.treeModel = treeModel;
 	}
-
 
 	/**
 	 * @throws JargonException
@@ -373,14 +369,14 @@ public class DirectoryContentsWindow extends JPanel implements
 						log.info("destination path || selectedNodeInTreeForSingleClick"
 								+ selectedNodeInTreeForSingleClick);
 						if (iPlugin.isHomeDirectoryTheRootNode()) {
-							destinationFilePath = TasselCoreFunctions
+							destinationFilePath = TapasCoreFunctions
 									.getRootDirectoryPath(iPlugin)
 									+ jTextField_destinationPath.getText();
 							log.info("Destination Path if home directory is checked:"
 									+ destinationFilePath);
 						}
 						if (!iPlugin.isHomeDirectoryTheRootNode()) {
-							destinationFilePath = TasselCoreFunctions
+							destinationFilePath = TapasCoreFunctions
 									.getHomeDirectoryPath(iPlugin)
 									+ jTextField_destinationPath.getText();
 							log.info("Destination Path if home directory is not checked:"
@@ -599,18 +595,22 @@ public class DirectoryContentsWindow extends JPanel implements
 	public void setFileInformationFromObjStat(ObjStat objstatWithFileInformation) {
 
 		TableModel tm = table.getModel();
-		tm.setValueAt(objstatWithFileInformation.getAbsolutePath(), 0, 1);
-		tm.setValueAt(
-				FileUtils.byteCountToDisplaySize(objstatWithFileInformation
-						.getObjSize()), 1, 1);
-		tm.setValueAt(objstatWithFileInformation.getCreatedAt(), 2, 1);
-		tm.setValueAt(objstatWithFileInformation.getModifiedAt(), 3, 1);
-		tm.setValueAt(objstatWithFileInformation.getDataId(), 4, 1);
-		tm.setValueAt(objstatWithFileInformation.getObjectType(), 5, 1);
-		tm.setValueAt(objstatWithFileInformation.getChecksum(), 6, 1);
-		tm.setValueAt(objstatWithFileInformation.getOwnerName(), 7, 1);
-		tm.setValueAt(objstatWithFileInformation.getOwnerZone(), 8, 1);
-		tm.setValueAt(objstatWithFileInformation.getCacheDir(), 9, 1);
+		if (null != tm) {
+			tm.setValueAt(objstatWithFileInformation.getAbsolutePath(), 0, 1);
+			tm.setValueAt(FileUtils
+					.byteCountToDisplaySize(objstatWithFileInformation
+							.getObjSize()), 1, 1);
+			tm.setValueAt(objstatWithFileInformation.getCreatedAt(), 2, 1);
+			tm.setValueAt(objstatWithFileInformation.getModifiedAt(), 3, 1);
+			tm.setValueAt(objstatWithFileInformation.getDataId(), 4, 1);
+			tm.setValueAt(objstatWithFileInformation.getObjectType(), 5, 1);
+			tm.setValueAt(objstatWithFileInformation.getChecksum(), 6, 1);
+			tm.setValueAt(objstatWithFileInformation.getOwnerName(), 7, 1);
+			tm.setValueAt(objstatWithFileInformation.getOwnerZone(), 8, 1);
+			tm.setValueAt(objstatWithFileInformation.getCacheDir(), 9, 1);
+		} else {
+			log.error("Table Model object is null");
+		}
 	}
 
 	/**
@@ -710,7 +710,7 @@ public class DirectoryContentsWindow extends JPanel implements
 	}
 
 	public DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent,
-			Object child, boolean shouldBeVisible,TreePath path) {
+			Object child, boolean shouldBeVisible, TreePath path) {
 		DefaultMutableTreeNode childNode = null;
 		try {
 			childNode = new DefaultMutableTreeNode(child, false);
@@ -721,9 +721,10 @@ public class DirectoryContentsWindow extends JPanel implements
 			treeModel.insertNodeInto(childNode, parent, parent.getChildCount());
 			userDirectoryTree.makeVisible(path);
 
-			/*if (shouldBeVisible) {
-				userDirectoryTree.scrollPathToVisible(path);
-			}*/
+			/*
+			 * if (shouldBeVisible) {
+			 * userDirectoryTree.scrollPathToVisible(path); }
+			 */
 		} catch (IllegalStateException illegalStateException) {
 			log.error(illegalStateException.getMessage());
 			JOptionPane.showMessageDialog(null, "node does not allow children");

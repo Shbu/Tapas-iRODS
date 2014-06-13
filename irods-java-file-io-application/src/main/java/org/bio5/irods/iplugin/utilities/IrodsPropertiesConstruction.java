@@ -1,7 +1,5 @@
 package org.bio5.irods.iplugin.utilities;
 
-import javax.swing.JProgressBar;
-
 import org.bio5.irods.iplugin.bean.IPlugin;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.transfer.TransferControlBlock;

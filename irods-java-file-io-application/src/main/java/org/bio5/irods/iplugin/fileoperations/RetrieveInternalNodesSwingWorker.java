@@ -9,7 +9,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
-import org.bio5.irods.iplugin.bean.TasselCoreFunctions;
+import org.bio5.irods.iplugin.bean.TapasCoreFunctions;
 import org.bio5.irods.iplugin.utilities.IrodsUtilities;
 import org.irods.jargon.core.connection.SettableJargonProperties;
 import org.irods.jargon.core.pub.io.IRODSFile;
@@ -52,11 +52,11 @@ public class RetrieveInternalNodesSwingWorker extends
 
 			String path = null;
 			if(irodsImageJ.isHomeDirectoryTheRootNode()){
-				path =TasselCoreFunctions.getRootDirectoryPath(irodsImageJ);
+				path =TapasCoreFunctions.getRootDirectoryPath(irodsImageJ);
 				log.info("Path till root: "+path);
 			}
 			if(!irodsImageJ.isHomeDirectoryTheRootNode()){
-				path =TasselCoreFunctions.getHomeDirectoryPath(irodsImageJ);
+				path =TapasCoreFunctions.getHomeDirectoryPath(irodsImageJ);
 				log.info("Path till home: "+path);
 			}
 

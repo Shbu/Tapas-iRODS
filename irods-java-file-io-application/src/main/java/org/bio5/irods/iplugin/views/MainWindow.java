@@ -34,7 +34,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
-import org.bio5.irods.iplugin.bean.TasselCoreFunctions;
+import org.bio5.irods.iplugin.bean.TapasCoreFunctions;
 import org.bio5.irods.iplugin.connection.IrodsConnection;
 import org.bio5.irods.iplugin.fileoperations.FileOperations;
 import org.bio5.irods.iplugin.utilities.Constants;
@@ -88,9 +88,9 @@ public class MainWindow extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MainWindow(IPlugin irodsImagej) {
+	public MainWindow(IPlugin iPlugin) {
 		// super();
-		this.iplugin = irodsImagej;
+		this.iplugin = iPlugin;
 
 		mainWindowInit();
 
@@ -117,7 +117,7 @@ public class MainWindow extends JFrame {
 				KeyEvent.VK_F4, InputEvent.ALT_MASK));
 		mntmNewMenuItem_Exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.exit(0);
+				closeApplication(iplugin);
 			}
 		});
 		mnNewMenu_File.add(mntmNewMenuItem_Exit);
@@ -175,7 +175,8 @@ public class MainWindow extends JFrame {
 				getRootPane().addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent e) {
 						if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-							System.exit(0);
+							closeApplication(iplugin);
+
 						}
 					}
 				});
@@ -186,7 +187,7 @@ public class MainWindow extends JFrame {
 		button_Cancel.setToolTipText("Click to close application");
 		button_Cancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.exit(0);
+				closeApplication(iplugin);
 			}
 		});
 
@@ -222,8 +223,7 @@ public class MainWindow extends JFrame {
 		textField_ImageJCacheFolderPath
 				.setToolTipText("Enter ImageJ Cache folder path");
 		textField_ImageJCacheFolderPath.setColumns(10);
-		textField_ImageJCacheFolderPath.setText(irodsImagej
-				.getImageJCacheFolder());
+		textField_ImageJCacheFolderPath.setText(iPlugin.getImageJCacheFolder());
 
 		JLabel lblImagejCacheFolder = new JLabel("ImageJ Cache Folder:");
 		JButton btnChooseFolder = new JButton("Choose folder");
@@ -263,6 +263,8 @@ public class MainWindow extends JFrame {
 				Constants.PROPERTY_FILE_NAME, Constants.IMAGEJ_CACHE_FOLDER);
 		if (null != tapasProperties) {
 			setPropertyFileDataToLoginPanel(tapasProperties);
+		} else {
+			log.error("tapas property file is null");
 		}
 
 		comboBox_Zone.addActionListener(new ActionListener() {
@@ -664,7 +666,7 @@ public class MainWindow extends JFrame {
 
 	private void irodsFileFactoryCreation() {
 		try {
-			iRODSFileFactory = TasselCoreFunctions
+			iRODSFileFactory = TapasCoreFunctions
 					.getIrodsAccountFileFactory(iplugin);
 			iplugin.setiRODSFileFactory(iRODSFileFactory);
 		} catch (JargonException e) {
@@ -676,7 +678,7 @@ public class MainWindow extends JFrame {
 		Boolean isSet = false;
 
 		if (null != tapasProperties) {
-			log.info("Tapas Properties"
+			log.info("Tapas Properties: "
 					+ tapasProperties.getProperty("login.username"));
 			usernamePickedFromPropertyFiles = tapasProperties
 					.getProperty(Constants.PROPERTY_USER_NAME);
@@ -686,18 +688,36 @@ public class MainWindow extends JFrame {
 			zonePickedFromPropertyFiles = tapasProperties
 					.getProperty(Constants.PROPERTY_ZONE_NAME);
 			if (null != zonePickedFromPropertyFiles) {
-				comboBox_Zone.setModel(new DefaultComboBoxModel<String>(
-						new String[] { zonePickedFromPropertyFiles }));
-
+				String[] zoneNames = zonePickedFromPropertyFiles.split(",");
+				for (int j = 0; j < zoneNames.length; j++) {
+					/*
+					 * comboBox_Zone.setModel(new DefaultComboBoxModel<String>(
+					 * new String[] { zoneNames}));
+					 */
+					comboBox_Zone.addItem(zoneNames[j]);
+				}
 			}
 			hostPickedFromPropertyFiles = tapasProperties
 					.getProperty(Constants.PROPERTY_HOST_NAME);
 			if (null != hostPickedFromPropertyFiles) {
-				comboBox_Host.setModel(new DefaultComboBoxModel<String>(
-						new String[] { hostPickedFromPropertyFiles }));
+				/*
+				 * comboBox_Host.setModel(new DefaultComboBoxModel<String>( new
+				 * String[] { hostPickedFromPropertyFiles }));
+				 */
+				String[] hostNames = hostPickedFromPropertyFiles.split(",");
+				for (int i = 0; i < hostNames.length; i++) {
+					comboBox_Host.addItem(hostNames[i]);
+				}
 
 			}
 		}
 		return isSet;
+	}
+
+	private void closeApplication(IPlugin iplugin) {
+
+		System.exit(0);
+		TapasCoreFunctions.closeIRODSConnections(iplugin);
+
 	}
 }
