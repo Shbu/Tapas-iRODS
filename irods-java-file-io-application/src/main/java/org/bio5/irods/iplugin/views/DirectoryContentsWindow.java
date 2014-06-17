@@ -69,6 +69,7 @@ import org.irods.jargon.core.transfer.TransferControlBlock;
 
 public class DirectoryContentsWindow extends JPanel implements
 		TreeWillExpandListener {
+	
 
 	/**
 	 * 
