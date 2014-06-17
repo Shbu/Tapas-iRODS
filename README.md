@@ -7,7 +7,7 @@ Ultimate goal of the project is to pack entire source into a Jar, which when exe
 
 
 New Requirements - Received on 6/1/2014
--------------------------------------------
+--------------------------------------------
 
 1. Implement a technique to preserve user login details to help avoid retyping for same details in each login session. User should be able to customize this functionality and specify values pertaining to his own account. 
 2. After loggin in, user should be able to download multiple files depending on his selection.
