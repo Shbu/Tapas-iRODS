@@ -104,6 +104,9 @@ public class DirectoryContentsWindow extends JPanel implements
 	private String imageJCacheFolder;
 	private Long imageJCacheFolderSize;
 	private MainWindow mainWindowInstance;
+	private TreePath[] treePaths;
+	private JButton jButton_download;
+	private String multiSelected;
 
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(DirectoryContentsWindow.class
@@ -317,6 +320,28 @@ public class DirectoryContentsWindow extends JPanel implements
 			}
 		});
 
+		///////////////////////////////// Zhong Yang /////////////////////////////////////////
+		jButton_download = new JButton("Download files");
+		jButton_download.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				for (int i = 0; i < treePaths.length; i++) {
+					iPlugin.getJprogressbar().setValue(0);
+					multiSelected = IrodsUtilities
+							.getJtreeSelection(treePaths[i]);
+					getFile = new GetFileFromIrodsSwingWorker(iRODSFileFactory,
+							multiSelected, iPlugin, iPlugin.getJprogressbar());
+					getFile.execute();
+					/*
+					 * while (iPlugin.getFinishedFlag() != true) { try {
+					 * Thread.sleep(20); } catch (InterruptedException e1) {
+					 * e1.printStackTrace(); } }
+					 */
+				}
+				jButton_download.setEnabled(false);
+			}
+		});
+		//////////////////////////////////////////////////////////////////////////
+
 		jTextField_sourceFile.setEnabled(false);
 		JButton jButton_selectDestination = new JButton("Select Destination");
 		jButton_selectDestination.addActionListener(new ActionListener() {
@@ -335,7 +360,7 @@ public class DirectoryContentsWindow extends JPanel implements
 		});
 
 		jTextField_destinationPath.setEnabled(false);
-
+		jButton_download.setEnabled(false);
 		jButton_saveToIrodsServer.setEnabled(false);
 		jButton_saveToIrodsServer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -445,7 +470,8 @@ public class DirectoryContentsWindow extends JPanel implements
 																				.addComponent(
 																						jTextField_sourceFile)))
 												.addComponent(
-														jButton_saveToIrodsServer))
+														jButton_saveToIrodsServer)
+												.addComponent(jButton_download))
 								.addContainerGap()));
 		gl_panel.setVerticalGroup(gl_panel
 				.createParallelGroup(Alignment.LEADING)
@@ -474,6 +500,8 @@ public class DirectoryContentsWindow extends JPanel implements
 														jTextField_destinationPath))
 								.addGap(18)
 								.addComponent(jButton_saveToIrodsServer)
+								.addGap(18)
+								.addComponent(jButton_download)
 								.addContainerGap(220, Short.MAX_VALUE)));
 		panel.setLayout(gl_panel);
 
@@ -533,9 +561,44 @@ public class DirectoryContentsWindow extends JPanel implements
 				} else if (mouseEvent.getClickCount() == 1) {
 
 					/* Multiple files selection is still pending */
-					TreePath[] treePaths = userDirectoryTree
+					treePaths = userDirectoryTree
 							.getSelectionPaths();
-					if (null != treePaths) {
+//////////////////////////////////////Zhong Yang/////////////////////////////////////////
+					if (treePaths.length > 1) {
+						for (int i = 0; i < treePaths.length; i++) {
+							log.info("Single click Path" + i + ":"
+									+ treePaths[i]);
+						}
+						jButton_download.setEnabled(true);
+					} else {
+						/*selectedNodeInTreeForSingleClick = IrodsUtilities
+								.getJtreeSelectionForSingleClick(mouseEvent,
+										userDirectoryTree);*/
+						selectedNodeInTreeForSingleClick = IrodsUtilities
+								.getJtreeSelectionForSingleClick(iPlugin,
+										mouseEvent, userDirectoryTree);
+						if (null != selectedNodeInTreeForSingleClick) {
+							log.info("Single click path is not null: "
+									+ selectedNodeInTreeForSingleClick);
+							iPlugin.setSelectedNodeInTreeForSingleClick(selectedNodeInTreeForSingleClick);
+						}
+
+						if (iPlugin.getCurrentActiveTabUnderJTabbedPane() == Constants.JTABBEDPANE_SELECTED_TAB_FILE_INFORMATION) {
+							String selectedNodeInTreeForSingleClickToGetObjStat = IrodsUtilities
+									.getJtreeSelection(mouseEvent,
+											userDirectoryTree);
+							if (null != selectedNodeInTreeForSingleClickToGetObjStat) {
+								iPlugin.setObjSelectedUsingSingleClick(selectedNodeInTreeForSingleClickToGetObjStat);
+								log.info("ObjSelectedUsingSingleClick of irodsImageJ is set: "
+										+ selectedNodeInTreeForSingleClickToGetObjStat);
+								ObjectDetailsSwingWorker objectDetailsFromSwingWorker = new ObjectDetailsSwingWorker(
+										iPlugin);
+								objectDetailsFromSwingWorker.execute();
+							}
+						}
+					}
+/////////////////////////////////////////////////////////////////////////////
+					/*if (null != treePaths) {
 						for (int i = 0; i < treePaths.length; i++) {
 							log.info("Single click Path" + i + ":"
 									+ treePaths[i]);
@@ -543,18 +606,19 @@ public class DirectoryContentsWindow extends JPanel implements
 					}
 
 					selectedNodeInTreeForSingleClick = IrodsUtilities
-							.getJtreeSelection(mouseEvent,
-									userDirectoryTree);
+							.getJtreeSelection(mouseEvent, userDirectoryTree);
 					if (null != selectedNodeInTreeForSingleClick) {
-						log.info("Single click path is not null: "+selectedNodeInTreeForSingleClick);
+						log.info("Single click path is not null: "
+								+ selectedNodeInTreeForSingleClick);
 						iPlugin.setSelectedNodeInTreeForSingleClick(selectedNodeInTreeForSingleClick);
 					}
-					
+
 					selectedNodeInTreeForSingleClick = IrodsUtilities
 							.getJtreeSelectionForSingleClick(iPlugin,
 									mouseEvent, userDirectoryTree);
 					if (null != selectedNodeInTreeForSingleClick) {
-						log.info("Single click path is not null: "+selectedNodeInTreeForSingleClick);
+						log.info("Single click path is not null: "
+								+ selectedNodeInTreeForSingleClick);
 						iPlugin.setSelectedNodeInTreeForSingleClick(selectedNodeInTreeForSingleClick);
 					}
 
@@ -570,7 +634,7 @@ public class DirectoryContentsWindow extends JPanel implements
 									iPlugin);
 							objectDetailsFromSwingWorker.execute();
 						}
-					}
+					}*/
 				}
 			}
 		});

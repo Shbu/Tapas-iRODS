@@ -84,6 +84,16 @@ public final class IrodsUtilities {
 		}
 		return fullTreePath;
 	}
+	
+	public static String getJtreeSelection(TreePath treePaths) {
+		String fullTreePath = "";
+			Object treepath[] = treePaths.getPath();
+			for (int j = 0; j < treepath.length; j++) {
+				fullTreePath += IrodsUtilities.getPathSeperator()
+						+ treepath[j].toString();
+			}
+		return fullTreePath;
+	}
 
 	/**/
 	public static File createFileFromTreePath(TreePath treePath) {
