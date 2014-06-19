@@ -41,8 +41,8 @@ public class Constants {
 	public static boolean COMPUTE_AND_VERIFY_CHECKSUM_AFTER_TRANSFER_OPTION = false;
 	public static int MAX_THREADS = 10;
 	public static boolean USE_PARALLEL_TRANSFERS_OPTION = true;
-	
-	/*Error Strings*/
+
+	/* Error Strings */
 	public static String ERROR_STRING_CONNECTION_REFUSED = "Connection refused";
 	public static String ERROR_STRING_UNKNOWN_HOST = "UnknownHostException";
 
@@ -51,4 +51,9 @@ public class Constants {
 	public static final String PROPERTY_USER_NAME = "login.username";
 	public static final String PROPERTY_ZONE_NAME = "login.zone";
 	public static final String PROPERTY_HOST_NAME = "login.host";
+
+	/* OBJstat Details */
+	public static final String OBJECT_TYPE_COLLECTION = "COLLECTION";
+	public static final String OBJECT_TYPE_DATA_OBJECT = "DATA_OBJECT";
+
 }

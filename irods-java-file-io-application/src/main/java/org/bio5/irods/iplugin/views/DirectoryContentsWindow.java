@@ -23,7 +23,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;	
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -69,7 +69,6 @@ import org.irods.jargon.core.transfer.TransferControlBlock;
 
 public class DirectoryContentsWindow extends JPanel implements
 		TreeWillExpandListener {
-	
 
 	/**
 	 * 
@@ -181,6 +180,7 @@ public class DirectoryContentsWindow extends JPanel implements
 		iPlugin.setScrollPane(scrollPane);
 		iPlugin.setViewport(viewport);
 
+		/* Constructing TextFields for sourceFile and DestinationFile */
 		jTextField_sourceFile = new JLabel("Local file");
 		jTextField_destinationPath = new JLabel("Destination");
 		jButton_saveToIrodsServer = new JButton("Save to iRODS Server");
@@ -543,9 +543,18 @@ public class DirectoryContentsWindow extends JPanel implements
 					}
 
 					selectedNodeInTreeForSingleClick = IrodsUtilities
-							.getJtreeSelectionForSingleClick(mouseEvent,
+							.getJtreeSelection(mouseEvent,
 									userDirectoryTree);
 					if (null != selectedNodeInTreeForSingleClick) {
+						log.info("Single click path is not null: "+selectedNodeInTreeForSingleClick);
+						iPlugin.setSelectedNodeInTreeForSingleClick(selectedNodeInTreeForSingleClick);
+					}
+					
+					selectedNodeInTreeForSingleClick = IrodsUtilities
+							.getJtreeSelectionForSingleClick(iPlugin,
+									mouseEvent, userDirectoryTree);
+					if (null != selectedNodeInTreeForSingleClick) {
+						log.info("Single click path is not null: "+selectedNodeInTreeForSingleClick);
 						iPlugin.setSelectedNodeInTreeForSingleClick(selectedNodeInTreeForSingleClick);
 					}
 
@@ -766,19 +775,22 @@ public class DirectoryContentsWindow extends JPanel implements
 				elements, iPlugin);
 		try {
 			retrieveInternalNodesSwingWorker.doInBackground();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception exception) {
+			log.error("Error while retrieving internal nodes: "
+					+ exception.getMessage());
 		}
-		/*
-		 * Add nodes only if size of extracted list is more than Zero. This will
-		 * prevent empty nodes from expanding.
-		 */
-		if (iPlugin.getChildNodesListAfterLazyLoading().size() > 0) {
-			for (int i = 0; i < iPlugin.getChildNodesListAfterLazyLoading()
-					.size(); i++) {
-				treeModel.insertNodeInto(iPlugin
-						.getChildNodesListAfterLazyLoading().get(i), node, node
-						.getChildCount());
+		if (null != iPlugin.getChildNodesListAfterLazyLoading()) {
+			/*
+			 * Add nodes only if size of extracted list is more than Zero. This
+			 * will prevent empty nodes from expanding.
+			 */
+			if (iPlugin.getChildNodesListAfterLazyLoading().size() > 0) {
+				for (int i = 0; i < iPlugin.getChildNodesListAfterLazyLoading()
+						.size(); i++) {
+					treeModel.insertNodeInto(iPlugin
+							.getChildNodesListAfterLazyLoading().get(i), node,
+							node.getChildCount());
+				}
 			}
 		}
 	}

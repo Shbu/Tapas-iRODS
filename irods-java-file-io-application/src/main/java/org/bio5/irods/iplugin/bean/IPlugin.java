@@ -83,10 +83,9 @@ public class IPlugin implements Serializable {
 	private DefaultMutableTreeNode rootTreeNodeForDirectoryContents = null;
 
 	private boolean errorWhileUsingGetOperation = false;
-	
-	private String destinationPath =null;
-	
-	
+
+	private String destinationPath = null;
+
 	public String getDestinationPath() {
 		return destinationPath;
 	}
@@ -116,6 +115,8 @@ public class IPlugin implements Serializable {
 
 	private ObjStat objStatForGivenAbsolutePath;
 
+	private ObjStat objStatLiteForGivenAbsolutePath;
+
 	private HashMap<String, Object> saveDetails;
 
 	private boolean isImageOpened = false;
@@ -123,9 +124,17 @@ public class IPlugin implements Serializable {
 	private ImagePlus imagePlus;
 
 	boolean fileExistFlag = false;
-	
-	private String pathSeperator=null;
-	
+
+	private String pathSeperator = null;
+
+	public ObjStat getObjStatLiteForGivenAbsolutePath() {
+		return objStatLiteForGivenAbsolutePath;
+	}
+
+	public void setObjStatLiteForGivenAbsolutePath(
+			ObjStat objStatLiteForGivenAbsolutePath) {
+		this.objStatLiteForGivenAbsolutePath = objStatLiteForGivenAbsolutePath;
+	}
 
 	public String getPathSeperator() {
 		return pathSeperator;

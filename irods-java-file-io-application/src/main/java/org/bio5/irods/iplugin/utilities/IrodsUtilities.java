@@ -21,10 +21,12 @@ import javax.swing.tree.TreePath;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.FileConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.bio5.irods.iplugin.bean.IPlugin;
+import org.bio5.irods.iplugin.swingworkers.ObjectDetailsLite;
+import org.irods.jargon.core.pub.domain.ObjStat;
 
 public final class IrodsUtilities {
 
@@ -59,9 +61,10 @@ public final class IrodsUtilities {
 		}
 	}
 
-	/* Pull pathSeperator of the Operating System */
+	/* Returns pathSeperator of the Operating System */
 	public static String getPathSeperator() {
-		String pathSeperator = Constants.DEFAULT_PATH_SEPERATOR;
+		String pathSeperator = null;
+		pathSeperator = Constants.DEFAULT_PATH_SEPERATOR;
 		pathSeperator = System.getProperty("file.separator");
 		return pathSeperator;
 	}
@@ -82,6 +85,7 @@ public final class IrodsUtilities {
 		return fullTreePath;
 	}
 
+	/**/
 	public static File createFileFromTreePath(TreePath treePath) {
 		StringBuilder sb = new StringBuilder();
 		Object[] nodes = treePath.getPath();
@@ -91,6 +95,7 @@ public final class IrodsUtilities {
 		return new File(sb.toString());
 	}
 
+	/* Generate FilePath from given treePath */
 	public static String createFilePathFromTreePath(TreePath treePath) {
 		StringBuilder sb = new StringBuilder();
 		Object[] nodes = treePath.getPath();
@@ -100,16 +105,36 @@ public final class IrodsUtilities {
 		return sb.toString();
 	}
 
-	public static String getJtreeSelectionForSingleClick(MouseEvent me,
-			JTree userDirectoryTree) {
+	/* Returns JTree selection depending on the mouseEvent */
+	public static String getJtreeSelectionForSingleClick(IPlugin iplugin,
+			MouseEvent me, JTree userDirectoryTree) {
 		String fullTreePath = "";
 		TreePath tp = userDirectoryTree
 				.getPathForLocation(me.getX(), me.getY());
 		if (tp != null) {
 			DefaultMutableTreeNode lastPathComponentNode = (DefaultMutableTreeNode) tp
 					.getLastPathComponent();
-			if (lastPathComponentNode.isLeaf()) {
-				tp = tp.getParentPath();
+
+			/*
+			 * Get objstat details for each file and compare if it is a
+			 * collection or object
+			 */
+			ObjStat objStatValueOfObject = null;
+			if (null != iplugin) {
+				ObjectDetailsLite obj = new ObjectDetailsLite(iplugin);
+				try {
+					objStatValueOfObject = obj.getObjStatValueOfObj();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					log.error("Error while getting ObjStat values of object");
+				}
+			}
+			if (null != objStatValueOfObject) {
+				if (/*
+					 * lastPathComponentNode.isLeaf() &&
+					 */objStatValueOfObject.getObjectType().toString() == Constants.OBJECT_TYPE_DATA_OBJECT) {
+					tp = tp.getParentPath();
+				}
 			}
 			Object treepath[] = tp.getPath();
 			for (int i = 0; i < treepath.length; i++) {
@@ -120,6 +145,7 @@ public final class IrodsUtilities {
 		return fullTreePath;
 	}
 
+	/* Creates a directory at specific path if doesn't exist */
 	public static boolean createDirectoryIfDoesntExist(String directoryPath) {
 		boolean isDirectoryCreated = false;
 		try {
@@ -141,6 +167,10 @@ public final class IrodsUtilities {
 		return isDirectoryCreated;
 	}
 
+	/*
+	 * Get file name from given directory path. This returns the subString after
+	 * last slash in absolute path.
+	 */
 	public static String getFileNameFromDirectoryPath(String directoryPath) {
 		String fileName = null;
 		try {
@@ -159,6 +189,7 @@ public final class IrodsUtilities {
 		return fileName;
 	}
 
+	/* Returns user home directory folder path */
 	public static String getUserHomeFolderFromSystemProperty() {
 		String userHomeFolderFromSystemProperty = null;
 		userHomeFolderFromSystemProperty = System.getProperty("user.home");
@@ -214,13 +245,19 @@ public final class IrodsUtilities {
 			try {
 				propFileURL = IrodsUtilities.class.getClassLoader()
 						.getResource(propertyFileName);
-				propertyConfiguration = new PropertiesConfiguration(propFileURL);
+				if (null != propFileURL) {
+					propertyConfiguration = new PropertiesConfiguration(
+							propFileURL);
+				} else {
+					log.error("propFileURL is null");
+				}
 
 			} catch (ConfigurationException configurationException) {
 				log.error("Exception while loading configuration of property files"
 						+ configurationException.getMessage());
 			}
 
+			/* Getting properties file from ConfigurationProperties */
 			if (null != propertyConfiguration) {
 				log.info("propertyConfiguration is not null");
 				tapasConfigurationProperties = ConfigurationConverter
@@ -234,7 +271,7 @@ public final class IrodsUtilities {
 			try {
 				String filePath = Constants.IMAGEJ_CACHE_FOLDER
 						+ IrodsUtilities.getPathSeperator()
-						+ "config.properties";
+						+ Constants.PROPERTY_FILE_NAME;
 				if (null != filePath && "" != filePath) {
 					outputStreamForPropertiesFile = new FileOutputStream(
 							filePath);
@@ -246,12 +283,14 @@ public final class IrodsUtilities {
 
 			/* Storing properties file to local disk */
 			try {
-				if (null != outputStreamForPropertiesFile) {
+				if (null != outputStreamForPropertiesFile
+						&& null != tapasConfigurationProperties) {
+					log.info("Copying property file to local cache folder");
 					tapasConfigurationProperties.store(
 							outputStreamForPropertiesFile,
-							"Tapas proeprties file");
+							"Tapas properties file - V1.1");
 				} else {
-					log.error("outputStreamForPropertiesFile is null");
+					log.error("outputStreamForPropertiesFile OR tapasConfigurationProperties is null");
 				}
 			} catch (IOException ioException) {
 				log.error("IOException while storing properties file to local disk"
@@ -261,6 +300,7 @@ public final class IrodsUtilities {
 		return tapasConfigurationProperties;
 	}
 
+	/* Copies a given file from one location to other */
 	public static void copyFileToNewPhysicalLocation(File sourceFile,
 			String destination) {
 		File destinationFile = new File(destination);
@@ -284,11 +324,11 @@ public final class IrodsUtilities {
 				Reader reader = new FileReader(propertyFileName);
 				tapasLocalConfigurationProperties = new Properties();
 				tapasLocalConfigurationProperties.load(reader);
-			} catch (FileNotFoundException e) {
-				log.error("Error while reading localPropertyFile "
-						+ e.getMessage());
+			} catch (FileNotFoundException fileNotFoundException) {
+				log.error("fileNotFoundException Error while reading localPropertyFile "
+						+ fileNotFoundException.getMessage());
 			} catch (IOException ioException) {
-				log.error("Error while loading local property file"
+				log.error("ioException Error while loading local property file"
 						+ ioException.getMessage());
 			}
 		}
@@ -296,8 +336,8 @@ public final class IrodsUtilities {
 	}
 
 	/*
-	 * Replaces more than one slash with single slash in a given string -
-	 * Applicable for both FORWARD SLASH and BACKWARD SLASH
+	 * Replaces multiple slashes with single slash in a given string- Applicable
+	 * for both FORWARD SLASH and BACKWARD SLASH
 	 */
 
 	public static String refactorSlashInFilePaths(String filepath) {
