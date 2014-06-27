@@ -61,6 +61,17 @@ public final class IrodsUtilities {
 		}
 	}
 
+	/* Zhong */
+	public static String getJtreeSelection(TreePath treePaths) {
+		String fullTreePath = "";
+		Object treepath[] = treePaths.getPath();
+		for (int j = 0; j < treepath.length; j++) {
+			fullTreePath += IrodsUtilities.getPathSeperator()
+					+ treepath[j].toString();
+		}
+		return fullTreePath;
+	}
+
 	/* Returns pathSeperator of the Operating System */
 	public static String getPathSeperator() {
 		String pathSeperator = null;
@@ -82,16 +93,6 @@ public final class IrodsUtilities {
 						+ treepath[i].toString();
 			}
 		}
-		return fullTreePath;
-	}
-	
-	public static String getJtreeSelection(TreePath treePaths) {
-		String fullTreePath = "";
-			Object treepath[] = treePaths.getPath();
-			for (int j = 0; j < treepath.length; j++) {
-				fullTreePath += IrodsUtilities.getPathSeperator()
-						+ treepath[j].toString();
-			}
 		return fullTreePath;
 	}
 
