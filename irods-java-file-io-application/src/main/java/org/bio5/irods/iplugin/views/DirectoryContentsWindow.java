@@ -543,19 +543,21 @@ public class DirectoryContentsWindow extends JPanel implements
 					}
 
 					selectedNodeInTreeForSingleClick = IrodsUtilities
-							.getJtreeSelection(mouseEvent,
-									userDirectoryTree);
+							.getJtreeSelection(mouseEvent, userDirectoryTree);
 					if (null != selectedNodeInTreeForSingleClick) {
-						log.info("Single click path is not null: "+selectedNodeInTreeForSingleClick);
+						log.info("Single click path is not null: "
+								+ selectedNodeInTreeForSingleClick);
 						iPlugin.setSelectedNodeInTreeForSingleClick(selectedNodeInTreeForSingleClick);
 					}
-					
+
 					selectedNodeInTreeForSingleClick = IrodsUtilities
 							.getJtreeSelectionForSingleClick(iPlugin,
 									mouseEvent, userDirectoryTree);
 					if (null != selectedNodeInTreeForSingleClick) {
-						log.info("Single click path is not null: "+selectedNodeInTreeForSingleClick);
+						log.info("Single click path is not null: "
+								+ selectedNodeInTreeForSingleClick);
 						iPlugin.setSelectedNodeInTreeForSingleClick(selectedNodeInTreeForSingleClick);
+						iPlugin.setSingleClickPathOnlyTillParentFolderWithSizeCheck(selectedNodeInTreeForSingleClick);
 					}
 
 					if (iPlugin.getCurrentActiveTabUnderJTabbedPane() == Constants.JTABBEDPANE_SELECTED_TAB_FILE_INFORMATION) {
@@ -771,10 +773,16 @@ public class DirectoryContentsWindow extends JPanel implements
 		Object[] elements = tp.getPath();/* edit path */
 		// String pathOfInternalNode=builder.toString();
 
+		/*
+		 * send first parameter as ""(not null) if your elements parameter is
+		 * working fine - pick either one of the pararmeters to set path
+		 */
 		RetrieveInternalNodesSwingWorker retrieveInternalNodesSwingWorker = new RetrieveInternalNodesSwingWorker(
-				elements, iPlugin);
+				"", elements, iPlugin);
 		try {
-			retrieveInternalNodesSwingWorker.doInBackground();
+			if (null != retrieveInternalNodesSwingWorker) {
+				retrieveInternalNodesSwingWorker.doInBackground();
+			}
 		} catch (Exception exception) {
 			log.error("Error while retrieving internal nodes: "
 					+ exception.getMessage());

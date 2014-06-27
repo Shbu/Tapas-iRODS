@@ -127,6 +127,27 @@ public class IPlugin implements Serializable {
 
 	private String pathSeperator = null;
 
+	private String singleClickPathOnlyTillParentFolderWithSizeCheck = null;
+
+	private boolean emptyFolder = false;
+
+	public boolean isEmptyFolder() {
+		return emptyFolder;
+	}
+
+	public void setEmptyFolder(boolean emptyFolder) {
+		this.emptyFolder = emptyFolder;
+	}
+
+	public String getSingleClickPathOnlyTillParentFolderWithSizeCheck() {
+		return singleClickPathOnlyTillParentFolderWithSizeCheck;
+	}
+
+	public void setSingleClickPathOnlyTillParentFolderWithSizeCheck(
+			String singleClickPathOnlyTillParentFolderWithSizeCheck) {
+		this.singleClickPathOnlyTillParentFolderWithSizeCheck = singleClickPathOnlyTillParentFolderWithSizeCheck;
+	}
+
 	public ObjStat getObjStatLiteForGivenAbsolutePath() {
 		return objStatLiteForGivenAbsolutePath;
 	}

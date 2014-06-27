@@ -135,6 +135,14 @@ public final class IrodsUtilities {
 					 */objStatValueOfObject.getObjectType().toString() == Constants.OBJECT_TYPE_DATA_OBJECT) {
 					tp = tp.getParentPath();
 				}
+				log.info("object size: " + objStatValueOfObject.getObjSize());
+				if (objStatValueOfObject.getObjSize() == 0) {
+					log.info("folder size is 0");
+					iplugin.setEmptyFolder(true);
+				} else {
+					log.info("folder size is not 0");
+					iplugin.setEmptyFolder(false);
+				}
 			}
 			Object treepath[] = tp.getPath();
 			for (int i = 0; i < treepath.length; i++) {

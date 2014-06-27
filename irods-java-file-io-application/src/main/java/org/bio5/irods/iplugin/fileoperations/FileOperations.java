@@ -92,8 +92,9 @@ public class FileOperations {
 			collectionsUnderGivenAbsolutePath = retrieveCollectionsUnderGivenPath(
 					iRodsFile, iPlugin);
 		}
-		iPlugin.setiRodsFile(iRodsFile);
-
+		if (null!=iRodsFile) {
+			iPlugin.setiRodsFile(iRodsFile);
+		}
 		return collectionsUnderGivenAbsolutePath;
 	}
 

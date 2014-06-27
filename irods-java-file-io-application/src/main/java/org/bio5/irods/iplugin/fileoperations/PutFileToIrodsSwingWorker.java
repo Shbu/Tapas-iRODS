@@ -129,76 +129,133 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	private void reloadChildNodeAfterUploading() {
 		if (null != iPlugin.getUserDirectoryTree() && null != sourceLocalfile) {
 
-			DefaultMutableTreeNode parentNode = null;
+			DefaultMutableTreeNode node = null;
 			log.info("inside reloadChildNodeAfterUploading");
+
+			TreePath treePathToRetrieveInternalPaths = null;
+			treePathToRetrieveInternalPaths = iPlugin.getUserDirectoryTree()
+					.getSelectionPath();
+
+			/*
+			 * Implementation is still pending - if selected node is not leaf
+			 * node, then parent node is taken while retrieveing files. FIx this
+			 * immediately or test to check the funcitonality
+			 */
 
 			/*
 			 * Destination selection - Fetching parent path if leaf node is
 			 * selected
 			 */
-			parentNode = (DefaultMutableTreeNode) iPlugin
-					.getUserDirectoryTree().getLastSelectedPathComponent();
-			
-			TreePath tp = iPlugin
-					.getUserDirectoryTree().getSelectionPath();
-			log.info("TreePath: "+tp.toString());
-			
-			/*Pending*/
-			iPlugin.getDirectoryContentsPane().getTreeModel().reload(parentNode);
-			
-			/*RetrieveInternalNodesSwingWorker retrieve = new RetrieveInternalNodesSwingWorker(tp.getParentPath().getPath(), iPlugin);
-		
-			try {
-				retrieve.doInBackground();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}*/
-			
-			/*if (null != iPlugin.getDestinationPath()) {
-				String fileName = new File(iPlugin.getDestinationPath())
-						.getName();
-				parentNode = new DefaultMutableTreeNode(fileName);
+			node = (DefaultMutableTreeNode) iPlugin.getUserDirectoryTree()
+					.getLastSelectedPathComponent();
+
+			Object[] treePathForInternalNodes = null;
+			treePathForInternalNodes = treePathToRetrieveInternalPaths
+					.getPath();
+			if (null != node) {
+
+				/* Reset node to parent node if leaf node is selected */
+				log.info("folder size before checking node:"
+						+ iPlugin.isEmptyFolder());
+				if (node.isLeaf() && !iPlugin.isEmptyFolder()) {
+					node = (DefaultMutableTreeNode) node.getParent();
+					treePathForInternalNodes = treePathToRetrieveInternalPaths
+							.getParentPath().getPath();
+				}
+				node.removeAllChildren();
+				iPlugin.getTreeModel().nodeStructureChanged(node);
 			}
-			if (null != parentNode) {
-				
-				iPlugin.getDirectoryContentsPane()
-				.addObject(parentNode,
-						sourceLocalfile.getName(), true, tp);
-				
-				
-				if (parentNode.isLeaf()) {
 
-					if (!iPlugin.isFileExistFlag()) {
-						try {
-							log.info("last selected path component:"
-									+ parentNode);
-							parentNode = (DefaultMutableTreeNode) parentNode
-									.getParent();
-							log.info("Parent node of last selected component: "
-									+ parentNode);
-							iPlugin.getDirectoryContentsPane()
-									.addObject(parentNode,
-											sourceLocalfile.getName(), true);
-						} catch (Exception exception) {
-							log.error("Error:  " + exception.getMessage());
-							exception.printStackTrace();
-						}
-					} else {
-						log.info("File already exists in that directory, so not showing in tree path!");
+			RetrieveInternalNodesSwingWorker retrieve = null;
+			String singleClickPathOnlyTillParentFolderWithSizeCheck = iPlugin
+					.getSingleClickPathOnlyTillParentFolderWithSizeCheck();
+			if (null != treePathForInternalNodes
+					&& null != singleClickPathOnlyTillParentFolderWithSizeCheck) {
+				log.info("TreePath: " + treePathForInternalNodes.toString());
+				retrieve = new RetrieveInternalNodesSwingWorker(
+						singleClickPathOnlyTillParentFolderWithSizeCheck, null,
+						iPlugin);
+				try {
+					if (null != retrieve) {
+						retrieve.execute();
 					}
-				} else {
-					log.info("parentNode is a directory");
+				} catch (Exception exception) {
+					log.error("Error while retrieving internal files: "
+							+ exception.getMessage());
+				}
+			} else {
+				log.error("treePathForInternalNodes is null");
+			}
 
-					if (!iPlugin.isFileExistFlag()) {
-						iPlugin.getDirectoryContentsPane().addObject(
-								parentNode, sourceLocalfile.getName(), true);
-					} else {
-						log.info("File already exists in that directory, so not showing in tree path!");
+			if (null != iPlugin.getChildNodesListAfterLazyLoading()) {
+				/*
+				 * Add nodes only if size of extracted list is more than Zero.
+				 * This will prevent empty nodes from expanding.
+				 */
+				if (iPlugin.getChildNodesListAfterLazyLoading().size() > 0) {
+					for (int i = 0; i < iPlugin
+							.getChildNodesListAfterLazyLoading().size(); i++) {
+						log.info("node name before inserting:"
+								+ iPlugin.getChildNodesListAfterLazyLoading()
+										.get(i));
+						log.info("child count: " + node.getChildCount());
+						try {
+							iPlugin.getTreeModel()
+									.insertNodeInto(
+											iPlugin.getChildNodesListAfterLazyLoading()
+													.get(i), node,
+											node.getChildCount());
+						} catch (Exception e) {
+							log.error("Error while adding node elements to path: "
+									+ e.getMessage());
+						}
 					}
 				}
 			} else {
-				log.error("Parent node is null!");
-			}*/
+				log.error("iPlugin.getChildNodesListAfterLazyLoading() is null");
+			}
+
+			/* Pending */
+			// iPlugin.getDirectoryContentsPane().getTreeModel().reload(parentNode);
+
+			/*
+			 * RetrieveInternalNodesSwingWorker retrieve = new
+			 * RetrieveInternalNodesSwingWorker(tp.getParentPath().getPath(),
+			 * iPlugin);
+			 * 
+			 * try { retrieve.doInBackground(); } catch (Exception e) {
+			 * e.printStackTrace(); }
+			 */
+
+			/*
+			 * if (null != iPlugin.getDestinationPath()) { String fileName = new
+			 * File(iPlugin.getDestinationPath()) .getName(); parentNode = new
+			 * DefaultMutableTreeNode(fileName); } if (null != parentNode) {
+			 * 
+			 * iPlugin.getDirectoryContentsPane() .addObject(parentNode,
+			 * sourceLocalfile.getName(), true, tp);
+			 * 
+			 * 
+			 * if (parentNode.isLeaf()) {
+			 * 
+			 * if (!iPlugin.isFileExistFlag()) { try {
+			 * log.info("last selected path component:" + parentNode);
+			 * parentNode = (DefaultMutableTreeNode) parentNode .getParent();
+			 * log.info("Parent node of last selected component: " +
+			 * parentNode); iPlugin.getDirectoryContentsPane()
+			 * .addObject(parentNode, sourceLocalfile.getName(), true); } catch
+			 * (Exception exception) { log.error("Error:  " +
+			 * exception.getMessage()); exception.printStackTrace(); } } else {
+			 * log.info(
+			 * "File already exists in that directory, so not showing in tree path!"
+			 * ); } } else { log.info("parentNode is a directory");
+			 * 
+			 * if (!iPlugin.isFileExistFlag()) {
+			 * iPlugin.getDirectoryContentsPane().addObject( parentNode,
+			 * sourceLocalfile.getName(), true); } else { log.info(
+			 * "File already exists in that directory, so not showing in tree path!"
+			 * ); } } } else { log.error("Parent node is null!"); }
+			 */
 
 		} else {
 			log.error("1. UserDirectoryTree value is null in irodsImageJ bean or 2.sourceLocalFile is empty");

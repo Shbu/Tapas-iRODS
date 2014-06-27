@@ -20,14 +20,17 @@ public class RetrieveInternalNodesSwingWorker extends
 		SwingWorker<Void, Integer> {
 
 	private Object[] pathForInternalFiles;
+	private String singleClickPathForInternalFiles;
 	private IPlugin irodsImageJ;
-	private static IRODSFile iRodsFile;
+	private static IRODSFile iRodsFile = null;
 	List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = null;
 
-	public RetrieveInternalNodesSwingWorker(Object[] elements,
-			IPlugin irodsImageJ) {
+	public RetrieveInternalNodesSwingWorker(
+			String singleClickPathForInternalFilesWithSizeCheck,
+			Object[] pathForInternalFilesAsElements, IPlugin irodsImageJ) {
 		super();
-		this.pathForInternalFiles = elements;
+		this.singleClickPathForInternalFiles = singleClickPathForInternalFilesWithSizeCheck;
+		this.pathForInternalFiles = pathForInternalFilesAsElements;
 		this.irodsImageJ = irodsImageJ;
 	}
 
@@ -46,44 +49,95 @@ public class RetrieveInternalNodesSwingWorker extends
 			log.info("Threads upgraded to : " + jp.getMaxParallelThreads());
 			IRODSFileFactory iRODSFileFactory = irodsImageJ
 					.getiRODSFileFactory();
-			String finalpath = irodsImageJ.getPathTillHome();
-			String loopPath="";
-			log.info("ChildPath before adding path seperator" +finalpath);
+			String finalpathToGetIrodsFileInstance = irodsImageJ
+					.getPathTillHome();
+			String loopPath = "";
+			log.info("ChildPath before adding path seperator"
+					+ finalpathToGetIrodsFileInstance);
 
-			String path = null;
-			if(irodsImageJ.isHomeDirectoryTheRootNode()){
-				path =TapasCoreFunctions.getRootDirectoryPath(irodsImageJ);
-				log.info("Path till root: "+path);
+			String pathToPrefix = null;
+			if (irodsImageJ.isHomeDirectoryTheRootNode()) {
+				pathToPrefix = TapasCoreFunctions
+						.getRootDirectoryPath(irodsImageJ);
+				log.info("Path till root: " + pathToPrefix);
 			}
-			if(!irodsImageJ.isHomeDirectoryTheRootNode()){
-				path =TapasCoreFunctions.getHomeDirectoryPath(irodsImageJ);
-				log.info("Path till home: "+path);
+			if (!irodsImageJ.isHomeDirectoryTheRootNode()) {
+				pathToPrefix = TapasCoreFunctions
+						.getHomeDirectoryPath(irodsImageJ);
+				log.info("Path till home: " + pathToPrefix);
+			}
+			loopPath = singleClickPathForInternalFiles;
+			log.info("looppath after adding singleClickpath:" + loopPath);
+
+			if (null == loopPath || "" == loopPath) {
+				if (null != pathForInternalFiles) {
+					log.info("pathForInternalFiles length"
+							+ pathForInternalFiles.length);
+
+					for (int i = 0; i < pathForInternalFiles.length; i++) {
+						log.info("pathForInternalFiles files: "
+								+ pathForInternalFiles[i]);
+						loopPath += IrodsUtilities.getPathSeperator()
+								+ pathForInternalFiles[i].toString();
+					}
+				} else {
+					log.error("pathForInternalFiles is null");
+				}
+				log.info("loop Path after adding pathForInternalFiles: "
+						+ loopPath);
+			} else {
+				log.error("loopPath is either null or empty");
 			}
 
-			/*Problem with finalPath - Pending*/
-			for (int i = 0; i < pathForInternalFiles.length; i++) {
-				loopPath += IrodsUtilities.getPathSeperator()
-						+ pathForInternalFiles[i].toString();
-			}
-			log.info("loop Path: " +loopPath);
-			log.info("Final Path: " +path+loopPath);
-			log.info("ChildPath" + finalpath);
-			finalpath=path+loopPath;
+			log.info("pathToPrefix: " + pathToPrefix);
 
-			iRodsFile = iRODSFileFactory.instanceIRODSFile(finalpath);
+			finalpathToGetIrodsFileInstance = pathToPrefix + loopPath;
+			log.info("finalpath before getting irodsFile instance to pull files: "
+					+ finalpathToGetIrodsFileInstance);
+
+			if (null != iRODSFileFactory
+					&& null != finalpathToGetIrodsFileInstance
+					&& "" != finalpathToGetIrodsFileInstance) {
+				iRodsFile = iRODSFileFactory
+						.instanceIRODSFile(finalpathToGetIrodsFileInstance);
+			}
 			collectionsUnderGivenAbsolutePath = FileOperations
 					.retrieveCollectionsUnderGivenPath(iRodsFile, irodsImageJ);
 
 		}
-		irodsImageJ.setiRodsFile(iRodsFile);
-		done();
+		if (null != iRodsFile) {
+			irodsImageJ.setiRodsFile(iRodsFile);
+		}
+		parseAndSetChildNodesToIplugin();
 		return null;
 	}
 
 	@Override
 	public void done() {
-		List<DefaultMutableTreeNode> childNodesListAfterLazyLoading = parseDirectoryContentsUsingList(
-				collectionsUnderGivenAbsolutePath, new DefaultMutableTreeNode());
+
+	}
+
+	/*
+	 * Change done() to something else - to some other method and wipe code in
+	 * done() - it should be empty. Next call execute in invoking function and
+	 * not doInbackground() - pending.
+	 */
+	/**
+	 * 
+	 */
+	public void parseAndSetChildNodesToIplugin() {
+		List<DefaultMutableTreeNode> childNodesListAfterLazyLoading = null;
+		if (null != collectionsUnderGivenAbsolutePath) {
+			childNodesListAfterLazyLoading = parseDirectoryContentsUsingList(collectionsUnderGivenAbsolutePath);
+		} else {
+			log.error("collectionsUnderGivenAbsolutePath is null");
+		}
+		if (null != irodsImageJ.getChildNodesListAfterLazyLoading()) {
+			/* Clearing nodes before loading new nodes */
+			irodsImageJ.getChildNodesListAfterLazyLoading().clear();
+		} else {
+			log.error("irodsImageJ.getChildNodesListAfterLazyLoading() is null");
+		}
 		if (null != childNodesListAfterLazyLoading) {
 			if (childNodesListAfterLazyLoading.size() > 0) {
 				irodsImageJ
@@ -98,58 +152,49 @@ public class RetrieveInternalNodesSwingWorker extends
 						+ irodsImageJ.getChildNodesListAfterLazyLoading()
 								.size());
 			}
+		} else {
+			log.error("childNodesListAfterLazyLoading is null");
 		}
 	}
 
+	/**
+	 * @param listOfCollectionsUnderGivenAbsolutePath
+	 * @return
+	 */
 	private List<DefaultMutableTreeNode> parseDirectoryContentsUsingList(
-			List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath,
-			DefaultMutableTreeNode node) {
+			List<CollectionAndDataObjectListingEntry> listOfCollectionsUnderGivenAbsolutePath) {
 		List<DefaultMutableTreeNode> listOfNodes = new ArrayList<DefaultMutableTreeNode>();
-		CollectionAndDataObjectListingEntry fileUnderCollectionAndDataObjectListingEntry = null;
+		CollectionAndDataObjectListingEntry collectionAndDataObjectListingEntryForInternalNode = null;
 		for (int i = 0; i < listOfCollectionsUnderGivenAbsolutePath.size(); i++) {
-			fileUnderCollectionAndDataObjectListingEntry = listOfCollectionsUnderGivenAbsolutePath
+			collectionAndDataObjectListingEntryForInternalNode = listOfCollectionsUnderGivenAbsolutePath
 					.get(i);
-
-			if (!fileUnderCollectionAndDataObjectListingEntry.isCollection()) {
-				// System.out.println("File name" +irodsAccountFile.getName()
-				// +":" +irodsAccountFile.getAbsolutePath());
+			if (!collectionAndDataObjectListingEntryForInternalNode
+					.isCollection()) {
 				log.info("File name:"
-						+ fileUnderCollectionAndDataObjectListingEntry
+						+ collectionAndDataObjectListingEntryForInternalNode
 								.getNodeLabelDisplayValue()
 						+ ":"
-						+ fileUnderCollectionAndDataObjectListingEntry
+						+ collectionAndDataObjectListingEntryForInternalNode
 								.getFormattedAbsolutePath());
 				DefaultMutableTreeNode child = new DefaultMutableTreeNode(
-						fileUnderCollectionAndDataObjectListingEntry
+						collectionAndDataObjectListingEntryForInternalNode
 								.getNodeLabelDisplayValue(),
 						false);
 				listOfNodes.add(child);
 			}
 
-			if (fileUnderCollectionAndDataObjectListingEntry.isCollection()) {
-				// System.out.println("Direc name" +
-				// irodsAccountFile.getName());
+			if (collectionAndDataObjectListingEntryForInternalNode
+					.isCollection()) {
 				log.info("Direc name:"
-						+ fileUnderCollectionAndDataObjectListingEntry
+						+ collectionAndDataObjectListingEntryForInternalNode
 								.getNodeLabelDisplayValue());
 				DefaultMutableTreeNode child = new DefaultMutableTreeNode(
-						fileUnderCollectionAndDataObjectListingEntry
+						collectionAndDataObjectListingEntryForInternalNode
 								.getNodeLabelDisplayValue(),
 						true);
-				// node.add(child);
 				listOfNodes.add(child);
-				/*
-				 * File[] direcFiles=irodsAccountFile.listFiles(); for(int
-				 * i=0;i<direcFiles.length;i++){
-				 * //System.out.println("File number" +i +"\n depth:"
-				 * +direcFiles.length); log.info("File number:" +i +"\t depth:"
-				 * +direcFiles.length);
-				 * parseDirectoryContentsUsingList(direcFiles[i], child,
-				 * irodsAccount); }
-				 */
 			}
 		}
 		return listOfNodes;
 	}
-
 }
