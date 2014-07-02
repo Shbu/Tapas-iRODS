@@ -15,7 +15,6 @@ import java.security.MessageDigest;
 import java.util.Properties;
 
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import org.apache.commons.configuration.Configuration;
@@ -33,12 +32,17 @@ public final class IrodsUtilities {
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(IrodsUtilities.class.getName());
 
-	/* Calculate MD5 CheckSum of a File */
+	/**
+	 * Calculate MD5 CheckSum of a File.
+	 * 
+	 * @param file
+	 * @return
+	 */
 	public static String calculateMD5CheckSum(File file) {
 		try {
 			InputStream fin = new FileInputStream(file);
 			java.security.MessageDigest md5er = MessageDigest
-					.getInstance("MD5");
+					.getInstance(Constants.MD5_CONSTANT);
 			byte[] buffer = new byte[1024];
 			int read;
 			do {
@@ -62,6 +66,12 @@ public final class IrodsUtilities {
 	}
 
 	/* Zhong */
+	/**
+	 * Convert TreePath object to String object
+	 * 
+	 * @param treePaths
+	 * @return
+	 */
 	public static String getJtreeSelection(TreePath treePaths) {
 		String fullTreePath = "";
 		Object treepath[] = treePaths.getPath();
@@ -72,7 +82,11 @@ public final class IrodsUtilities {
 		return fullTreePath;
 	}
 
-	/* Returns pathSeperator of the Operating System */
+	/**
+	 * Returns pathSeperator of the Operating System
+	 * 
+	 * @return
+	 */
 	public static String getPathSeperator() {
 		String pathSeperator = null;
 		pathSeperator = Constants.DEFAULT_PATH_SEPERATOR;
@@ -80,12 +94,18 @@ public final class IrodsUtilities {
 		return pathSeperator;
 	}
 
-	/* Get JTree node path depending on the Mouse selection */
-	public static String getJtreeSelection(MouseEvent me,
+	/**
+	 * Get JTree node path depending on the Mouse selection
+	 * 
+	 * @param mouseEvent
+	 * @param userDirectoryTree
+	 * @return
+	 */
+	public static String getJtreeSelection(MouseEvent mouseEvent,
 			JTree userDirectoryTree) {
 		String fullTreePath = "";
-		TreePath tp = userDirectoryTree
-				.getPathForLocation(me.getX(), me.getY());
+		TreePath tp = userDirectoryTree.getPathForLocation(mouseEvent.getX(),
+				mouseEvent.getY());
 		if (tp != null) {
 			Object treepath[] = tp.getPath();
 			for (int i = 0; i < treepath.length; i++) {
@@ -96,7 +116,12 @@ public final class IrodsUtilities {
 		return fullTreePath;
 	}
 
-	/**/
+	/**
+	 * Create file Object from given Tree Path
+	 * 
+	 * @param treePath
+	 * @return
+	 */
 	public static File createFileFromTreePath(TreePath treePath) {
 		StringBuilder sb = new StringBuilder();
 		Object[] nodes = treePath.getPath();
@@ -106,7 +131,12 @@ public final class IrodsUtilities {
 		return new File(sb.toString());
 	}
 
-	/* Generate FilePath from given treePath */
+	/**
+	 * Generate FilePath from given treePath
+	 * 
+	 * @param treePath
+	 * @return
+	 */
 	public static String createFilePathFromTreePath(TreePath treePath) {
 		StringBuilder sb = new StringBuilder();
 		Object[] nodes = treePath.getPath();
@@ -116,16 +146,20 @@ public final class IrodsUtilities {
 		return sb.toString();
 	}
 
-	/* Returns JTree selection depending on the mouseEvent */
+	/**
+	 * Returns JTree selection depending on the mouseEvent
+	 * 
+	 * @param iplugin
+	 * @param mouseEvent
+	 * @param jTree
+	 * @return
+	 */
 	public static String getJtreeSelectionForSingleClick(IPlugin iplugin,
-			MouseEvent me, JTree userDirectoryTree) {
+			MouseEvent mouseEvent, JTree jTree) {
 		String fullTreePath = "";
-		TreePath tp = userDirectoryTree
-				.getPathForLocation(me.getX(), me.getY());
+		TreePath tp = jTree.getPathForLocation(mouseEvent.getX(),
+				mouseEvent.getY());
 		if (tp != null) {
-			DefaultMutableTreeNode lastPathComponentNode = (DefaultMutableTreeNode) tp
-					.getLastPathComponent();
-
 			/*
 			 * Get objstat details for each file and compare if it is a
 			 * collection or object
@@ -164,7 +198,12 @@ public final class IrodsUtilities {
 		return fullTreePath;
 	}
 
-	/* Creates a directory at specific path if doesn't exist */
+	/**
+	 * Creates a directory at specific path if doesn't exist
+	 * 
+	 * @param directoryPath
+	 * @return
+	 */
 	public static boolean createDirectoryIfDoesntExist(String directoryPath) {
 		boolean isDirectoryCreated = false;
 		try {
@@ -186,9 +225,12 @@ public final class IrodsUtilities {
 		return isDirectoryCreated;
 	}
 
-	/*
+	/**
 	 * Get file name from given directory path. This returns the subString after
 	 * last slash in absolute path.
+	 * 
+	 * @param directoryPath
+	 * @return
 	 */
 	public static String getFileNameFromDirectoryPath(String directoryPath) {
 		String fileName = null;
@@ -208,13 +250,21 @@ public final class IrodsUtilities {
 		return fileName;
 	}
 
-	/* Returns user home directory folder path */
+	/**
+	 * Returns user home directory folder path
+	 * 
+	 * @return
+	 */
 	public static String getUserHomeFolderFromSystemProperty() {
 		String userHomeFolderFromSystemProperty = null;
 		userHomeFolderFromSystemProperty = System.getProperty("user.home");
 		return userHomeFolderFromSystemProperty;
 	}
 
+	/**
+	 * @param dir
+	 * @return
+	 */
 	public static long getFolderSize(File dir) {
 		long size = 0;
 		for (File file : dir.listFiles()) {
@@ -227,13 +277,20 @@ public final class IrodsUtilities {
 		return size;
 	}
 
-	/*
-	 * This method will load Tapas properties from either of below two file - 1.
-	 * Local Property file in cache directory or 2. Property file in Jar. If
-	 * local file is not available, then property file available in jar is
+	/**
+	 * This method will load Tapas properties from either of below two files
+	 * </br>
+	 * <ol>
+	 * <li>Local Property file in cache directory</li>
+	 * <li>Property file in Jar.</li>
+	 * </ol>
+	 * If local file is not available, then property file available in jar is
 	 * loaded and then a copy is left in local path for future availability.
+	 * 
+	 * @param propertyFileName
+	 * @param localPathForPropertyFile
+	 * @return
 	 */
-
 	public static Properties getTapasLoginConfiguration(
 			String propertyFileName, String localPathForPropertyFile) {
 
@@ -319,7 +376,12 @@ public final class IrodsUtilities {
 		return tapasConfigurationProperties;
 	}
 
-	/* Copies a given file from one location to other */
+	/**
+	 * Copies a given file from one location to other
+	 * 
+	 * @param sourceFile
+	 * @param destination
+	 */
 	public static void copyFileToNewPhysicalLocation(File sourceFile,
 			String destination) {
 		File destinationFile = new File(destination);
@@ -332,6 +394,10 @@ public final class IrodsUtilities {
 		}
 	}
 
+	/**
+	 * @param filePath
+	 * @return
+	 */
 	public static Properties loadLocalTapasPropertyFiles(String filePath) {
 		Properties tapasLocalConfigurationProperties = null;
 
@@ -354,11 +420,13 @@ public final class IrodsUtilities {
 		return tapasLocalConfigurationProperties;
 	}
 
-	/*
+	/**
 	 * Replaces multiple slashes with single slash in a given string- Applicable
 	 * for both FORWARD SLASH and BACKWARD SLASH
+	 * 
+	 * @param filepath
+	 * @return
 	 */
-
 	public static String refactorSlashInFilePaths(String filepath) {
 		String finalPath = null;
 

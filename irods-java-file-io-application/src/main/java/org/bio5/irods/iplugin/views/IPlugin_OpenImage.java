@@ -9,7 +9,16 @@ import java.awt.event.WindowEvent;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
+import org.bio5.irods.iplugin.utilities.Constants;
 
+/**
+ * <u>ImageJ-Plugin: </u> IPlugin (ImageJ Plugin) <br>
+ * The main programm which contains the workflow, implemented as Plugin for
+ * ImageJ.
+ * 
+ * @author Sharan
+ * 
+ */
 public class IPlugin_OpenImage extends PlugInFrame {
 
 	private static final long serialVersionUID = 3225639715931294038L;
@@ -18,14 +27,19 @@ public class IPlugin_OpenImage extends PlugInFrame {
 	private static IPlugin_OpenImage irods_Plugin_instance;
 	@SuppressWarnings("unused")
 	private static Frame instance;
-	private static IPlugin irodsImagej;
-	private static MainWindow mainWindow;
+	private static IPlugin iplugin;
+	private static MainWindow mainWindowInstance;
 
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(IPlugin_OpenImage.class.getName());
 
+	/**
+	 * Returns iplugin instance
+	 * 
+	 * @return
+	 */
 	public static IPlugin getIrodsImagej() {
-		return irodsImagej;
+		return iplugin;
 	}
 
 	public static IPlugin_OpenImage getIrods_Plugin_instance() {
@@ -33,7 +47,7 @@ public class IPlugin_OpenImage extends PlugInFrame {
 	}
 
 	public IPlugin_OpenImage() {
-		super("iRODS");
+		super(Constants.PLUGIN_TITLE);
 		log = Logger.getLogger(IPlugin_OpenImage.class);
 	}
 
@@ -45,13 +59,13 @@ public class IPlugin_OpenImage extends PlugInFrame {
 	}
 
 	public void run(String arg) {
-		irodsImagej = new IPlugin();
+		iplugin = new IPlugin();
 		// irodsImagej.setMainWindow(mainWindow);
-		mainWindow = new MainWindow(irodsImagej);
-		if (null != mainWindow) {
-			irodsImagej.setMainWindow(mainWindow);
+		mainWindowInstance = new MainWindow(iplugin);
+		if (null != mainWindowInstance) {
+			iplugin.setMainWindow(mainWindowInstance);
 		}
-		mainWindow.setVisible(true);
+		mainWindowInstance.setVisible(true);
 	}
 
 	/* Main method to Debug the code - Remove it once app is done! */
@@ -64,8 +78,8 @@ public class IPlugin_OpenImage extends PlugInFrame {
 		String pluginsDir = url.substring(5, url.length()
 				- clazz.getName().length() - 6);
 		System.setProperty("plugins.dir", pluginsDir);
-		
-		/*start Imagej*/
+
+		/* start Imagej */
 		new ImageJ();
 
 		// Open a sample bio5 image

@@ -47,6 +47,10 @@ import org.irods.jargon.core.pub.IRODSFileSystemAOImpl;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 
+/**
+ * @author Sharan
+ * 
+ */
 public class MainWindow extends JFrame {
 
 	/**
@@ -59,6 +63,7 @@ public class MainWindow extends JFrame {
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(MainWindow.class.getName());
 
+	/* Variables initialization */
 	private JPanel contentPanePanel;
 	private JTextField textbox_LoginId;
 	private JPasswordField textField_passwordField;
@@ -74,7 +79,7 @@ public class MainWindow extends JFrame {
 	private File selectedFileForImageJCacheFolder;
 	private JComboBox<String> comboBox_Zone;
 	private JComboBox<String> comboBox_Host;
-	private IRODSFileFactory iRODSFileFactory;
+	private IRODSFileFactory iRODSFileFactory = null;
 	private String usernamePickedFromPropertyFiles = null;
 	private String zonePickedFromPropertyFiles = null;
 	private String hostPickedFromPropertyFiles = null;
@@ -180,7 +185,7 @@ public class MainWindow extends JFrame {
 			}
 		});
 
-		JButton button_Cancel = new JButton("Cancel");
+		JButton button_Cancel = new JButton(Constants.CANCEL_BUTTON);
 		button_Cancel.setToolTipText("Click to close application");
 		button_Cancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -188,42 +193,42 @@ public class MainWindow extends JFrame {
 			}
 		});
 
-		JLabel Label_Username = new JLabel("User Name:");
+		JLabel Label_Username = new JLabel(Constants.USER_NAME);
 		Label_Username.setHorizontalAlignment(SwingConstants.CENTER);
-		JLabel Label_Password = new JLabel("Password:");
+		JLabel Label_Password = new JLabel(Constants.PASSWORD);
 		Label_Password.setHorizontalAlignment(SwingConstants.CENTER);
 
 		textField_passwordField = new JPasswordField();
 		textField_passwordField.setHorizontalAlignment(SwingConstants.LEFT);
-		textField_passwordField.setToolTipText("Password");
+		textField_passwordField.setToolTipText(Constants.PASSWORD);
 
 		textField_Port = new JTextField();
 		textField_Port.setEditable(false);
 		textField_Port.setText(Constants.PORT);
-		textField_Port.setToolTipText("Port No.");
+		textField_Port.setToolTipText(Constants.PORT_NO);
 		textField_Port.setColumns(10);
 
-		JLabel Label_Port = new JLabel("Port:");
+		JLabel Label_Port = new JLabel(Constants.PORT_LABEL);
 		Label_Port.setHorizontalAlignment(SwingConstants.CENTER);
 
-		JLabel label_Zone = new JLabel("Zone:");
+		JLabel label_Zone = new JLabel(Constants.ZONE);
 		label_Zone.setHorizontalAlignment(SwingConstants.CENTER);
 
-		JLabel label_Host = new JLabel("Host:");
+		JLabel label_Host = new JLabel(Constants.HOST);
 		label_Host.setHorizontalAlignment(SwingConstants.CENTER);
 
-		JLabel homeDirectory_Label = new JLabel("File Selection:");
+		JLabel homeDirectory_Label = new JLabel(Constants.FILE_SELECTION);
 
-		HomeDirectory_CheckBox = new JCheckBox("Home Directory");
+		HomeDirectory_CheckBox = new JCheckBox(Constants.HOME_DIRECTORY);
 
 		textField_ImageJCacheFolderPath = new JTextField();
 		textField_ImageJCacheFolderPath
-				.setToolTipText("Enter ImageJ Cache folder path");
+				.setToolTipText(Constants.ENTER_IMAGE_J_CACHE_FOLDER_PATH);
 		textField_ImageJCacheFolderPath.setColumns(10);
 		textField_ImageJCacheFolderPath.setText(iPlugin.getImageJCacheFolder());
 
-		JLabel lblImagejCacheFolder = new JLabel("ImageJ Cache Folder:");
-		JButton btnChooseFolder = new JButton("Choose folder");
+		JLabel lblImagejCacheFolder = new JLabel(Constants.IMAGE_J_CACHE_FOLDER);
+		JButton btnChooseFolder = new JButton(Constants.CHOOSE_FOLDER);
 		btnChooseFolder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				fileChooserForImageJCacheFolder = new JFileChooser(
@@ -244,7 +249,7 @@ public class MainWindow extends JFrame {
 					textField_ImageJCacheFolderPath.setText(iplugin
 							.getImageJCacheFolder());
 				} else {
-					log.info("User cancelled file selection window: "
+					log.error("User cancelled file selection window: "
 							+ Constants.NEW_LINE_STRING);
 				}
 			}
@@ -495,7 +500,10 @@ public class MainWindow extends JFrame {
 		contentPanePanel.setLayout(gl_contentPane);
 	}
 
-	public void setVisibilityOfForm() {
+	/**
+	 * Sets the visibility of Login panel
+	 */
+	private void setVisibilityOfForm() {
 		setContentPane(directoryContentsPane);
 		validate();
 		repaint();
@@ -503,6 +511,9 @@ public class MainWindow extends JFrame {
 		setVisible(true);
 	}
 
+	/**
+	 * 
+	 */
 	private void mainWindowInit() {
 		// irodsImagejInstance = new IrodsImageJBean();
 
@@ -516,6 +527,11 @@ public class MainWindow extends JFrame {
 
 	}
 
+	/**
+	 * loginMethod will be invoked when Login button is clicked. irodsAccount
+	 * instantiation happens and directory contents will be pulled if
+	 * credentials are valid.
+	 */
 	@SuppressWarnings("deprecation")
 	private void loginMethod() {
 
@@ -659,19 +675,29 @@ public class MainWindow extends JFrame {
 				iplugin.setImageJCacheFolder(textField_ImageJCacheFolderPath
 						.getText());
 			}
+		} else {
+			log.error("textField_ImageJCacheFolderPath.getText() is null");
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private void irodsFileFactoryCreation() {
 		try {
 			iRODSFileFactory = TapasCoreFunctions
 					.getIrodsAccountFileFactory(iplugin);
 			iplugin.setiRODSFileFactory(iRODSFileFactory);
-		} catch (JargonException e) {
-			log.error("Error while creating irodsFileFactory" + e.getMessage());
+		} catch (JargonException jargonException) {
+			log.error("Error while creating irodsFileFactory"
+					+ jargonException.getMessage());
 		}
 	}
 
+	/**
+	 * @param tapasProperties
+	 * @return
+	 */
 	private boolean setPropertyFileDataToLoginPanel(Properties tapasProperties) {
 		Boolean isSet = false;
 
@@ -707,15 +733,21 @@ public class MainWindow extends JFrame {
 					comboBox_Host.addItem(hostNames[i]);
 				}
 
+			} else {
+				log.error("hostPickedFromPropertyFiles is null");
 			}
 		}
 		return isSet;
 	}
 
+	/**
+	 * @param iplugin
+	 */
 	private void closeApplication(IPlugin iplugin) {
-
 		System.exit(0);
-		TapasCoreFunctions.closeIRODSConnections(iplugin);
+		if (null != iplugin) {
+			TapasCoreFunctions.closeIRODSConnections(iplugin);
+		}
 
 	}
 }

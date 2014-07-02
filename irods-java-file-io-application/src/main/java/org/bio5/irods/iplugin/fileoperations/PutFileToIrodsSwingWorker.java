@@ -155,15 +155,19 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 			if (null != node) {
 
 				/* Reset node to parent node if leaf node is selected */
-				log.info("folder size before checking node:"
+				log.info("Empty folder check:"
 						+ iPlugin.isEmptyFolder());
 				if (node.isLeaf() && !iPlugin.isEmptyFolder()) {
+					log.info("node is leaf and not empty folder");
 					node = (DefaultMutableTreeNode) node.getParent();
 					treePathForInternalNodes = treePathToRetrieveInternalPaths
 							.getParentPath().getPath();
 				}
 				node.removeAllChildren();
 				iPlugin.getTreeModel().nodeStructureChanged(node);
+			}
+			else{
+				log.error("node is null");
 			}
 
 			RetrieveInternalNodesSwingWorker retrieve = null;
@@ -177,7 +181,7 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 						iPlugin);
 				try {
 					if (null != retrieve) {
-						retrieve.execute();
+						retrieve.doInBackground();
 					}
 				} catch (Exception exception) {
 					log.error("Error while retrieving internal files: "
@@ -200,6 +204,7 @@ public class PutFileToIrodsSwingWorker extends SwingWorker<Void, Integer> {
 										.get(i));
 						log.info("child count: " + node.getChildCount());
 						try {
+							log.info("adding node to treemodel");
 							iPlugin.getTreeModel()
 									.insertNodeInto(
 											iPlugin.getChildNodesListAfterLazyLoading()

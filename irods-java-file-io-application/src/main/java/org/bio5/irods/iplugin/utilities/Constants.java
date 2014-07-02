@@ -57,4 +57,24 @@ public class Constants {
 	public static final String OBJECT_TYPE_COLLECTION = "COLLECTION";
 	public static final String OBJECT_TYPE_DATA_OBJECT = "DATA_OBJECT";
 
+	/* irods labels */
+	public static final String PLUGIN_TITLE = "Imagej v1.0.1";
+
+	/* irods Login Panel Lables */
+	public static final String CANCEL_BUTTON = "Cancel";
+	public static final String CHOOSE_FOLDER = "Choose folder";
+	public static final String IMAGE_J_CACHE_FOLDER = "ImageJ Cache Folder:";
+	public static final String ENTER_IMAGE_J_CACHE_FOLDER_PATH = "Enter ImageJ Cache folder path";
+	public static final String HOME_DIRECTORY = "Home Directory";
+	public static final String FILE_SELECTION = "File Selection:";
+	public static final String HOST = "Host:";
+	public static final String ZONE = "Zone:";
+	public static final String PORT_LABEL = "Port:";
+	public static final String PORT_NO = "Port No.";
+	public static final String PASSWORD = "Password:";
+	public static final String USER_NAME = "User Name:";
+	
+	
+	public static final String MD5_CONSTANT = "MD5";
+
 }
