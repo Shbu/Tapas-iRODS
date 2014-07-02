@@ -5,6 +5,7 @@ import ij.ImagePlus;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
@@ -85,6 +86,16 @@ public class IPlugin implements Serializable {
 	private boolean errorWhileUsingGetOperation = false;
 
 	private String destinationPath = null;
+
+	private Properties tapasProperties = null;
+
+	public Properties getTapasProperties() {
+		return tapasProperties;
+	}
+
+	public void setTapasProperties(Properties tapasProperties) {
+		this.tapasProperties = tapasProperties;
+	}
 
 	public String getDestinationPath() {
 		return destinationPath;

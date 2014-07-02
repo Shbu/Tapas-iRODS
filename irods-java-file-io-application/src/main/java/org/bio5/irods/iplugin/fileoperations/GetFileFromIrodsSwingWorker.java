@@ -58,10 +58,13 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 
 		if (null != iPlugin) {
 			transferControlBlock = iPlugin.getTransferControlBlock();
-			iPlugin.setTransferControlBlock(transferControlBlock);
-			iPlugin.setTransferOptions(transferControlBlock
-					.getTransferOptions());
-			iPlugin.getTransferOptions().setMaxThreads(10);
+			if (null != transferControlBlock) {
+				iPlugin.setTransferOptions(transferControlBlock
+						.getTransferOptions());
+			} else {
+				log.error("transferControlBlock is null");
+			}
+			//iPlugin.getTransferOptions().setMaxThreads(10);
 			dataTransferOperationsAO = iPlugin.getIrodsFileSystem()
 					.getIRODSAccessObjectFactory()
 					.getDataTransferOperations(iPlugin.getIrodsAccount());
@@ -70,22 +73,27 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 			 * performance degradation.
 			 */
 			if (iPlugin.isHomeDirectoryTheRootNode()) {
-				sourceIrodsFilePath =iRODSFileFactory
-						.instanceIRODSFile(TapasCoreFunctions.getRootDirectoryPath(iPlugin)+ treePath); 
+				sourceIrodsFilePath = iRODSFileFactory
+						.instanceIRODSFile(TapasCoreFunctions
+								.getRootDirectoryPath(iPlugin) + treePath);
 				log.info("sourceIrodsFilePath" + sourceIrodsFilePath);
-						
-						/*iRODSFileFactory
-						.instanceIRODSFile(IrodsUtilities.getPathSeperator()
-								+ iPlugin.getIrodsAccount().getZone()
-								+ treePath);*/
+
+				/*
+				 * iRODSFileFactory
+				 * .instanceIRODSFile(IrodsUtilities.getPathSeperator() +
+				 * iPlugin.getIrodsAccount().getZone() + treePath);
+				 */
 			} else {
 				sourceIrodsFilePath = iRODSFileFactory
-						.instanceIRODSFile(TapasCoreFunctions.getHomeDirectoryPath(iPlugin)+ treePath);
-						/*iRODSFileFactory
-						.instanceIRODSFile(IrodsUtilities.getPathSeperator()
-								+ iPlugin.getIrodsAccount().getZone()
-								+ IrodsUtilities.getPathSeperator()
-								+ Constants.HOME_STRING + treePath);*/
+						.instanceIRODSFile(TapasCoreFunctions
+								.getHomeDirectoryPath(iPlugin) + treePath);
+				/*
+				 * iRODSFileFactory
+				 * .instanceIRODSFile(IrodsUtilities.getPathSeperator() +
+				 * iPlugin.getIrodsAccount().getZone() +
+				 * IrodsUtilities.getPathSeperator() + Constants.HOME_STRING +
+				 * treePath);
+				 */
 				log.info("sourceIrodsFilePath" + sourceIrodsFilePath);
 
 			}
@@ -163,11 +171,9 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 							openImageUsingImageJ();
 						} else {
 							log.error("Error while transfering files");
-							JOptionPane
-							.showMessageDialog(
-									null,
-									"Error while transfering files!",
-									"Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(null,
+									"Error while transfering files!", "Error",
+									JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}

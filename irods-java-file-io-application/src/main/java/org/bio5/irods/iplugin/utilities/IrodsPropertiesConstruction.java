@@ -1,16 +1,24 @@
 package org.bio5.irods.iplugin.utilities;
 
+import java.util.Properties;
+
+import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
+import org.bio5.irods.iplugin.views.MainWindow;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.transfer.TransferControlBlock;
 
 public class IrodsPropertiesConstruction {
 
+	/* Logger instantiation */
+	static Logger log = Logger.getLogger(IrodsPropertiesConstruction.class
+			.getName());
+
 	/* Default jargon Properties */
 	public TransferControlBlock constructTransferControlBlockFromJargonProperties(
-			IPlugin irodsImagej) throws JargonException {
+			IPlugin iplugin) throws JargonException {
 		TransferControlBlock defaultTransferControlBlock = null;
-		defaultTransferControlBlock = irodsImagej.getIrodsFileSystem()
+		defaultTransferControlBlock = iplugin.getIrodsFileSystem()
 				.getIRODSAccessObjectFactory()
 				.buildDefaultTransferControlBlockBasedOnJargonProperties();
 		return defaultTransferControlBlock;
@@ -18,24 +26,59 @@ public class IrodsPropertiesConstruction {
 
 	/* Enhanced jargon Properties */
 	public TransferControlBlock constructHighPerformanceTransferControlBlockFromJargonProperties(
-			IPlugin irodsImagej) throws JargonException {
-		TransferControlBlock defaultTransferControlBlock = null;
-		defaultTransferControlBlock = irodsImagej.getIrodsFileSystem()
-				.getIRODSAccessObjectFactory()
-				.buildDefaultTransferControlBlockBasedOnJargonProperties();
+			IPlugin iplugin) {
+		TransferControlBlock highPerformanceTransferControlBlock = null;
+		if (null != iplugin) {
+			Properties tapasProperties = iplugin.getTapasProperties();
+			try {
+				highPerformanceTransferControlBlock = iplugin
+						.getIrodsFileSystem()
+						.getIRODSAccessObjectFactory()
+						.buildDefaultTransferControlBlockBasedOnJargonProperties();
+			} catch (JargonException jargonException) {
+				log.error("Error while constructing defaultTransferControlBlock"
+						+ jargonException.getMessage());
+			}
+			try {
+				highPerformanceTransferControlBlock.getTransferOptions()
+						.setIntraFileStatusCallbacks(true);
 
-		defaultTransferControlBlock.getTransferOptions()
-				.setIntraFileStatusCallbacks(true);
-		defaultTransferControlBlock.getTransferOptions().setMaxThreads(
-				Constants.MAX_THREADS);
-		defaultTransferControlBlock
-				.getTransferOptions()
-				.setUseParallelTransfer(Constants.USE_PARALLEL_TRANSFERS_OPTION);
-		defaultTransferControlBlock
-				.getTransferOptions()
-				.setComputeAndVerifyChecksumAfterTransfer(
-						Constants.COMPUTE_AND_VERIFY_CHECKSUM_AFTER_TRANSFER_OPTION);
-		return defaultTransferControlBlock;
+				/* Setting max threads for parallel transfers */
+				if (null != tapasProperties) {
+					String maxThreadFromProperty = tapasProperties
+							.getProperty(Constants.PROPERTY_MAX_THREADS);
+					if (null != maxThreadFromProperty
+							&& "" != maxThreadFromProperty) {
+						int maxThreads = Integer
+								.parseInt(maxThreadFromProperty);
+						if (maxThreads > 0 || maxThreads == 0) {
+							log.info("tapas.parallel.transfer.max.threads: "
+									+ maxThreads);
+							highPerformanceTransferControlBlock
+									.getTransferOptions().setMaxThreads(
+											maxThreads);
+						}
+					} else {
+						highPerformanceTransferControlBlock
+								.getTransferOptions().setMaxThreads(
+										Constants.MAX_THREADS);
+						log.error("tapasProperties is null while constructHighPerformanceTransferControlBlockFromJargonProperties");
+						log.info("max threads set to: " + Constants.MAX_THREADS);
+					}
+				}
+				highPerformanceTransferControlBlock.getTransferOptions()
+						.setUseParallelTransfer(
+								Constants.USE_PARALLEL_TRANSFERS_OPTION);
+				highPerformanceTransferControlBlock
+						.getTransferOptions()
+						.setComputeAndVerifyChecksumAfterTransfer(
+								Constants.COMPUTE_AND_VERIFY_CHECKSUM_AFTER_TRANSFER_OPTION);
+			} catch (Exception exception) {
+				log.error("Error while setting TransferOption in TransferControlBlock"
+						+ exception.getMessage());
+			}
+		}
+		return highPerformanceTransferControlBlock;
 	}
 
 	public IrodsTransferStatusCallbackListener constructIrodsTransferStatusCallbackListener(

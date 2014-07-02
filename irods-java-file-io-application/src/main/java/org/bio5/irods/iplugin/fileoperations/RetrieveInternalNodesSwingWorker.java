@@ -43,10 +43,11 @@ public class RetrieveInternalNodesSwingWorker extends
 
 		if (null != irodsImageJ) {
 			/* Setting jargon properties */
-			SettableJargonProperties jp = new SettableJargonProperties();
-			log.info("Default threads : " + jp.getMaxParallelThreads());
-			jp.setMaxParallelThreads(10);
-			log.info("Threads upgraded to : " + jp.getMaxParallelThreads());
+			SettableJargonProperties jargonProperties = null;
+			jargonProperties =	new SettableJargonProperties();
+			log.info("Default threads : " + jargonProperties.getMaxParallelThreads());
+			jargonProperties.setMaxParallelThreads(17);
+			log.info("Threads upgraded to : " + jargonProperties.getMaxParallelThreads());
 			IRODSFileFactory iRODSFileFactory = irodsImageJ
 					.getiRODSFileFactory();
 			String finalpathToGetIrodsFileInstance = irodsImageJ

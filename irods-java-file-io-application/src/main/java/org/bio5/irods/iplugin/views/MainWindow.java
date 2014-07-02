@@ -6,12 +6,9 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.net.UnknownHostException;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -263,6 +260,7 @@ public class MainWindow extends JFrame {
 				Constants.PROPERTY_FILE_NAME, Constants.IMAGEJ_CACHE_FOLDER);
 		if (null != tapasProperties) {
 			setPropertyFileDataToLoginPanel(tapasProperties);
+			iplugin.setTapasProperties(tapasProperties);
 		} else {
 			log.error("tapas property file is null");
 		}

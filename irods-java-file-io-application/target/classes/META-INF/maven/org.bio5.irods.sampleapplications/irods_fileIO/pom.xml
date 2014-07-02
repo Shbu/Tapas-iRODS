@@ -1,3 +1,4 @@
+<!--serverCode -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -59,7 +60,7 @@
 	<build>
 		<plugins>
 
-			<!-- jar with dependencies -->
+			<!-- added dependencies - start -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -76,6 +77,7 @@
 					<finalName>${artifactId}-${version}-jar-with-dependencies</finalName>
 				</configuration>
 			</plugin>
+			<!--added dependencies - end -->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -98,8 +100,8 @@
 								<manifest>
 									<addDefaultImplementationEntries>false</addDefaultImplementationEntries>
 									<addClasspath>true</addClasspath>
-									<mainClass>org.bio5.irods.imagej.views.Irods_Plugin</mainClass>
-									<classpathPrefix>../org/</classpathPrefix>
+									<classpathPrefix>lib/</classpathPrefix>
+									<mainClass>IPlugin_OpenImage</mainClass>
 								</manifest>
 								<manifestEntries>
 									<!-- <Class-Path>../org/</Class-Path> -->
@@ -110,6 +112,22 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- Making Jar executable - NOT WORKING - PENDING -->
+			<plugin>
+				<groupId>org.bio5.irods.sampleapplications</groupId>
+				<artifactId>irods_fileIO</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass>IPlugin_OpenImage</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 

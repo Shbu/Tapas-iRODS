@@ -39,7 +39,7 @@ public class Constants {
 
 	/* Enhanced jargon Properties */
 	public static boolean COMPUTE_AND_VERIFY_CHECKSUM_AFTER_TRANSFER_OPTION = false;
-	public static int MAX_THREADS = 10;
+	public static int MAX_THREADS = 4;
 	public static boolean USE_PARALLEL_TRANSFERS_OPTION = true;
 
 	/* Error Strings */
@@ -51,6 +51,7 @@ public class Constants {
 	public static final String PROPERTY_USER_NAME = "login.username";
 	public static final String PROPERTY_ZONE_NAME = "login.zone";
 	public static final String PROPERTY_HOST_NAME = "login.host";
+	public static final String PROPERTY_MAX_THREADS = "tapas.parallel.transfer.max.threads";
 
 	/* OBJstat Details */
 	public static final String OBJECT_TYPE_COLLECTION = "COLLECTION";

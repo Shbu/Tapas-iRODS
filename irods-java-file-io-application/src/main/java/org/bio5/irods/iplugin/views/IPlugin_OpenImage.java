@@ -1,6 +1,7 @@
 package org.bio5.irods.iplugin.views;
 
 import ij.IJ;
+import ij.ImageJ;
 import ij.plugin.frame.PlugInFrame;
 
 import java.awt.Frame;
@@ -63,6 +64,9 @@ public class IPlugin_OpenImage extends PlugInFrame {
 		String pluginsDir = url.substring(5, url.length()
 				- clazz.getName().length() - 6);
 		System.setProperty("plugins.dir", pluginsDir);
+		
+		/*start Imagej*/
+		new ImageJ();
 
 		// Open a sample bio5 image
 		/*
