@@ -2,6 +2,8 @@ package org.bio5.irods.iplugin.fileoperations;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.WindowManager;
+import ij.gui.ImageWindow;
 import ij.io.Opener;
 
 import java.io.File;
@@ -64,7 +66,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 			} else {
 				log.error("transferControlBlock is null");
 			}
-			//iPlugin.getTransferOptions().setMaxThreads(10);
+			// iPlugin.getTransferOptions().setMaxThreads(10);
 			dataTransferOperationsAO = iPlugin.getIrodsFileSystem()
 					.getIRODSAccessObjectFactory()
 					.getDataTransferOperations(iPlugin.getIrodsAccount());
@@ -233,6 +235,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 
 		/* Opening the selected ImageJ */
 		Opener imagejOpener = new Opener();
+		ImagePlus imagePlusInstanceOfCurrentActiveImage = null;
 		if (null != iPlugin.getImageJCacheFolder()) {
 			String imageFilePath = iPlugin.getImageJCacheFolder()
 					+ IrodsUtilities.getPathSeperator()
@@ -240,12 +243,30 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 			log.info("Current file opened by user: " + imageFilePath);
 			ImagePlus imagePlus = imagejOpener.openImage(imageFilePath);
 			// ImagePlus imagePlus = IJ.openImage(imageFilePath);
+			
 
 			if (null != imagePlus) {
 				iPlugin.setImagePlus(imagePlus);
 				log.info("ImagePlus instance is not null and before calling show() function of ImagePlus class");
 				imagePlus.show();
-				iPlugin.setImageOpened(true);
+				imagePlusInstanceOfCurrentActiveImage = IJ.getImage();
+
+				log.info("ImagePlus instance of current image from IJ"
+						+ imagePlusInstanceOfCurrentActiveImage);
+
+				/*
+				 * Functionality - pending - how to check if Images are opened
+				 * in imagej already
+				 */
+				if (null != imagePlusInstanceOfCurrentActiveImage) {
+					log.info("Current Image from IJ"
+							+ imagePlusInstanceOfCurrentActiveImage.getImage());
+					log.error("image windows are open");
+					iPlugin.setImageOpened(true);
+				} else {
+					log.error("No image windows are open");
+					iPlugin.setImageOpened(false);
+				}
 				log.info("irodsImagej.isImageOpened is set to true");
 			} else {
 				log.error("ImagePlus instance in GetFileFromIrodsSwingWorker is null and irodsImagej.isImageOpened is false");

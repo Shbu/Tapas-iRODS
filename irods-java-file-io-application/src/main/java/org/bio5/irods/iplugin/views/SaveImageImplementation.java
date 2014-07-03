@@ -1,7 +1,9 @@
 package org.bio5.irods.iplugin.views;
 
 import ij.IJ;
+import ij.ImagePlus;
 
+import java.awt.Image;
 import java.io.File;
 
 import javax.swing.JOptionPane;
@@ -55,17 +57,33 @@ public class SaveImageImplementation {
 	}
 
 	private void saveCurrentEditedImageFileToLocal() {
-		if (null != iplugin.getImagePlus()) {
-			if (null != iplugin.getImageJCacheFolder()
-					&& null != iplugin.getSelectedNodeInTreeForDoubleClick()) {
-				String fileName = IrodsUtilities
-						.getFileNameFromDirectoryPath(iplugin
-								.getSelectedNodeInTreeForDoubleClick());
+
+		/* ImagePlus imp = iplugin.getImagePlus(); */
+		ImagePlus imp = IJ.getImage();
+
+		if (null != imp) {
+			/*
+			 * if (null != iplugin.getImageJCacheFolder() && null !=
+			 * iplugin.getSelectedNodeInTreeForDoubleClick())
+			 */
+			if (null != iplugin.getImageJCacheFolder())
+
+			{
+				/*
+				 * String fileName = IrodsUtilities
+				 * .getFileNameFromDirectoryPath(iplugin
+				 * .getSelectedNodeInTreeForDoubleClick());
+				 */
+
+				String fileName = imp.getTitle();
 				if (null != fileName) {
 					savePathWithFileName = iplugin.getImageJCacheFolder()
 							+ IrodsUtilities.getPathSeperator() + fileName;
 					log.info("savePathWithFileName : " + savePathWithFileName);
-					IJ.save(iplugin.getImagePlus(), savePathWithFileName);
+
+					/* Getting current active image */
+
+					IJ.save(imp, savePathWithFileName);
 					log.info("File saved to local machine : " + fileName);
 					JOptionPane.showMessageDialog(null,
 							"File saved to local machine with filename and extention : "
@@ -73,77 +91,89 @@ public class SaveImageImplementation {
 				}
 
 			} else {
-				log.error("ImageJCacheFolder or ImagePlus is null");
+				log.error("ImageJCacheFolder or ImagePlus is null!");
 				JOptionPane.showMessageDialog(null,
 						"ImageJCacheFolder or ImagePlus is null!", "Error",
 						JOptionPane.ERROR_MESSAGE);
+				return;
 			}
 		} else {
 			log.error("Error while getting iplugin-imagePlus instance");
 			JOptionPane.showMessageDialog(null,
 					"Error while getting iplugin-imagePlus instance!", "Error",
 					JOptionPane.ERROR_MESSAGE);
+			return;
 		}
 	}
 
 	private void saveCurrentEditedFileToIrodsByPluginOption() {
 		try {
-
 			String targetResourceName = "";
-			targetResourceName = iplugin.getIrodsAccount()
-					.getDefaultStorageResource();
+
 			File sourceLocalfile = null;
 			IRODSFile destinationIrodsFile = null;
 
-			if (savePathWithFileName != null) {
-				sourceLocalfile = new File(savePathWithFileName);
-				log.info("savePathWithFileName is set into sourceLocalfile: "
-						+ sourceLocalfile);
-			} else {
-				log.error("savePathWithFileName is null");
-				JOptionPane.showMessageDialog(null,
-						"savePathWithFileName is null!", "Error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-
-			if (null != destinationFilePath && destinationFilePath != ""
-					&& null != sourceLocalfile
-					&& sourceLocalfile.getAbsolutePath() != "") {
-
-				destinationIrodsFile = iplugin.getiRODSFileFactory()
-						.instanceIRODSFile(destinationFilePath);
-				log.info("destinaitonIrodsFile absolutepath: "
-						+ destinationIrodsFile.getAbsoluteFile());
-
-				try {
-					if (null != iplugin && null != sourceLocalfile
-							&& null != destinationIrodsFile
-							&& null != targetResourceName) {
-						log.info("Inside core save functionality - just before executing PutFileToIrodsSwingWorker method");
-						putFile = new PutFileToIrodsSwingWorker(iplugin,
-								sourceLocalfile, destinationIrodsFile,
-								targetResourceName);
-						putFile.execute();
-						log.info("Executed PutFile method!");
-					} else {
-						log.error("sourceLocalfile or destinaitonIrodsFile or targetResourceName is null");
-						JOptionPane
-								.showMessageDialog(
-										null,
-										"sourceLocalfile or destinaitonIrodsFile or targetResourceName is null!",
-										"Error", JOptionPane.ERROR_MESSAGE);
-					}
-				} catch (Exception execeptionWhileExecutingPutFile) {
-					log.error(execeptionWhileExecutingPutFile.getMessage());
+			if (null != iplugin && null != iplugin.getIrodsAccount()
+					&& null != iplugin.getiRODSFileFactory()) {
+				targetResourceName = iplugin.getIrodsAccount()
+						.getDefaultStorageResource();
+				if (savePathWithFileName != null) {
+					sourceLocalfile = new File(savePathWithFileName);
+					log.info("savePathWithFileName is set into sourceLocalfile: "
+							+ sourceLocalfile);
+				} else {
+					log.error("savePathWithFileName is null");
 					JOptionPane.showMessageDialog(null,
-							execeptionWhileExecutingPutFile.getStackTrace(),
+							"savePathWithFileName is null!", "Error",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (null != destinationFilePath && destinationFilePath != ""
+						&& null != sourceLocalfile
+						&& sourceLocalfile.getAbsolutePath() != "") {
+
+					destinationIrodsFile = iplugin.getiRODSFileFactory()
+							.instanceIRODSFile(destinationFilePath);
+					log.info("destinaitonIrodsFile absolutepath: "
+							+ destinationIrodsFile.getAbsoluteFile());
+
+					try {
+						if (null != sourceLocalfile
+								&& null != destinationIrodsFile
+								&& null != targetResourceName) {
+							log.info("Inside core save functionality - just before executing PutFileToIrodsSwingWorker method");
+							putFile = new PutFileToIrodsSwingWorker(iplugin,
+									sourceLocalfile, destinationIrodsFile,
+									targetResourceName);
+							putFile.execute();
+							log.info("Executed PutFile method!");
+						} else {
+							log.error("sourceLocalfile or destinaitonIrodsFile or targetResourceName is null");
+							JOptionPane
+									.showMessageDialog(
+											null,
+											"sourceLocalfile or destinaitonIrodsFile or targetResourceName is null!",
+											"Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+					} catch (Exception execeptionWhileExecutingPutFile) {
+						log.error(execeptionWhileExecutingPutFile.getMessage());
+						JOptionPane
+								.showMessageDialog(null,
+										execeptionWhileExecutingPutFile
+												.getStackTrace(), "Error",
+										JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+				} else {
+					log.error("sourceLocalfile or destinationFilePath is null");
+					JOptionPane.showMessageDialog(null,
+							"sourceLocalfile or destinationFilePath is null!",
 							"Error", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 			} else {
-				log.error("sourceLocalfile or destinationFilePath is null");
-				JOptionPane.showMessageDialog(null,
-						"sourceLocalfile or destinationFilePath is null!",
-						"Error", JOptionPane.ERROR_MESSAGE);
+				log.error("iplugin instance is null");
 			}
 		}
 

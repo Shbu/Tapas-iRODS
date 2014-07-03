@@ -23,8 +23,10 @@ public class IPlugin_SaveImage extends PlugInFrame {
 	}
 
 	public void init() {
-		if (null != IPlugin_OpenImage.getIrodsImagej()) {
+		/*if (null != IPlugin_OpenImage.getIrodsImagej()) {*/
+		if (null != IPlugin_OpenImage.getIrodsImagej() && null!=IJ.getImage()) {
 			iplugin = IPlugin_OpenImage.getIrodsImagej();
+			iplugin.setImageOpened(true);
 			if (iplugin.isImageOpened()) {
 				log.info("irodsImagej.isImageOpened() is true");
 

@@ -88,6 +88,8 @@ public class IPlugin implements Serializable {
 	private String destinationPath = null;
 
 	private Properties tapasProperties = null;
+	
+	private String currentActiveImage =null;
 
 	public Properties getTapasProperties() {
 		return tapasProperties;
