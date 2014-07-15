@@ -94,7 +94,7 @@
 								<!-- Below snippet will drop jar directly into ImageJ's */plugins/irods 
 									folder -->
 								<copy todir="${imagej.path}/plugins/"
-									file="target/${project.build.finalName}-jar-with-dependencies.jar" failonerror="true"/>
+									file="target/${project.build.finalName}-jar-with-dependencies.jar" failonerror="false"/>
 							</tasks>
 							<archive>
 								<manifest>
