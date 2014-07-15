@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.bio5.irods.sampleapplications</groupId>
+	<groupId>org.bio5.irods.iplugin</groupId>
 	<artifactId>irods_fileIO</artifactId>
 	<version>0.0.1Snapshot</version>
 	<packaging>jar</packaging>
@@ -94,7 +94,7 @@
 								<!-- Below snippet will drop jar directly into ImageJ's */plugins/irods 
 									folder -->
 								<copy todir="${imagej.path}/plugins/"
-									file="target/${project.build.finalName}-jar-with-dependencies.jar" />
+									file="target/${project.build.finalName}-jar-with-dependencies.jar" failonerror="true"/>
 							</tasks>
 							<archive>
 								<manifest>
@@ -114,7 +114,7 @@
 			</plugin>
 
 			<!-- Making Jar executable - NOT WORKING - PENDING -->
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.bio5.irods.sampleapplications</groupId>
 				<artifactId>irods_fileIO</artifactId>
 				<configuration>
@@ -126,7 +126,7 @@
 						</manifest>
 					</archive>
 				</configuration>
-			</plugin>
+			</plugin> -->
 
 		</plugins>
 	</build>
