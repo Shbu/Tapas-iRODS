@@ -1,14 +1,21 @@
 package org.bio5.irods.iplugin.utilities;
 
+import java.util.Iterator;
+import java.util.List;
+
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
+import org.irods.jargon.conveyor.core.ConveyorExecutionException;
+import org.irods.jargon.conveyor.core.TransferNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.transfer.TransferStatus;
 import org.irods.jargon.core.transfer.TransferStatusCallbackListener;
+import org.irods.jargon.transfer.dao.domain.Transfer;
+import org.irods.jargon.transfer.dao.domain.TransferItem;
 
 public class IrodsTransferStatusCallbackListener implements
 		TransferStatusCallbackListener {
@@ -33,6 +40,7 @@ public class IrodsTransferStatusCallbackListener implements
 			throws JargonException {
 
 		log.info("transfer status callback details: " + transferStatus);
+		
 
 		if (transferStatus.getTransferException() != null) {
 			log.info("Exception in file transfer: "
@@ -63,6 +71,10 @@ public class IrodsTransferStatusCallbackListener implements
 			return;
 
 		}
+		
+	
+		
+		
 		/*
 		 * Below lines are commented to avoid pre-loading of progress bar before
 		 * even knowing the file transfer condition. This helps us to avoid
@@ -91,6 +103,9 @@ public class IrodsTransferStatusCallbackListener implements
 		 * ); } }
 		 */
 		else if (transferStatus.isIntraFileStatusReport()) {
+			/*Testing cancel operation*/
+			cancelTransaction();
+			
 			log.info("Transfer state: " + transferStatus.getTransferState()
 					+ " | Bytes Transferred so far:"
 					+ transferStatus.getBytesTransfered()
@@ -114,6 +129,9 @@ public class IrodsTransferStatusCallbackListener implements
 			}
 		} else if (transferStatus.getTransferState() == TransferStatus.TransferState.IN_PROGRESS_COMPLETE_FILE) {
 			if (!iPlugin.isErrorWhileUsingGetOperation()) {
+				
+				
+				
 				log.info("Transfer state: " + transferStatus.getTransferState()
 						+ " | Bytes Transferred so far:"
 						+ transferStatus.getBytesTransfered()
@@ -143,6 +161,7 @@ public class IrodsTransferStatusCallbackListener implements
 		else {
 			log.info("Something else is going on!"
 					+ transferStatus.getTransferState());
+			
 		}
 	}
 
@@ -190,5 +209,37 @@ public class IrodsTransferStatusCallbackListener implements
 			break;
 		}
 		return response;
+	}
+
+	public void cancelTransaction() {
+		List<Transfer> transfers = null;
+		log.info("Entered into cancelTransaction method");
+		try {
+			if (null != iPlugin && iPlugin.getConveyorService()!=null) {
+				transfers = iPlugin.getConveyorService()
+						.getQueueManagerService().listAllTransfersInQueue();
+				log.info("Total transfers in progress: " + transfers.size());
+
+				Iterator<Transfer> transferIterator = transfers.iterator();
+
+				while (transferIterator.hasNext()) {
+					Transfer transfer=null;
+					transfer = transferIterator.next();
+					log.info("transfer details: " +"\n" +"Transfer ID:" +transfer.getId() +"\n" +transfer.getIrodsAbsolutePath());
+					iPlugin.getConveyorService().getQueueManagerService()
+							.cancelTransfer(transfer.getId());
+					
+				}
+			}
+		} catch (TransferNotFoundException transferNotFoundException) {
+			log.error("TransferNotFoundException: "
+					+ transferNotFoundException.getMessage());
+			// TODO: handle exception
+		} catch (ConveyorExecutionException conveyorExecutionException) {
+			log.error("conveyorExecutionException: "
+					+ conveyorExecutionException.getMessage());
+			// TODO: handle exception
+		}
+
 	}
 }

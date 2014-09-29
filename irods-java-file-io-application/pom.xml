@@ -12,6 +12,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jargon.version>3.3.3-SNAPSHOT</jargon.version>
+		<jargon.conveyor>3.3.3-SNAPSHOT</jargon.conveyor>
 		<imagej.version>1.47</imagej.version>
 		<imagej.path>C:\Program Files\ImageJ\</imagej.path>
 	</properties>
@@ -29,6 +30,12 @@
 			<artifactId>jargon-core</artifactId>
 			<version>${jargon.version}</version>
 		</dependency>
+		
+		<dependency>
+            <groupId>org.irods.jargon</groupId>
+            <artifactId>jargon-conveyor</artifactId>
+            <version>${jargon.conveyor}</version>
+        </dependency>
 
 		<!-- ImageJ Dependency -->
 		<dependency>

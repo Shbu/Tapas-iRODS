@@ -33,7 +33,9 @@ import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
 import org.bio5.irods.iplugin.bean.TapasCoreFunctions;
 import org.bio5.irods.iplugin.connection.IrodsConnection;
+import org.bio5.irods.iplugin.exception.IpluginException;
 import org.bio5.irods.iplugin.fileoperations.FileOperations;
+import org.bio5.irods.iplugin.services.IPluginConfigurationServiceImpl;
 import org.bio5.irods.iplugin.utilities.Constants;
 import org.bio5.irods.iplugin.utilities.IrodsUtilities;
 import org.irods.jargon.core.connection.IRODSAccount;
@@ -83,6 +85,7 @@ public class MainWindow extends JFrame {
 	private String usernamePickedFromPropertyFiles = null;
 	private String zonePickedFromPropertyFiles = null;
 	private String hostPickedFromPropertyFiles = null;
+	private IPluginConfigurationServiceImpl iPluginConfigurationService =null;
 
 	/**
 	 * Launch the application.
@@ -558,6 +561,9 @@ public class MainWindow extends JFrame {
 				if (iplugin.getIrodsAccount() != null) {
 					irodsFileFactoryCreation();
 				}
+				
+				/* Creating Configuration service data for the account */
+				createConfigurationService();
 
 				if (null != irodsFileSystem) {
 					IRODSSession iRODSSession = irodsFileSystem
@@ -677,6 +683,16 @@ public class MainWindow extends JFrame {
 			}
 		} else {
 			log.error("textField_ImageJCacheFolderPath.getText() is null");
+		}
+	}
+	
+	
+	private void createConfigurationService() throws IpluginException{
+		if(null != iplugin){
+			
+			iPluginConfigurationService = new IPluginConfigurationServiceImpl(iplugin);
+			iplugin.setiPluginConfigurationService(iPluginConfigurationService);
+			
 		}
 	}
 

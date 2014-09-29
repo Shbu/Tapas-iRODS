@@ -38,22 +38,20 @@ public class samplePanel extends JPanel {
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(
-				Alignment.LEADING).addGroup(
-				groupLayout
-						.createSequentialGroup()
-						.addGap(20)
-						.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE,
-								570, GroupLayout.PREFERRED_SIZE)
-						.addContainerGap(19, Short.MAX_VALUE)));
-		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(
-				Alignment.LEADING).addGroup(
-				groupLayout
-						.createSequentialGroup()
-						.addGap(23)
-						.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE,
-								405, GroupLayout.PREFERRED_SIZE)
-						.addContainerGap(38, Short.MAX_VALUE)));
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(20)
+					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 570, Short.MAX_VALUE)
+					.addGap(19))
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(23)
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 407, Short.MAX_VALUE)
+					.addGap(9))
+		);
 		
 		Object[][] data =
 			{

@@ -518,6 +518,7 @@ public class DirectoryContentsWindow extends JPanel implements
 		tabbedPane.addTab("File Information", null, panel_1, null);
 
 		table = new JTable();
+		table.setEnabled(true);
 		table.setIntercellSpacing(new Dimension(5, 5));
 		table.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		table.setToolTipText("File Information");

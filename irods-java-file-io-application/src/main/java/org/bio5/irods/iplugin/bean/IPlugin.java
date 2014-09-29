@@ -15,11 +15,13 @@ import javax.swing.JViewport;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import org.bio5.irods.iplugin.services.IPluginConfigurationServiceImpl;
 import org.bio5.irods.iplugin.utilities.Constants;
 import org.bio5.irods.iplugin.utilities.IrodsTransferStatusCallbackListener;
 import org.bio5.irods.iplugin.views.DirectoryContentsWindow;
 import org.bio5.irods.iplugin.views.MainWindow;
 import org.bio5.irods.iplugin.views.SaveImagePanelImplementation;
+import org.irods.jargon.conveyor.core.ConveyorService;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.packinstr.TransferOptions;
@@ -90,6 +92,28 @@ public class IPlugin implements Serializable {
 	private Properties tapasProperties = null;
 	
 	private String currentActiveImage =null;
+	
+	private ConveyorService  conveyorService =null;
+	
+	private IPluginConfigurationServiceImpl iPluginConfigurationService =null;
+	
+
+	public IPluginConfigurationServiceImpl getiPluginConfigurationService() {
+		return iPluginConfigurationService;
+	}
+
+	public void setiPluginConfigurationService(
+			IPluginConfigurationServiceImpl iPluginConfigurationService) {
+		this.iPluginConfigurationService = iPluginConfigurationService;
+	}
+
+	public ConveyorService getConveyorService() {
+		return conveyorService;
+	}
+
+	public void setConveyorService(ConveyorService conveyorService) {
+		this.conveyorService = conveyorService;
+	}
 
 	public Properties getTapasProperties() {
 		return tapasProperties;
