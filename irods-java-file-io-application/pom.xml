@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.bio5.irods.iplugin</groupId>
 	<artifactId>irods_fileIO</artifactId>
-	<version>0.0.1Snapshot</version>
+	<version>0.0.1-Snapshot</version>
 	<packaging>jar</packaging>
 
 	<name>irods_java_file_io_application</name>
@@ -12,7 +12,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jargon.version>3.3.3-SNAPSHOT</jargon.version>
-		<jargon.conveyor>3.3.3-SNAPSHOT</jargon.conveyor>
+		<jargon.conveyor>4.0.2-RELEASE</jargon.conveyor>
 		<imagej.version>1.47</imagej.version>
 		<imagej.path>C:\Program Files\ImageJ\</imagej.path>
 	</properties>
@@ -155,5 +155,38 @@
 			</snapshots>
 		</repository>
 		<!-- End of RENCI repository -->
+		
+		<repository>
+            <id>dice.repository</id>
+            <name>dice.repository</name>
+            <url>https://raw.github.com/DICE-UNC/DICE-Maven/master/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+        </repository>
 	</repositories>
+	
+	
+	<distributionManagement>
+        <repository>
+            <id>renci.repository</id>
+            <name>renci.repository</name>
+            <url>https://ci-dev.renci.org/nexus/content/repositories/release</url>
+        </repository>
+        <snapshotRepository>
+            <id>renci.snapshots</id>
+            <name>renci.snapshots</name>
+            <url>https://ci-dev.renci.org/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <!-- <site>
+            <id>renci.site</id>
+            <name>renci.site</name>
+            <url>file:///${user.dir}/sites/irodsidrop</url>
+        </site> -->
+    </distributionManagement>
 </project>

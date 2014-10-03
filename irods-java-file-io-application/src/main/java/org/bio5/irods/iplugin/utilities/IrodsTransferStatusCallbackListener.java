@@ -9,16 +9,17 @@ import javax.swing.JProgressBar;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
+import org.irods.jargon.conveyor.core.ConveyorCallbackListener;
 import org.irods.jargon.conveyor.core.ConveyorExecutionException;
+import org.irods.jargon.conveyor.core.QueueStatus;
 import org.irods.jargon.conveyor.core.TransferNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.transfer.TransferStatus;
 import org.irods.jargon.core.transfer.TransferStatusCallbackListener;
 import org.irods.jargon.transfer.dao.domain.Transfer;
-import org.irods.jargon.transfer.dao.domain.TransferItem;
 
 public class IrodsTransferStatusCallbackListener implements
-		TransferStatusCallbackListener {
+		TransferStatusCallbackListener,ConveyorCallbackListener {
 
 	private JProgressBar jprogressbar;
 	private IPlugin iPlugin;
@@ -34,6 +35,8 @@ public class IrodsTransferStatusCallbackListener implements
 			.getLogger(IrodsTransferStatusCallbackListener.class.getName());
 
 	public void overallStatusCallback(TransferStatus ts) throws JargonException {
+		
+		log.info("inside overallStatusCallback block");
 	}
 
 	public void statusCallback(TransferStatus transferStatus)
@@ -241,5 +244,17 @@ public class IrodsTransferStatusCallbackListener implements
 			// TODO: handle exception
 		}
 
+	}
+
+	public void setQueueStatus(QueueStatus paramQueueStatus) {
+		
+	}
+
+	public void signalUnhandledConveyorException(Exception paramException) {
+		
+
+        log.error("exception is occurring in conveyor framework", paramException);
+        
+		
 	}
 }

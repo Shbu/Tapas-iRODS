@@ -9,6 +9,7 @@ import org.bio5.irods.iplugin.exception.IpluginException;
 import org.irods.jargon.conveyor.basic.BasicConveyorBootstrapperImpl;
 import org.irods.jargon.conveyor.basic.ConveyorBootstrapConfiguration;
 import org.irods.jargon.conveyor.core.ConveyorBootstrapper;
+import org.irods.jargon.conveyor.core.ConveyorCallbackListener;
 import org.irods.jargon.conveyor.core.ConveyorService;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,8 @@ public class IPluginConfigurationServiceImpl {
 								.getIRODSAccessObjectFactory());
 				log.info("Created ConveyorService instance from conveyorBootStrapper");
 				iplugin.setConveyorService(conveyorService);
+				ConveyorCallbackListener conveyorCallBackListener = (ConveyorCallbackListener) iplugin.getIrodsTransferStatusCallbackListener();
+				conveyorService.setConveyorCallbackListener(conveyorCallBackListener);
 			}
 
 			catch (Exception exception) {

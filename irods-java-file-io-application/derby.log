@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-2014-09-27 00:16:34.804 GMT:
- Booting Derby version The Apache Software Foundation - Apache Derby - 10.6.1.0 - (938214): instance a816c00e-0148-b477-599d-0000004dd5b0 
-on database directory C:\Users\cherry\.idrop\idrop964\database\transfer   with class loader sun.misc.Launcher$AppClassLoader@26e431
+2014-10-03 01:01:43.170 GMT:
+ Booting Derby version The Apache Software Foundation - Apache Derby - 10.6.1.0 - (938214): instance a816c00e-0148-d386-d4f5-0000004f3ff0 
+on database directory C:\Users\cherry\.idrop\idrop964\database\transfer   with class loader sun.misc.Launcher$AppClassLoader@14f8dab
 
 Database Class Loader started - derby.database.classpath=''

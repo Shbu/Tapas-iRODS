@@ -32,6 +32,7 @@ import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 import org.irods.jargon.core.transfer.TransferControlBlock;
+import org.irods.jargon.transfer.dao.domain.GridAccount;
 
 public class IPlugin implements Serializable {
 
@@ -42,7 +43,7 @@ public class IPlugin implements Serializable {
 	}
 
 	private MainWindow mainWindow = null;
-
+	
 	private SaveImagePanelImplementation saveImagePanelImplementation = null;
 
 	private IRODSAccount irodsAccount = null;
@@ -91,12 +92,20 @@ public class IPlugin implements Serializable {
 
 	private Properties tapasProperties = null;
 	
-	private String currentActiveImage =null;
-	
 	private ConveyorService  conveyorService =null;
 	
 	private IPluginConfigurationServiceImpl iPluginConfigurationService =null;
 	
+	private GridAccount gridAccount =null;
+	
+	
+	public GridAccount getGridAccount() {
+		return gridAccount;
+	}
+
+	public void setGridAccount(GridAccount gridAccount) {
+		this.gridAccount = gridAccount;
+	}
 
 	public IPluginConfigurationServiceImpl getiPluginConfigurationService() {
 		return iPluginConfigurationService;

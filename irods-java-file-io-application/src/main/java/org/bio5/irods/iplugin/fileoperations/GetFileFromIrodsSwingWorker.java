@@ -7,6 +7,8 @@ import ij.gui.ImageWindow;
 import ij.io.Opener;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
@@ -17,6 +19,8 @@ import org.bio5.irods.iplugin.bean.IPlugin;
 import org.bio5.irods.iplugin.bean.TapasCoreFunctions;
 import org.bio5.irods.iplugin.utilities.Constants;
 import org.bio5.irods.iplugin.utilities.IrodsUtilities;
+import org.irods.jargon.conveyor.core.ConveyorExecutionException;
+import org.irods.jargon.conveyor.core.QueueManagerService;
 import org.irods.jargon.core.exception.DataNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.exception.OverwriteException;
@@ -25,6 +29,8 @@ import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.transfer.TransferControlBlock;
+import org.irods.jargon.transfer.dao.domain.Transfer;
+import org.irods.jargon.transfer.dao.domain.TransferType;
 
 public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 
@@ -35,6 +41,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	private DataObjectAO dataObjectAO;
 	private TransferControlBlock transferControlBlock;
 	IRODSFile sourceIrodsFilePath = null;
+	Transfer transferObjectForGetOperation=null;
 
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(GetFileFromIrodsSwingWorker.class
@@ -152,7 +159,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 									JOptionPane.INFORMATION_MESSAGE);
 			}
 			try {
-				if (null != sourceIrodsFilePath) {
+				if (null != sourceIrodsFilePath && null!= destinationLocalFilePath) {
 					if (null != iPlugin) {
 
 						log.error("Defaulting ErrorWhileUsingGetOperation value to :"
@@ -161,12 +168,67 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 
 						log.info("Transfer Options in IntraFileStatusCallBack status: "
 								+ transferControlBlock.getTransferOptions());
-						dataTransferOperationsAO
+						/*dataTransferOperationsAO
 								.getOperation(
 										sourceIrodsFilePath,
 										destinationLocalFilePath,
 										iPlugin.getIrodsTransferStatusCallbackListener(),
-										transferControlBlock);
+										transferControlBlock);*/
+						
+						
+				        if (null!=iPlugin.getGridAccount()) {
+				        	
+							transferObjectForGetOperation = new Transfer();
+							transferObjectForGetOperation.setIrodsAbsolutePath(sourceIrodsFilePath.getAbsolutePath());
+					        transferObjectForGetOperation.setLocalAbsolutePath(destinationLocalFilePath.getAbsolutePath());
+					        transferObjectForGetOperation.setTransferType(TransferType.GET);
+					        
+							transferObjectForGetOperation.setGridAccount(iPlugin.getGridAccount());
+							
+							QueueManagerService qms =iPlugin.getConveyorService().getQueueManagerService();
+							
+							try {
+
+								if (null != qms) {
+									qms.enqueueTransferOperation(
+											transferObjectForGetOperation,
+											iPlugin.getIrodsAccount());
+
+									List<Transfer> transfers = qms
+											.listAllTransfersInQueue();
+
+									Iterator<Transfer> transferIterator = transfers
+											.iterator();
+
+									while (transferIterator.hasNext()) {
+										Transfer transfer = null;
+										transfer = transferIterator.next();
+										log.info("transfer details: "
+												+ "\n"
+												+ "Transfer ID:"
+												+ transfer.getId()
+												+ "\n"
+												+ transfer
+														.getIrodsAbsolutePath());
+										iPlugin.getConveyorService()
+												.getQueueManagerService()
+												.cancelTransfer(
+														transfer.getId());
+
+										log.info("Total no. of transfers"
+												+ transfers.size());
+									}
+								}
+							}
+							catch (ConveyorExecutionException conveyorExecutionException) {
+								
+								log.error("Error while using GET operation through ConveyorExecutionException:" +conveyorExecutionException.getMessage());
+							}
+						}
+				        else{
+				        	log.error("Grid account object is null!");
+				        }
+						
 
 						if (!iPlugin.isErrorWhileUsingGetOperation()) {
 							log.info("Executing openImageUsingImageJ method");
@@ -179,7 +241,12 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 						}
 					}
 				}
-			} catch (OverwriteException overwriteException) {
+			} 
+			finally{
+				log.info("finally block");
+				
+			}
+			/*catch (OverwriteException overwriteException) {
 				log.error("File with same name already exist in local directory! "
 						+ overwriteException.getMessage());
 				JOptionPane
@@ -188,7 +255,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 								"File with same name already exist in local directory!",
 								"Information", JOptionPane.INFORMATION_MESSAGE);
 
-				/* Getting MD5 checksum of local file, if exists */
+				 Getting MD5 checksum of local file, if exists 
 				File fileInLocal = new File(
 						destinationLocalFilePath.getAbsolutePath()
 								+ IrodsUtilities.getPathSeperator()
@@ -217,7 +284,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 						JOptionPane.ERROR_MESSAGE);
 				log.info("Error while pulling files!"
 						+ jargonException.getMessage());
-			}
+			}*/
 
 		}
 		return null;
