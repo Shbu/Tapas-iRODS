@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -21,7 +22,6 @@ import org.bio5.irods.iplugin.utilities.IrodsTransferStatusCallbackListener;
 import org.bio5.irods.iplugin.views.DirectoryContentsWindow;
 import org.bio5.irods.iplugin.views.MainWindow;
 import org.bio5.irods.iplugin.views.SaveImagePanelImplementation;
-import org.irods.jargon.conveyor.core.ConveyorService;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.packinstr.TransferOptions;
@@ -32,7 +32,6 @@ import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 import org.irods.jargon.core.transfer.TransferControlBlock;
-import org.irods.jargon.transfer.dao.domain.GridAccount;
 
 public class IPlugin implements Serializable {
 
@@ -92,11 +91,20 @@ public class IPlugin implements Serializable {
 
 	private Properties tapasProperties = null;
 	
-	private ConveyorService  conveyorService =null;
+	//private ConveyorService  conveyorService =null;
 	
 	private IPluginConfigurationServiceImpl iPluginConfigurationService =null;
 	
-	private GridAccount gridAccount =null;
+	
+	private JButton cancelTransaction_JButton;
+	
+	private boolean cancelPutTransaction=false;
+	
+	private boolean cancelGetTransaction=false;
+	
+	
+	/*Code realted to Jargon Conveyor*/
+	/*private GridAccount gridAccount =null;
 	
 	
 	public GridAccount getGridAccount() {
@@ -105,6 +113,30 @@ public class IPlugin implements Serializable {
 
 	public void setGridAccount(GridAccount gridAccount) {
 		this.gridAccount = gridAccount;
+	}*/
+
+	public JButton getCancelTransaction_JButton() {
+		return cancelTransaction_JButton;
+	}
+
+	public void setCancelTransaction_JButton(JButton cancelTransaction_JButton) {
+		this.cancelTransaction_JButton = cancelTransaction_JButton;
+	}
+
+	public boolean isCancelPutTransaction() {
+		return cancelPutTransaction;
+	}
+
+	public void setCancelPutTransaction(boolean cancelPutTransaction) {
+		this.cancelPutTransaction = cancelPutTransaction;
+	}
+
+	public boolean isCancelGetTransaction() {
+		return cancelGetTransaction;
+	}
+
+	public void setCancelGetTransaction(boolean cancelGetTransaction) {
+		this.cancelGetTransaction = cancelGetTransaction;
 	}
 
 	public IPluginConfigurationServiceImpl getiPluginConfigurationService() {
@@ -115,14 +147,16 @@ public class IPlugin implements Serializable {
 			IPluginConfigurationServiceImpl iPluginConfigurationService) {
 		this.iPluginConfigurationService = iPluginConfigurationService;
 	}
-
-	public ConveyorService getConveyorService() {
+	
+	
+	/*Code realted to Jargon Conveyor*/
+	/*public ConveyorService getConveyorService() {
 		return conveyorService;
 	}
 
 	public void setConveyorService(ConveyorService conveyorService) {
 		this.conveyorService = conveyorService;
-	}
+	}*/
 
 	public Properties getTapasProperties() {
 		return tapasProperties;

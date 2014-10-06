@@ -1,25 +1,17 @@
 package org.bio5.irods.iplugin.utilities;
 
-import java.util.Iterator;
-import java.util.List;
-
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
-import org.irods.jargon.conveyor.core.ConveyorCallbackListener;
-import org.irods.jargon.conveyor.core.ConveyorExecutionException;
-import org.irods.jargon.conveyor.core.QueueStatus;
-import org.irods.jargon.conveyor.core.TransferNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.transfer.TransferStatus;
 import org.irods.jargon.core.transfer.TransferStatusCallbackListener;
-import org.irods.jargon.transfer.dao.domain.Transfer;
 
 public class IrodsTransferStatusCallbackListener implements
-		TransferStatusCallbackListener,ConveyorCallbackListener {
+		TransferStatusCallbackListener {
 
 	private JProgressBar jprogressbar;
 	private IPlugin iPlugin;
@@ -42,27 +34,32 @@ public class IrodsTransferStatusCallbackListener implements
 	public void statusCallback(TransferStatus transferStatus)
 			throws JargonException {
 
-		log.info("transfer status callback details: " + transferStatus);
+		log.info("transfer status callback details: " + transferStatus.getTransferState());
 		
-
 		if (transferStatus.getTransferException() != null) {
 			log.info("Exception in file transfer: "
-					+ transferStatus.getTransferState());
+					+ transferStatus.getTransferException());
 			log.error("Exception occured:"
 					+ transferStatus.getTransferException());
-			JOptionPane.showMessageDialog(null, "Exception occured : "
-					+ transferStatus.getTransferException(), "Error",
-					JOptionPane.ERROR_MESSAGE);
+			
+			if (transferStatus.getTransferException().getLocalizedMessage()
+					.contains("ArithmeticException")) {
+
+				JOptionPane.showMessageDialog(null, "Cannot download file:  "
+						+ "File size is 0 bytes", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			else {
+				JOptionPane.showMessageDialog(null, "Exception occured : "
+						+ transferStatus.getTransferException(), "Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
 			iPlugin.setErrorWhileUsingGetOperation(true);
 			return;
 		}
-
-		if (transferStatus.getTransferState() == TransferStatus.TransferState.CANCELLED) {
-			log.info("Transfer cancelled: " + transferStatus.getTransferState());
-			iPlugin.setErrorWhileUsingGetOperation(true);
-			return;
-		}
-
+		
 		if (transferStatus.getTransferState() == TransferStatus.TransferState.FAILURE) {
 			log.error("Error occurred in transfer :" + transferStatus);
 			JOptionPane.showMessageDialog(null,
@@ -74,6 +71,14 @@ public class IrodsTransferStatusCallbackListener implements
 			return;
 
 		}
+
+		if (transferStatus.getTransferState() == TransferStatus.TransferState.CANCELLED) {
+			log.info("Transfer cancelled: " + transferStatus.getTransferState());
+			iPlugin.setErrorWhileUsingGetOperation(true);
+			return;
+		}
+
+		
 		
 	
 		
@@ -84,31 +89,36 @@ public class IrodsTransferStatusCallbackListener implements
 		 * showing false progress.
 		 */
 
-		/*
-		 * else if (transferStatus.getTransferState() ==
-		 * TransferStatus.TransferState.IN_PROGRESS_START_FILE) { if
-		 * (!iPlugin.isErrorWhileUsingGetOperation()) {
-		 * log.info("Transfer state: " + transferStatus.getTransferState() +
-		 * " | Bytes Transferred so far:" + transferStatus.getBytesTransfered()
-		 * + "| Total file size inf bytes:" + transferStatus.getTotalSize() +
-		 * "| Transfer percentage out of 100: " +
-		 * transferStatus.getBytesTransfered() * 100 /
-		 * transferStatus.getTotalSize()); jprogressbar.setMinimum(0);
-		 * jprogressbar.setMaximum(100); jprogressbar.setValue((int)
-		 * (transferStatus .getBytesTransfered() * 100 / transferStatus
-		 * .getTotalSize())); if (Constants.JPROGRESS_SET_STRING_PAINTED) {
-		 * jprogressbar.setString("Progress: " +
-		 * FileUtils.byteCountToDisplaySize(transferStatus
-		 * .getBytesTransfered()) + "/" +
-		 * FileUtils.byteCountToDisplaySize(transferStatus .getTotalSize())); }
-		 * } else {
-		 * log.info("Skipped displaying progress as file transfer is cancelled!"
-		 * ); } }
-		 */
+		
+		else if (transferStatus.getTransferState() == TransferStatus.TransferState.IN_PROGRESS_START_FILE) {
+			if (!iPlugin.isErrorWhileUsingGetOperation()) {
+				log.info("Transfer state: " + transferStatus.getTransferState()
+						+ " | Bytes Transferred so far:"
+						+ transferStatus.getBytesTransfered()
+						+ "| Total file size inf bytes:"
+						+ transferStatus.getTotalSize()
+						+ "| Transfer percentage out of 100: "
+						+ transferStatus.getBytesTransfered() * 100
+						/ transferStatus.getTotalSize());
+				jprogressbar.setMinimum(0);
+				jprogressbar.setMaximum(100);
+				jprogressbar.setValue((int) (transferStatus
+						.getBytesTransfered() * 100 / transferStatus
+						.getTotalSize()));
+				if (Constants.JPROGRESS_SET_STRING_PAINTED) {
+					jprogressbar.setString("Progress: "
+							+ FileUtils.byteCountToDisplaySize(transferStatus
+									.getBytesTransfered())
+							+ "/"
+							+ FileUtils.byteCountToDisplaySize(transferStatus
+									.getTotalSize()));
+				}
+			} else {
+				log.info("Skipped displaying progress as file transfer is cancelled!");
+			}
+		}
+		 
 		else if (transferStatus.isIntraFileStatusReport()) {
-			/*Testing cancel operation*/
-			cancelTransaction();
-			
 			log.info("Transfer state: " + transferStatus.getTransferState()
 					+ " | Bytes Transferred so far:"
 					+ transferStatus.getBytesTransfered()
@@ -213,8 +223,10 @@ public class IrodsTransferStatusCallbackListener implements
 		}
 		return response;
 	}
+	
+	/*Code realted to Jargon Conveyor*/
 
-	public void cancelTransaction() {
+	/*public void cancelTransaction() {
 		List<Transfer> transfers = null;
 		log.info("Entered into cancelTransaction method");
 		try {
@@ -244,11 +256,22 @@ public class IrodsTransferStatusCallbackListener implements
 			// TODO: handle exception
 		}
 
-	}
-
-	public void setQueueStatus(QueueStatus paramQueueStatus) {
+	}*/
+	
+	public synchronized void cancelTransferUsingTransferControlBlock() {
+		log.info("Inside cancelTransferUsingTransferControlBlock");
 		
-	}
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                iPlugin.getTransferControlBlock().setCancelled(true);
+                // might need this for cancel transfer
+                // iDropCore.getIrodsFileSystem().closeAndEatExceptions(iDropCore.getIrodsAccount());
+                // CardLayout cl = (CardLayout) (testCardPanel.getLayout());
+                // cl.show(testCardPanel, "card6");
+            }
+        });
+    }
+
 
 	public void signalUnhandledConveyorException(Exception paramException) {
 		

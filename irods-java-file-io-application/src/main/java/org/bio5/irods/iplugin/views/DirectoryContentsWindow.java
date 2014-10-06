@@ -48,10 +48,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
 import org.bio5.irods.iplugin.bean.TapasCoreFunctions;
+import org.bio5.irods.iplugin.exception.IpluginException;
 import org.bio5.irods.iplugin.fileoperations.GetFileFromIrodsSwingWorker;
 import org.bio5.irods.iplugin.fileoperations.PutFileToIrodsSwingWorker;
 import org.bio5.irods.iplugin.fileoperations.RetrieveInternalNodesSwingWorker;
 import org.bio5.irods.iplugin.listeners.MyTreeModelListener;
+import org.bio5.irods.iplugin.services.IPluginConfigurationServiceImpl;
 import org.bio5.irods.iplugin.swingworkers.ObjectDetailsSwingWorker;
 import org.bio5.irods.iplugin.utilities.Constants;
 import org.bio5.irods.iplugin.utilities.IrodsPropertiesConstruction;
@@ -65,6 +67,7 @@ import org.irods.jargon.core.pub.domain.ObjStat;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
+import org.irods.jargon.core.transfer.DefaultTransferControlBlock;
 import org.irods.jargon.core.transfer.TransferControlBlock;
 
 public class DirectoryContentsWindow extends JPanel implements
@@ -104,9 +107,10 @@ public class DirectoryContentsWindow extends JPanel implements
 	private String imageJCacheFolder;
 	private Long imageJCacheFolderSize;
 	private MainWindow mainWindowInstance;
-	
+
 	private TreePath[] treePaths;
 	private JButton jButton_download;
+	private JButton jButton_cancelTransaction;
 	private String multiSelected;
 
 	/* Logger instantiation */
@@ -198,6 +202,27 @@ public class DirectoryContentsWindow extends JPanel implements
 		/* Construct IrodsTransferStatusCallbackListener */
 		irodsPropertiesConstruction
 				.constructIrodsTransferStatusCallbackListener(iPlugin);
+		
+		
+		/*Construct Configuration service for Tapas Transactions*/
+		try {
+			IPluginConfigurationServiceImpl iPluginConfigurationService = TapasCoreFunctions
+					.createConfigurationServiceForTapasTransactions(iPlugin);
+			if (null != iPluginConfigurationService) {
+				iPlugin.setiPluginConfigurationService(iPluginConfigurationService);
+			} else {
+				log.error("iPluginConfigurationService is null");
+			}
+		} catch (IpluginException e) {
+			log.error("Error while setting ConfigurationServices for Tapas Transactions:"
+					+ e.getMessage());
+		}
+		
+		
+		/*Code realted to Jargon Conveyor*/
+		/*Validate pass phrase in TearOffMode*/
+		//TapasCoreFunctions.validatePassPhraseInTearOffMode(iPlugin);
+		
 
 		imageJCacheFolder = iPlugin.getImageJCacheFolder();
 		log.info("ImageJ cache folder: " + iPlugin.getImageJCacheFolder());
@@ -320,8 +345,9 @@ public class DirectoryContentsWindow extends JPanel implements
 				}
 			}
 		});
-		
-		///////////////////////////////// Zhong Yang ///////////////////////////////
+
+		// /////////////////////////////// Zhong Yang
+		// ///////////////////////////////
 		jButton_download = new JButton("Download files");
 		jButton_download.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -332,6 +358,8 @@ public class DirectoryContentsWindow extends JPanel implements
 					getFile = new GetFileFromIrodsSwingWorker(iRODSFileFactory,
 							multiSelected, iPlugin, iPlugin.getJprogressbar());
 					getFile.execute();
+					
+					
 					/*
 					 * while (iPlugin.getFinishedFlag() != true) { try {
 					 * Thread.sleep(20); } catch (InterruptedException e1) {
@@ -339,10 +367,41 @@ public class DirectoryContentsWindow extends JPanel implements
 					 */
 				}
 				jButton_download.setEnabled(false);
+				
+				/*Enables "Cancel Transaction" button*/
+				iPlugin.getCancelTransaction_JButton().setEnabled(true);
+				log.info("Cancel Transaction button is enabled");
+				
+				/*User can now click "Cancel Transaction" button to cancel Get transfers*/
+				iPlugin.setCancelGetTransaction(true);
 			}
 		});
-		//////////////////////////////////////////////////////////////////////////
+		// ////////////////////////////////////////////////////////////////////////
+		
+		
+		/*code to enable 'cancel transactions' button*/
+		jButton_cancelTransaction = new JButton("Cancel Transactions");
+		jButton_cancelTransaction.setEnabled(false);
+		iPlugin.setCancelTransaction_JButton(jButton_cancelTransaction);
+		jButton_cancelTransaction.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				log.info("Cancel Transaction button is clicked!");
 
+				if (iPlugin.isCancelGetTransaction()) {
+					log.info("Get Transaction is cancelled: "
+							+ getFile.cancel(true));
+				}
+
+				if (iPlugin.isCancelPutTransaction()) {
+					log.info("Put Transaction is cancelled: "
+							+ putFile.cancel(true));
+				}
+
+				jButton_cancelTransaction.setEnabled(false);
+				log.info("Cancel Transaction button is disabled");
+			}
+		});
+		
 		jTextField_sourceFile.setEnabled(false);
 		JButton jButton_selectDestination = new JButton("Select Destination");
 		jButton_selectDestination.addActionListener(new ActionListener() {
@@ -361,10 +420,10 @@ public class DirectoryContentsWindow extends JPanel implements
 		});
 
 		jTextField_destinationPath.setEnabled(false);
-		
-		/*Zhong yang - start*/
+
+		/* Zhong yang - start */
 		jButton_download.setEnabled(false);
-		/*end*/
+		/* end */
 
 		jButton_saveToIrodsServer.setEnabled(false);
 		jButton_saveToIrodsServer.addActionListener(new ActionListener() {
@@ -430,7 +489,7 @@ public class DirectoryContentsWindow extends JPanel implements
 										targetResourceName);
 								putFile.execute();
 								log.info("PutFile operation is executed!");
-
+								
 							}
 						} catch (Exception exception) {
 							log.error(exception.getMessage());
@@ -476,9 +535,10 @@ public class DirectoryContentsWindow extends JPanel implements
 																						jTextField_sourceFile)))
 												.addComponent(
 														jButton_saveToIrodsServer)
-														/*Added by ZHong - start*/
-														.addComponent(jButton_download))
-														/*Added by ZHong - end*/
+												/* Added by ZHong - start */
+												.addComponent(jButton_download)
+												.addComponent(jButton_cancelTransaction))
+								/* Added by ZHong - end */
 								.addContainerGap()));
 		gl_panel.setVerticalGroup(gl_panel
 				.createParallelGroup(Alignment.LEADING)
@@ -507,10 +567,10 @@ public class DirectoryContentsWindow extends JPanel implements
 														jTextField_destinationPath))
 								.addGap(18)
 								.addComponent(jButton_saveToIrodsServer)
-								/*Added by - ZHong Yang - start*/
-								.addGap(18)
-								.addComponent(jButton_download)
-								/*Added by - ZHong Yang - end*/
+								/* Added by - ZHong Yang - start */
+								.addGap(18).addComponent(jButton_download)
+								/* Added by - ZHong Yang - end */
+								.addGap(18).addComponent(jButton_cancelTransaction)
 								.addContainerGap(220, Short.MAX_VALUE)));
 		panel.setLayout(gl_panel);
 
@@ -566,16 +626,24 @@ public class DirectoryContentsWindow extends JPanel implements
 								selectedNodeInTreeForDoubleClick, iPlugin,
 								iPlugin.getJprogressbar());
 						getFile.execute();
+						
+						/*Enables "Cancel Transaction" button*/
+						iPlugin.getCancelTransaction_JButton().setEnabled(true);
+						log.info("Cancel Transaction button is enabled");
+						
+						/*User can now click "Cancel Transaction" button to cancel Get transfers*/
+						iPlugin.setCancelGetTransaction(true);
+						
+						
 					}
 
 				} else if (mouseEvent.getClickCount() == 1) {
 
 					/* Multiple files selection is still pending */
-					treePaths = userDirectoryTree
-							.getSelectionPaths();
+					treePaths = userDirectoryTree.getSelectionPaths();
 					if (null != treePaths) {
-						
-						if ((treePaths.length > 1) ) {
+
+						if ((treePaths.length > 1)) {
 							for (int i = 0; i < treePaths.length; i++) {
 								log.info("Single click Path" + i + ":"
 										+ treePaths[i]);
@@ -824,7 +892,7 @@ public class DirectoryContentsWindow extends JPanel implements
 		try {
 			if (null != retrieveInternalNodesSwingWorker) {
 				retrieveInternalNodesSwingWorker.doInBackground();
-			} 
+			}
 		} catch (Exception exception) {
 			log.error("Error while retrieving internal nodes: "
 					+ exception.getMessage());

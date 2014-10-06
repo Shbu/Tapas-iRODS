@@ -1,6 +1,13 @@
 ----------------------------------------------------------------
-2014-10-03 01:01:43.170 GMT:
- Booting Derby version The Apache Software Foundation - Apache Derby - 10.6.1.0 - (938214): instance a816c00e-0148-d386-d4f5-0000004f3ff0 
-on database directory C:\Users\cherry\.idrop\idrop964\database\transfer   with class loader sun.misc.Launcher$AppClassLoader@14f8dab
-
+Sun Oct 05 22:47:26 MST 2014:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.1.1 - (1458268): instance a816c00e-0148-e3ff-7e95-0000006f4308 
+on database directory C:\Users\cherry\.idrop\idrop201\idrop-conveyor\database\transfer with class loader sun.misc.Launcher$AppClassLoader@26e431 
+Loaded from file:/C:/Users/cherry/.m2/repository/org/apache/derby/derby/10.10.1.1/derby-10.10.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.7.0_25-b17
+user.dir=C:\Users\cherry\git\iRODS-FileIO_LazyLoading\irods-java-file-io-application
+os.name=Windows 7
+os.arch=x86
+os.version=6.1
+derby.system.home=null
 Database Class Loader started - derby.database.classpath=''

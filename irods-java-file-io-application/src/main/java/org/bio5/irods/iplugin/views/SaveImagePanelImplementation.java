@@ -6,7 +6,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.HashMap;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -35,7 +34,6 @@ public class SaveImagePanelImplementation extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private HashMap<String, Object> saveDetails;
 	private JTextField textField_LocalFileName;
 	private IPlugin iplugin;
 	private JTextField textField_irodsDestinationPath;
@@ -51,9 +49,7 @@ public class SaveImagePanelImplementation extends JFrame {
 			.getName());
 
 	/**
-	 * Create the frame.
-	 * 
-	 * @param saveDetails
+	 * @param ipluginInstance
 	 */
 	public SaveImagePanelImplementation(IPlugin ipluginInstance) {
 		setTitle("iRODS ImageJ - Save Image");
@@ -93,90 +89,90 @@ public class SaveImagePanelImplementation extends JFrame {
 		});
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane
-		.setHorizontalGroup(gl_contentPane
-				.createParallelGroup(Alignment.TRAILING)
-				.addGroup(
-						gl_contentPane
-						.createSequentialGroup()
-						.addGap(38)
+				.setHorizontalGroup(gl_contentPane
+						.createParallelGroup(Alignment.TRAILING)
 						.addGroup(
 								gl_contentPane
-								.createParallelGroup(
-										Alignment.LEADING)
-										.addComponent(
-												lbl_irodsDestinationPath)
-												.addComponent(
-														lbl_localFileName))
-														.addGap(18)
+										.createSequentialGroup()
+										.addGap(38)
+										.addGroup(
+												gl_contentPane
+														.createParallelGroup(
+																Alignment.LEADING)
+														.addComponent(
+																lbl_irodsDestinationPath)
+														.addComponent(
+																lbl_localFileName))
+										.addGap(18)
+										.addGroup(
+												gl_contentPane
+														.createParallelGroup(
+																Alignment.LEADING,
+																false)
 														.addGroup(
 																gl_contentPane
-																.createParallelGroup(
-																		Alignment.LEADING,
-																		false)
-																		.addGroup(
-																				gl_contentPane
-																				.createSequentialGroup()
-																				.addComponent(
-																						btn_saveButton)
-																						.addGap(37)
-																						.addComponent(
-																								btn_Cancel))
-																								.addGroup(
-																										gl_contentPane
-																										.createSequentialGroup()
-																										.addComponent(
-																												textField_LocalFileName,
-																												GroupLayout.PREFERRED_SIZE,
-																												181,
-																												GroupLayout.PREFERRED_SIZE)
-																												.addGap(18)
-																												.addComponent(
-																														btn_select_local_file))
-																														.addComponent(
-																																textField_irodsDestinationPath))
-																																.addGap(67)));
+																		.createSequentialGroup()
+																		.addComponent(
+																				btn_saveButton)
+																		.addGap(37)
+																		.addComponent(
+																				btn_Cancel))
+														.addGroup(
+																gl_contentPane
+																		.createSequentialGroup()
+																		.addComponent(
+																				textField_LocalFileName,
+																				GroupLayout.PREFERRED_SIZE,
+																				181,
+																				GroupLayout.PREFERRED_SIZE)
+																		.addGap(18)
+																		.addComponent(
+																				btn_select_local_file))
+														.addComponent(
+																textField_irodsDestinationPath))
+										.addGap(67)));
 		gl_contentPane
-		.setVerticalGroup(gl_contentPane
-				.createParallelGroup(Alignment.LEADING)
-				.addGroup(
-						gl_contentPane
-						.createSequentialGroup()
-						.addGap(73)
+				.setVerticalGroup(gl_contentPane
+						.createParallelGroup(Alignment.LEADING)
 						.addGroup(
 								gl_contentPane
-								.createParallelGroup(
-										Alignment.BASELINE)
-										.addComponent(
-												textField_LocalFileName,
-												GroupLayout.PREFERRED_SIZE,
-												GroupLayout.DEFAULT_SIZE,
-												GroupLayout.PREFERRED_SIZE)
-												.addComponent(
-														lbl_localFileName)
+										.createSequentialGroup()
+										.addGap(73)
+										.addGroup(
+												gl_contentPane
+														.createParallelGroup(
+																Alignment.BASELINE)
+														.addComponent(
+																textField_LocalFileName,
+																GroupLayout.PREFERRED_SIZE,
+																GroupLayout.DEFAULT_SIZE,
+																GroupLayout.PREFERRED_SIZE)
+														.addComponent(
+																lbl_localFileName)
 														.addComponent(
 																btn_select_local_file))
-																.addGap(27)
-																.addGroup(
-																		gl_contentPane
-																		.createParallelGroup(
-																				Alignment.BASELINE)
-																				.addComponent(
-																						textField_irodsDestinationPath,
-																						GroupLayout.PREFERRED_SIZE,
-																						GroupLayout.DEFAULT_SIZE,
-																						GroupLayout.PREFERRED_SIZE)
-																						.addComponent(
-																								lbl_irodsDestinationPath))
-																								.addGap(39)
-																								.addGroup(
-																										gl_contentPane
-																										.createParallelGroup(
-																												Alignment.BASELINE)
-																												.addComponent(
-																														btn_saveButton)
-																														.addComponent(
-																																btn_Cancel))
-																																.addContainerGap(81, Short.MAX_VALUE)));
+										.addGap(27)
+										.addGroup(
+												gl_contentPane
+														.createParallelGroup(
+																Alignment.BASELINE)
+														.addComponent(
+																textField_irodsDestinationPath,
+																GroupLayout.PREFERRED_SIZE,
+																GroupLayout.DEFAULT_SIZE,
+																GroupLayout.PREFERRED_SIZE)
+														.addComponent(
+																lbl_irodsDestinationPath))
+										.addGap(39)
+										.addGroup(
+												gl_contentPane
+														.createParallelGroup(
+																Alignment.BASELINE)
+														.addComponent(
+																btn_saveButton)
+														.addComponent(
+																btn_Cancel))
+										.addContainerGap(81, Short.MAX_VALUE)));
 		contentPane.setLayout(gl_contentPane);
 		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[] {
 				contentPane, lbl_localFileName, textField_LocalFileName,
@@ -239,7 +235,7 @@ public class SaveImagePanelImplementation extends JFrame {
 			if (null != iplugin.getImagePlus()) {
 				if (null != iplugin.getImageJCacheFolder()
 						&& null != iplugin
-						.getSelectedNodeInTreeForDoubleClick()) {
+								.getSelectedNodeInTreeForDoubleClick()) {
 					String fileName = IrodsUtilities
 							.getFileNameFromDirectoryPath(iplugin
 									.getSelectedNodeInTreeForDoubleClick());
@@ -283,6 +279,9 @@ public class SaveImagePanelImplementation extends JFrame {
 
 	}
 
+	/**
+	 * 
+	 */
 	private void saveCurrentEditedFileToIrodsByPluginOption() {
 		try {
 			String targetResourceName = "";
@@ -317,6 +316,17 @@ public class SaveImagePanelImplementation extends JFrame {
 								sourceLocalfile, destinationIrodsFile,
 								targetResourceName);
 						putFile.execute();
+
+						/* Enables "Cancel Transaction" button */
+						iplugin.getCancelTransaction_JButton().setEnabled(true);
+						log.info("Cancel Transaction button is enabled");
+
+						/*
+						 * User can now click "Cancel Transaction" button to
+						 * cancel Get transfers
+						 */
+						iplugin.setCancelGetTransaction(true);
+
 						log.info("Executed PutFile method!");
 						JOptionPane.showMessageDialog(null,
 								"Uploading file completed!");
@@ -349,6 +359,9 @@ public class SaveImagePanelImplementation extends JFrame {
 		return destinationFilePath;
 	}
 
+	/**
+	 * 
+	 */
 	private void saveCurrentEditedFileToIrods() {
 		try {
 
@@ -395,7 +408,8 @@ public class SaveImagePanelImplementation extends JFrame {
 
 				destinationFilePath = IrodsUtilities.getPathSeperator()
 						+ iplugin.getIrodsAccount().getZone()
-						+ IrodsUtilities.getPathSeperator() + Constants.HOME_STRING
+						+ IrodsUtilities.getPathSeperator()
+						+ Constants.HOME_STRING
 						+ IrodsUtilities.getPathSeperator()
 						+ textField_irodsDestinationPath.getText();
 				log.info("Final destinationFilePath: " + destinationFilePath);
@@ -442,9 +456,9 @@ public class SaveImagePanelImplementation extends JFrame {
 				.showOpenDialog(SaveImagePanelImplementation.this);
 		if (option == JFileChooser.APPROVE_OPTION) {
 			textField_LocalFileName
-			.setText(((fileChooser.getSelectedFile() != null) ? fileChooser
-					.getSelectedFile().getAbsolutePath()
-					: "nothing is selected"));
+					.setText(((fileChooser.getSelectedFile() != null) ? fileChooser
+							.getSelectedFile().getAbsolutePath()
+							: "nothing is selected"));
 		} else {
 			textField_LocalFileName.setName("File selection canceled !");
 		}

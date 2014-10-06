@@ -146,6 +146,15 @@ public class SaveImageImplementation {
 									sourceLocalfile, destinationIrodsFile,
 									targetResourceName);
 							putFile.execute();
+							
+							/*Enables "Cancel Transaction" button*/
+							iplugin.getCancelTransaction_JButton().setEnabled(true);
+							log.info("Cancel Transaction button is enabled");
+							
+							/*User can now click "Cancel Transaction" button to cancel Get transfers*/
+							iplugin.setCancelGetTransaction(true);
+							
+							
 							log.info("Executed PutFile method!");
 						} else {
 							log.error("sourceLocalfile or destinaitonIrodsFile or targetResourceName is null");

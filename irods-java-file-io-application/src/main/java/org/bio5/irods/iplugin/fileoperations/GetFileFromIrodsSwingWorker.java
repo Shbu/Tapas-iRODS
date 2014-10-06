@@ -2,13 +2,9 @@ package org.bio5.irods.iplugin.fileoperations;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.WindowManager;
-import ij.gui.ImageWindow;
 import ij.io.Opener;
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
@@ -17,10 +13,7 @@ import javax.swing.SwingWorker;
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
 import org.bio5.irods.iplugin.bean.TapasCoreFunctions;
-import org.bio5.irods.iplugin.utilities.Constants;
 import org.bio5.irods.iplugin.utilities.IrodsUtilities;
-import org.irods.jargon.conveyor.core.ConveyorExecutionException;
-import org.irods.jargon.conveyor.core.QueueManagerService;
 import org.irods.jargon.core.exception.DataNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.exception.OverwriteException;
@@ -29,10 +22,8 @@ import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.transfer.TransferControlBlock;
-import org.irods.jargon.transfer.dao.domain.Transfer;
-import org.irods.jargon.transfer.dao.domain.TransferType;
 
-public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
+public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> implements Runnable {
 
 	private IRODSFileFactory iRODSFileFactory;
 	private String treePath;
@@ -41,7 +32,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 	private DataObjectAO dataObjectAO;
 	private TransferControlBlock transferControlBlock;
 	IRODSFile sourceIrodsFilePath = null;
-	Transfer transferObjectForGetOperation=null;
+	//Transfer transferObjectForGetOperation=null;
 
 	/* Logger instantiation */
 	static Logger log = Logger.getLogger(GetFileFromIrodsSwingWorker.class
@@ -157,26 +148,36 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 									"Local cache directory have files with same name but MD5 checksum is different!",
 									"Information",
 									JOptionPane.INFORMATION_MESSAGE);
+
+				if (md5ChecksumLocalFile.equals(md5ChecksumServerFile)) {
+					JOptionPane
+							.showMessageDialog(
+									null,
+									"File already exists in local. MD5 checksum of local file and remote file is same!",
+									"Information",
+									JOptionPane.INFORMATION_MESSAGE);
+				}
 			}
 			try {
 				if (null != sourceIrodsFilePath && null!= destinationLocalFilePath) {
 					if (null != iPlugin) {
 
-						log.error("Defaulting ErrorWhileUsingGetOperation value to :"
+						log.info("Defaulting ErrorWhileUsingGetOperation value to :"
 								+ "False");
 						iPlugin.setErrorWhileUsingGetOperation(false);
 
 						log.info("Transfer Options in IntraFileStatusCallBack status: "
 								+ transferControlBlock.getTransferOptions());
-						/*dataTransferOperationsAO
+						dataTransferOperationsAO
 								.getOperation(
 										sourceIrodsFilePath,
 										destinationLocalFilePath,
 										iPlugin.getIrodsTransferStatusCallbackListener(),
-										transferControlBlock);*/
+										transferControlBlock);
 						
 						
-				        if (null!=iPlugin.getGridAccount()) {
+						/*Code realted to Jargon Conveyor*/
+				        /*if (null!=iPlugin.getGridAccount()) {
 				        	
 							transferObjectForGetOperation = new Transfer();
 							transferObjectForGetOperation.setIrodsAbsolutePath(sourceIrodsFilePath.getAbsolutePath());
@@ -190,6 +191,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 							try {
 
 								if (null != qms) {
+									log.info("before running enqueueTransferOperation of QMS");
 									qms.enqueueTransferOperation(
 											transferObjectForGetOperation,
 											iPlugin.getIrodsAccount());
@@ -227,14 +229,14 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 						}
 				        else{
 				        	log.error("Grid account object is null!");
-				        }
+				        }*/
 						
 
 						if (!iPlugin.isErrorWhileUsingGetOperation()) {
 							log.info("Executing openImageUsingImageJ method");
 							openImageUsingImageJ();
 						} else {
-							log.error("Error while transfering files");
+							log.error("Error while transferring files");
 							JOptionPane.showMessageDialog(null,
 									"Error while transfering files!", "Error",
 									JOptionPane.ERROR_MESSAGE);
@@ -242,11 +244,13 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 					}
 				}
 			} 
-			finally{
+			
+			/*Code realted to Jargon Conveyor*/
+			/*finally{
 				log.info("finally block");
 				
-			}
-			/*catch (OverwriteException overwriteException) {
+			}*/
+			catch (OverwriteException overwriteException) {
 				log.error("File with same name already exist in local directory! "
 						+ overwriteException.getMessage());
 				JOptionPane
@@ -255,7 +259,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 								"File with same name already exist in local directory!",
 								"Information", JOptionPane.INFORMATION_MESSAGE);
 
-				 Getting MD5 checksum of local file, if exists 
+				 /*Getting MD5 checksum of local file, if exists */
 				File fileInLocal = new File(
 						destinationLocalFilePath.getAbsolutePath()
 								+ IrodsUtilities.getPathSeperator()
@@ -284,7 +288,7 @@ public class GetFileFromIrodsSwingWorker extends SwingWorker<Void, Integer> {
 						JOptionPane.ERROR_MESSAGE);
 				log.info("Error while pulling files!"
 						+ jargonException.getMessage());
-			}*/
+			}
 
 		}
 		return null;

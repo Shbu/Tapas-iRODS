@@ -30,12 +30,14 @@
 			<artifactId>jargon-core</artifactId>
 			<version>${jargon.version}</version>
 		</dependency>
-		
-		<dependency>
-            <groupId>org.irods.jargon</groupId>
-            <artifactId>jargon-conveyor</artifactId>
-            <version>${jargon.conveyor}</version>
-        </dependency>
+
+
+		<!-- Jargon Conveyor Dependency -->
+		<!-- <dependency>
+			<groupId>org.irods.jargon</groupId>
+			<artifactId>jargon-conveyor</artifactId>
+			<version>${jargon.conveyor}</version>
+		</dependency> -->
 
 		<!-- ImageJ Dependency -->
 		<dependency>
@@ -101,7 +103,8 @@
 								<!-- Below snippet will drop jar directly into ImageJ's */plugins/irods 
 									folder -->
 								<copy todir="${imagej.path}/plugins/"
-									file="target/${project.build.finalName}-jar-with-dependencies.jar" failonerror="false"/>
+									file="target/${project.build.finalName}-jar-with-dependencies.jar"
+									failonerror="false" />
 							</tasks>
 							<archive>
 								<manifest>
@@ -121,19 +124,10 @@
 			</plugin>
 
 			<!-- Making Jar executable - NOT WORKING - PENDING -->
-			<!-- <plugin>
-				<groupId>org.bio5.irods.sampleapplications</groupId>
-				<artifactId>irods_fileIO</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>IPlugin_OpenImage</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin> -->
+			<!-- <plugin> <groupId>org.bio5.irods.sampleapplications</groupId> <artifactId>irods_fileIO</artifactId> 
+				<configuration> <archive> <manifest> <addClasspath>true</addClasspath> <classpathPrefix>lib/</classpathPrefix> 
+				<mainClass>IPlugin_OpenImage</mainClass> </manifest> </archive> </configuration> 
+				</plugin> -->
 
 		</plugins>
 	</build>
@@ -155,38 +149,35 @@
 			</snapshots>
 		</repository>
 		<!-- End of RENCI repository -->
-		
+
 		<repository>
-            <id>dice.repository</id>
-            <name>dice.repository</name>
-            <url>https://raw.github.com/DICE-UNC/DICE-Maven/master/releases</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-                <updatePolicy>always</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-        </repository>
+			<id>dice.repository</id>
+			<name>dice.repository</name>
+			<url>https://raw.github.com/DICE-UNC/DICE-Maven/master/releases</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+		</repository>
 	</repositories>
-	
-	
+
+
 	<distributionManagement>
-        <repository>
-            <id>renci.repository</id>
-            <name>renci.repository</name>
-            <url>https://ci-dev.renci.org/nexus/content/repositories/release</url>
-        </repository>
-        <snapshotRepository>
-            <id>renci.snapshots</id>
-            <name>renci.snapshots</name>
-            <url>https://ci-dev.renci.org/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <!-- <site>
-            <id>renci.site</id>
-            <name>renci.site</name>
-            <url>file:///${user.dir}/sites/irodsidrop</url>
-        </site> -->
-    </distributionManagement>
+		<repository>
+			<id>renci.repository</id>
+			<name>renci.repository</name>
+			<url>https://ci-dev.renci.org/nexus/content/repositories/release</url>
+		</repository>
+		<snapshotRepository>
+			<id>renci.snapshots</id>
+			<name>renci.snapshots</name>
+			<url>https://ci-dev.renci.org/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<!-- <site> <id>renci.site</id> <name>renci.site</name> <url>file:///${user.dir}/sites/irodsidrop</url> 
+			</site> -->
+	</distributionManagement>
 </project>

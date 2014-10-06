@@ -33,13 +33,9 @@ import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
 import org.bio5.irods.iplugin.bean.TapasCoreFunctions;
 import org.bio5.irods.iplugin.connection.IrodsConnection;
-import org.bio5.irods.iplugin.exception.IpluginException;
 import org.bio5.irods.iplugin.fileoperations.FileOperations;
-import org.bio5.irods.iplugin.services.IPluginConfigurationServiceImpl;
 import org.bio5.irods.iplugin.utilities.Constants;
 import org.bio5.irods.iplugin.utilities.IrodsUtilities;
-import org.irods.jargon.conveyor.core.ConveyorExecutionException;
-import org.irods.jargon.conveyor.core.GridAccountService;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.exception.AuthenticationException;
@@ -50,8 +46,6 @@ import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.IRODSFileSystemAOImpl;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
-import org.irods.jargon.transfer.dao.domain.GridAccount;
-import org.irods.jargon.transfer.exception.PassPhraseInvalidException;
 
 /**
  * @author Sharan
@@ -89,7 +83,6 @@ public class MainWindow extends JFrame {
 	private String usernamePickedFromPropertyFiles = null;
 	private String zonePickedFromPropertyFiles = null;
 	private String hostPickedFromPropertyFiles = null;
-	private IPluginConfigurationServiceImpl iPluginConfigurationService =null;
 
 	/**
 	 * Launch the application.
@@ -566,11 +559,6 @@ public class MainWindow extends JFrame {
 					irodsFileFactoryCreation();
 				}
 				
-				/* Creating Configuration service data for the account */
-				createConfigurationService();
-				
-				/*validating pass phrase in tearoff mode*/
-				validatePassPhraseInTearOffMode();
 
 				if (null != irodsFileSystem) {
 					IRODSSession iRODSSession = irodsFileSystem
@@ -694,46 +682,6 @@ public class MainWindow extends JFrame {
 	}
 	
 	
-	private void createConfigurationService() throws IpluginException{
-		if(null != iplugin){
-			
-			iPluginConfigurationService = new IPluginConfigurationServiceImpl(iplugin);
-			iplugin.setiPluginConfigurationService(iPluginConfigurationService);
-			
-		}
-	}
-	
-	
-	private void validatePassPhraseInTearOffMode() {
-		if (null != iplugin.getIrodsAccount()) {
-			try {
-				GridAccountService gAccountService = iplugin
-						.getConveyorService().getGridAccountService();
-				gAccountService.validatePassPhrase("abcd");
-				gAccountService
-						.addOrUpdateGridAccountBasedOnIRODSAccount(iplugin
-								.getIrodsAccount());
-
-				GridAccount gridAccount = gAccountService
-						.findGridAccountByIRODSAccount(iplugin
-								.getIrodsAccount());
-				if (null != gridAccount) {
-					log.info("gaccount details" + gridAccount.getUserName());
-					iplugin.setGridAccount(gridAccount);
-					
-				}
-				
-			} catch (ConveyorExecutionException e) {
-				log.error("Conveyor execution exception while Authenticating the user"
-						+ e.getMessage());
-			} catch (PassPhraseInvalidException e) {
-				// TODO Auto-generated catch block
-				log.error("PassPhraseInvalidException while Authenticating the user"
-						+ e.getMessage());
-			}
-		}
-	}
-
 	/**
 	 * 
 	 */

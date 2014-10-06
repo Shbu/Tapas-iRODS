@@ -1,16 +1,7 @@
 package org.bio5.irods.iplugin.services;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.bio5.irods.iplugin.bean.IPlugin;
-import org.bio5.irods.iplugin.exception.IpluginAlreadyRunningException;
 import org.bio5.irods.iplugin.exception.IpluginException;
-import org.irods.jargon.conveyor.basic.BasicConveyorBootstrapperImpl;
-import org.irods.jargon.conveyor.basic.ConveyorBootstrapConfiguration;
-import org.irods.jargon.conveyor.core.ConveyorBootstrapper;
-import org.irods.jargon.conveyor.core.ConveyorCallbackListener;
-import org.irods.jargon.conveyor.core.ConveyorService;
 import org.slf4j.LoggerFactory;
 
 public class IPluginConfigurationServiceImpl {
@@ -26,7 +17,9 @@ public class IPluginConfigurationServiceImpl {
 		if (null != iplugin) {
 			this.iplugin = iplugin;
 
-			try {
+			
+			/*Code realted to Jargon Conveyor*/
+			/*try {
 				
 				ConveyorBootstrapConfiguration conveyorBootstrapConfiguration = new ConveyorBootstrapConfiguration();
 				ConveyorBootstrapper conveyorBootstrapper = new BasicConveyorBootstrapperImpl(
@@ -52,7 +45,7 @@ public class IPluginConfigurationServiceImpl {
 					throw new IpluginException(exception);
 				}
 
-			}
+			}*/
 		} else {
 			log.info("iplugin is empty!");
 		}
