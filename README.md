@@ -1,11 +1,9 @@
-Tapas - plugin for ImageJ application (formerly known as iRODS-FileIO or iPlugin)
+Tapas v1.0 - plugin for ImageJ application (formerly known as iRODS-FileIO or iPlugin)
 ------------------------
 
 Tapas (iRODS-FileIO) project deals with development of a Desktop Swing Application which can communicate with iRODS data servers and pull high definition image files through ImageJ application. Further more, through this plugin, users should be able to edit image files (perform analysis) and save edited files back to data servers.
 
 Ultimate goal of the project is to pack entire source into a Jar, which when executed through ImageJ application as a plugin. Once execute, it should be able to talk to iRODS and get images into ImageJ workspace, which further can be edited at users wish and can be saved back to iRODS servers.
-
-
 
 
 
