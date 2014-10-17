@@ -9,7 +9,7 @@ Ultimate goal of the project is to pack entire source into a Jar, which when exe
 
 New Requirements - Received on 09/25/2014 - completed on 10/16/2014
 ----------------------------------------
-1. Implement "Custom Nagivation" feature to the navigation menu bar. Meaning, user should be able to navigate to any directory structure just by giving path (Ex: <zone>/home/<accountName>/<folders>). This involves recursive directory looping and Lazy Loading mechanism.
+1. Implement "Custom Nagivation" feature under navigation menu bar. In this implementation, user should be given provision to to navigate to any directory structure if he is willing to give path (Ex: <zone>/home/<accountName>/<folders>). This involves recursive directory looping and Lazy Loading mechanism.
 2. User should be given provision to cancel transactions. 
 
 
