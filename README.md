@@ -1,9 +1,24 @@
-iPlugin (formerly known as iRODS-FileIO)
+Tapas - plugin for ImageJ application (formerly known as iRODS-FileIO or iPlugin)
 ------------------------
 
-iRODS-FileIO project deals with development of a Desktop Swing Application which can communicate with iRODS data servers and pull high definition image files through ImageJ application.
+Tapas (iRODS-FileIO) project deals with development of a Desktop Swing Application which can communicate with iRODS data servers and pull high definition image files through ImageJ application. Further more, through this plugin, users should be able to edit image files (perform analysis) and save edited files back to data servers.
 
-Ultimate goal of the project is to pack entire source into a Jar, which when executed through ImageJ application as a plugin, should be able to talk to iRODS and get images into ImageJ workspace, which further can be edited at users wish and can be saved back to iRODS servers.
+Ultimate goal of the project is to pack entire source into a Jar, which when executed through ImageJ application as a plugin. Once execute, it should be able to talk to iRODS and get images into ImageJ workspace, which further can be edited at users wish and can be saved back to iRODS servers.
+
+
+
+
+
+New Requirements - Received on 09/25/2014 - completed on 10/16/2014
+----------------------------------------
+1. Implement "Custom Nagivation" feature to the navigation menu bar. Meaning, user should be able to navigate to any directory structure just by giving path (Ex: <zone>/home/<accountName>/<folders>). This involves recursive directory looping and Lazy Loading mechanism.
+2. User should be given provision to cancel transactions. 
+
+
+New Requirements - Received on 09/20/2014 - Completed on 10/1/2014
+-----------------------------------------
+
+Implementation of Jargon-conveyor packages. Jargon conveyor is morer sophisticated API to interact with iRODS data servers. This has additional features that helps developer to manipulate parallel transactions at each individual thread level.
 
 
 New Requirements - Received on 6/1/2014
