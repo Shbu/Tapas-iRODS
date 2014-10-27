@@ -1,16 +1,16 @@
 package org.bio5.irods.iplugin.views;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.net.ConnectException;
 import java.util.List;
 import java.util.Properties;
 
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -25,7 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
@@ -47,23 +46,10 @@ import org.irods.jargon.core.pub.IRODSFileSystemAOImpl;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 
-/**
- * @author Sharan
- * 
- */
 public class MainWindow extends JFrame {
-
-	/**
-	 * 
-	 */
-
 	private static final long serialVersionUID = 393011043100419159L;
 	public IRODSFileSystem irodsFileSystem;
-
-	/* Logger instantiation */
 	static Logger log = Logger.getLogger(MainWindow.class.getName());
-
-	/* Variables initialization */
 	private JPanel contentPanePanel;
 	private JTextField textbox_LoginId;
 	private JPasswordField textField_passwordField;
@@ -71,7 +57,6 @@ public class MainWindow extends JFrame {
 	private DirectoryContentsWindow directoryContentsPane;
 	private IPlugin iplugin;
 	private JCheckBox HomeDirectory_CheckBox;
-
 	public JFileChooser localImageJFileChooser;
 	private JTextField textField_ImageJCacheFolderPath;
 	private IRODSFileSystemAOImpl iRODSFileSystemAOImpl;
@@ -84,23 +69,14 @@ public class MainWindow extends JFrame {
 	private String zonePickedFromPropertyFiles = null;
 	private String hostPickedFromPropertyFiles = null;
 
-	/**
-	 * Launch the application.
-	 */
-	/**
-	 * Create the frame.
-	 */
 	public MainWindow(IPlugin iPlugin) {
-		// super();
 		this.iplugin = iPlugin;
 
 		mainWindowInit();
 
-		setTitle("iRODS");
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setTitle("Tapas");
+		setDefaultCloseOperation(2);
 		setBounds(100, 100, 682, 454);
-
-		// setFocusable(true);
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -110,16 +86,16 @@ public class MainWindow extends JFrame {
 		menuBar.add(mnNewMenu_File);
 
 		JMenuItem mntmNewMenuItem_Open = new JMenuItem("Open");
-		mntmNewMenuItem_Open.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_O, InputEvent.CTRL_MASK));
+		mntmNewMenuItem_Open.setAccelerator(KeyStroke.getKeyStroke(79, 2));
+
 		mnNewMenu_File.add(mntmNewMenuItem_Open);
 
 		JMenuItem mntmNewMenuItem_Exit = new JMenuItem("Exit");
-		mntmNewMenuItem_Exit.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_F4, InputEvent.ALT_MASK));
+		mntmNewMenuItem_Exit.setAccelerator(KeyStroke.getKeyStroke(115, 8));
+
 		mntmNewMenuItem_Exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				closeApplication(iplugin);
+				MainWindow.this.dispose();
 			}
 		});
 		mnNewMenu_File.add(mntmNewMenuItem_Exit);
@@ -127,176 +103,203 @@ public class MainWindow extends JFrame {
 		mnHelp.setMnemonic('H');
 		menuBar.add(mnHelp);
 		JMenuItem mntm_About = new JMenuItem("About iPlugin");
-		mntm_About.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
+		mntm_About.setAccelerator(KeyStroke.getKeyStroke(122, 0));
 		mntm_About.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JOptionPane
 						.showMessageDialog(
 								null,
-								"iPlugin V1.2 - Plugin for imagej to handle file operations with iRODS Servers",
-								"About iRODS ImageJ Plugin v1.2", 1);
+								"Tapas V1.0 - Plugin for imagej to handle file operations with iRODS Data Servers",
+								"About Tapas - ImageJ Plugin v1.0", 1);
 			}
 		});
 		mnHelp.add(mntm_About);
-		contentPanePanel = new JPanel();
-		contentPanePanel.setBorder(new EmptyBorder(0, 0, 0, 0));
+		this.contentPanePanel = new JPanel();
+		this.contentPanePanel.setBorder(new EmptyBorder(0, 0, 0, 0));
 
-		setContentPane(contentPanePanel);
+		setContentPane(this.contentPanePanel);
 
-		textbox_LoginId = new JTextField();
-		textbox_LoginId.setHorizontalAlignment(SwingConstants.LEFT);
-		textbox_LoginId.setToolTipText("User Id");
-		textbox_LoginId.setColumns(13);
+		this.textbox_LoginId = new JTextField();
+		this.textbox_LoginId.setHorizontalAlignment(2);
+		this.textbox_LoginId.setToolTipText("User Id");
+		this.textbox_LoginId.setColumns(13);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				textbox_LoginId.requestFocus();
+				MainWindow.this.textbox_LoginId.requestFocus();
 			}
 		});
-
-		final JButton button_Login = new JButton("Login");
+		JButton button_Login = new JButton("Login");
 		button_Login.setToolTipText("Click to Login");
 		button_Login.setEnabled(true);
 
-		/* Adding default button_Login as default button for ENTER_KEY */
 		getRootPane().setDefaultButton(button_Login);
-		/*
-		 * Let cursor show into login text filed and user can input string to
-		 * it.
-		 */
-		textbox_LoginId.requestFocusInWindow();
+
+		this.textbox_LoginId.requestFocusInWindow();
 
 		button_Login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				/*
-				 * When the root panel active, request the this panel focusable,
-				 * and set key listener for ESC button.
-				 */
-				getRootPane().setFocusable(true);
-				loginMethod();
-				getRootPane().addKeyListener(new KeyAdapter() {
-					public void keyPressed(KeyEvent e) {
-						if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-							closeApplication(iplugin);
+				MainWindow.this.getRootPane().setFocusable(true);
+				try {
+					MainWindow.this.loginMethod();
+				} catch (ConnectException connectException) {
+					MainWindow.log.error(connectException.getMessage(),
+							connectException);
+					JOptionPane
+							.showMessageDialog(
+									null,
+									"ConnectionException - Connection timed out: connect",
+									"Error", 0);
 
+					connectException.printStackTrace();
+				}
+				MainWindow.this.getRootPane().addKeyListener(new KeyAdapter() {
+					public void keyPressed(KeyEvent e) {
+						if (e.getKeyCode() == 27) {
+							try {
+								MainWindow.this
+										.closeApplication(MainWindow.this.iplugin);
+							} catch (JargonException jargonException) {
+								MainWindow.log
+										.error("Error while closing application!"
+												+ jargonException);
+
+								JOptionPane.showMessageDialog(null,
+										"Error while closing application!",
+										"Error", 0);
+
+								return;
+							}
 						}
 					}
 				});
 			}
 		});
-
-		JButton button_Cancel = new JButton(Constants.CANCEL_BUTTON);
+		JButton button_Cancel = new JButton("Cancel");
 		button_Cancel.setToolTipText("Click to close application");
 		button_Cancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				closeApplication(iplugin);
-			}
-		});
+				try {
+					MainWindow.this.closeApplication(MainWindow.this.iplugin);
+				} catch (JargonException jargonException) {
+					MainWindow.log.error("Error while closing application!"
+							+ jargonException);
 
-		JLabel Label_Username = new JLabel(Constants.USER_NAME);
-		Label_Username.setHorizontalAlignment(SwingConstants.CENTER);
-		JLabel Label_Password = new JLabel(Constants.PASSWORD);
-		Label_Password.setHorizontalAlignment(SwingConstants.CENTER);
+					JOptionPane.showMessageDialog(null,
+							"Error while closing application!", "Error", 0);
 
-		textField_passwordField = new JPasswordField();
-		textField_passwordField.setHorizontalAlignment(SwingConstants.LEFT);
-		textField_passwordField.setToolTipText(Constants.PASSWORD);
-
-		textField_Port = new JTextField();
-		textField_Port.setEditable(false);
-		textField_Port.setText(Constants.PORT);
-		textField_Port.setToolTipText(Constants.PORT_NO);
-		textField_Port.setColumns(10);
-
-		JLabel Label_Port = new JLabel(Constants.PORT_LABEL);
-		Label_Port.setHorizontalAlignment(SwingConstants.CENTER);
-
-		JLabel label_Zone = new JLabel(Constants.ZONE);
-		label_Zone.setHorizontalAlignment(SwingConstants.CENTER);
-
-		JLabel label_Host = new JLabel(Constants.HOST);
-		label_Host.setHorizontalAlignment(SwingConstants.CENTER);
-
-		JLabel homeDirectory_Label = new JLabel(Constants.FILE_SELECTION);
-
-		HomeDirectory_CheckBox = new JCheckBox(Constants.HOME_DIRECTORY);
-
-		textField_ImageJCacheFolderPath = new JTextField();
-		textField_ImageJCacheFolderPath
-				.setToolTipText(Constants.ENTER_IMAGE_J_CACHE_FOLDER_PATH);
-		textField_ImageJCacheFolderPath.setColumns(10);
-		textField_ImageJCacheFolderPath.setText(iPlugin.getImageJCacheFolder());
-
-		JLabel lblImagejCacheFolder = new JLabel(Constants.IMAGE_J_CACHE_FOLDER);
-		JButton btnChooseFolder = new JButton(Constants.CHOOSE_FOLDER);
-		btnChooseFolder.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				fileChooserForImageJCacheFolder = new JFileChooser(
-						IrodsUtilities.getUserHomeFolderFromSystemProperty());
-				fileChooserForImageJCacheFolder
-						.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				int returnVal = fileChooserForImageJCacheFolder
-						.showOpenDialog(MainWindow.this);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					selectedFileForImageJCacheFolder = fileChooserForImageJCacheFolder
-							.getSelectedFile();
-					log.info("Opening: "
-							+ selectedFileForImageJCacheFolder
-									.getAbsolutePath() + "."
-							+ Constants.NEW_LINE_STRING);
-					iplugin.setImageJCacheFolder(selectedFileForImageJCacheFolder
-							.getAbsolutePath());
-					textField_ImageJCacheFolderPath.setText(iplugin
-							.getImageJCacheFolder());
-				} else {
-					log.error("User cancelled file selection window: "
-							+ Constants.NEW_LINE_STRING);
+					return;
 				}
 			}
 		});
+		JLabel Label_Username = new JLabel("User Name:");
+		Label_Username.setHorizontalAlignment(0);
+		JLabel Label_Password = new JLabel("Password:");
+		Label_Password.setHorizontalAlignment(0);
 
-		/* Initializing values */
-		comboBox_Zone = new JComboBox<String>();
-		comboBox_Host = new JComboBox<String>();
+		this.textField_passwordField = new JPasswordField();
+		this.textField_passwordField.setHorizontalAlignment(2);
+		this.textField_passwordField.setToolTipText("Password:");
 
-		/* Pulling tapas login configuration from properties */
+		this.textField_Port = new JTextField();
+		this.textField_Port.setEditable(false);
+		this.textField_Port.setText(Constants.PORT);
+		this.textField_Port.setToolTipText("Port No.");
+		this.textField_Port.setColumns(10);
+
+		JLabel Label_Port = new JLabel("Port:");
+		Label_Port.setHorizontalAlignment(0);
+
+		JLabel label_Zone = new JLabel("Zone:");
+		label_Zone.setHorizontalAlignment(0);
+
+		JLabel label_Host = new JLabel("Host:");
+		label_Host.setHorizontalAlignment(0);
+
+		JLabel homeDirectory_Label = new JLabel("File Selection:");
+
+		this.HomeDirectory_CheckBox = new JCheckBox("Home Directory");
+
+		this.textField_ImageJCacheFolderPath = new JTextField();
+		this.textField_ImageJCacheFolderPath
+				.setToolTipText("Enter ImageJ Cache folder path");
+
+		this.textField_ImageJCacheFolderPath.setColumns(10);
+		this.textField_ImageJCacheFolderPath.setText(iPlugin
+				.getImageJCacheFolder());
+
+		JLabel lblImagejCacheFolder = new JLabel("ImageJ Cache Folder:");
+		JButton btnChooseFolder = new JButton("Choose folder");
+		btnChooseFolder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MainWindow.this.fileChooserForImageJCacheFolder = new JFileChooser(
+						IrodsUtilities.getUserHomeFolderFromSystemProperty());
+
+				MainWindow.this.fileChooserForImageJCacheFolder
+						.setFileSelectionMode(1);
+
+				int returnVal = MainWindow.this.fileChooserForImageJCacheFolder
+						.showOpenDialog(MainWindow.this);
+				if (returnVal == 0) {
+					MainWindow.this.selectedFileForImageJCacheFolder = MainWindow.this.fileChooserForImageJCacheFolder
+							.getSelectedFile();
+
+					MainWindow.log.info("Opening: "
+							+ MainWindow.this.selectedFileForImageJCacheFolder
+									.getAbsolutePath() + "." + "\n");
+
+					MainWindow.this.iplugin
+							.setImageJCacheFolder(MainWindow.this.selectedFileForImageJCacheFolder
+									.getAbsolutePath());
+
+					MainWindow.this.textField_ImageJCacheFolderPath
+							.setText(MainWindow.this.iplugin
+									.getImageJCacheFolder());
+				} else {
+					MainWindow.log
+							.error("User cancelled file selection window: \n");
+				}
+			}
+		});
+		this.comboBox_Zone = new JComboBox();
+		this.comboBox_Host = new JComboBox();
 
 		Properties tapasProperties = IrodsUtilities.getTapasLoginConfiguration(
-				Constants.PROPERTY_FILE_NAME, Constants.IMAGEJ_CACHE_FOLDER);
+				"tapas.properties", Constants.IMAGEJ_CACHE_FOLDER);
 		if (null != tapasProperties) {
 			setPropertyFileDataToLoginPanel(tapasProperties);
-			iplugin.setTapasProperties(tapasProperties);
+			this.iplugin.setTapasProperties(tapasProperties);
 		} else {
 			log.error("tapas property file is null");
 		}
-
-		comboBox_Zone.addActionListener(new ActionListener() {
+		this.comboBox_Zone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JComboBox comboBox = (JComboBox) e.getSource();
 				Object selected = comboBox.getSelectedItem();
 				if (selected.toString().equals(Constants.ZONE_IPLANT)) {
-					comboBox_Host.setSelectedItem(Constants.HOST_IPLANT);
+					MainWindow.this.comboBox_Host
+							.setSelectedItem("data.iplantcollaborative.org");
 				}
 				if (selected.toString().equals(Constants.ZONE_SPX)) {
-					comboBox_Host.setSelectedItem(Constants.HOST_SPX);
+					MainWindow.this.comboBox_Host
+							.setSelectedItem("spxirods.dyndns.org");
 				}
 			}
 		});
+		this.comboBox_Zone.setEditable(true);
+		this.comboBox_Zone.setToolTipText("Select your zone");
+		this.comboBox_Host.setToolTipText("Select your host");
+		this.comboBox_Host.setEditable(true);
 
-		comboBox_Zone.setEditable(true);
-		comboBox_Zone.setToolTipText("Select your zone");
-		comboBox_Host.setToolTipText("Select your host");
-		comboBox_Host.setEditable(true);
-
-		GroupLayout gl_contentPane = new GroupLayout(contentPanePanel);
+		GroupLayout gl_contentPane = new GroupLayout(this.contentPanePanel);
 		gl_contentPane
 				.setHorizontalGroup(gl_contentPane
-						.createParallelGroup(Alignment.LEADING)
+						.createParallelGroup(GroupLayout.Alignment.LEADING)
 						.addGroup(
 								gl_contentPane.createSequentialGroup()
 										.addGap(269).addComponent(button_Login)
 										.addGap(18).addComponent(button_Cancel)
-										.addContainerGap(257, Short.MAX_VALUE))
+										.addContainerGap(257, 32767))
 						.addGroup(
 								gl_contentPane
 										.createSequentialGroup()
@@ -304,7 +307,7 @@ public class MainWindow extends JFrame {
 										.addGroup(
 												gl_contentPane
 														.createParallelGroup(
-																Alignment.LEADING)
+																GroupLayout.Alignment.LEADING)
 														.addComponent(
 																Label_Password)
 														.addComponent(
@@ -323,25 +326,25 @@ public class MainWindow extends JFrame {
 										.addGroup(
 												gl_contentPane
 														.createParallelGroup(
-																Alignment.LEADING)
+																GroupLayout.Alignment.LEADING)
 														.addGroup(
 																gl_contentPane
 																		.createSequentialGroup()
 																		.addComponent(
-																				comboBox_Zone,
-																				GroupLayout.PREFERRED_SIZE,
+																				this.comboBox_Zone,
+																				-2,
 																				142,
-																				GroupLayout.PREFERRED_SIZE)
+																				-2)
 																		.addContainerGap())
 														.addGroup(
 																gl_contentPane
 																		.createParallelGroup(
-																				Alignment.LEADING)
+																				GroupLayout.Alignment.LEADING)
 																		.addGroup(
 																				gl_contentPane
 																						.createSequentialGroup()
 																						.addComponent(
-																								HomeDirectory_CheckBox)
+																								this.HomeDirectory_CheckBox)
 																						.addContainerGap())
 																		.addGroup(
 																				gl_contentPane
@@ -349,9 +352,9 @@ public class MainWindow extends JFrame {
 																						.addGroup(
 																								gl_contentPane
 																										.createParallelGroup(
-																												Alignment.LEADING)
+																												GroupLayout.Alignment.LEADING)
 																										.addComponent(
-																												textField_Port,
+																												this.textField_Port,
 																												64,
 																												64,
 																												64)
@@ -361,45 +364,46 @@ public class MainWindow extends JFrame {
 																														.addGroup(
 																																gl_contentPane
 																																		.createParallelGroup(
-																																				Alignment.LEADING)
+																																				GroupLayout.Alignment.LEADING)
 																																		.addComponent(
-																																				textField_passwordField,
-																																				GroupLayout.DEFAULT_SIZE,
+																																				this.textField_passwordField,
+																																				-1,
 																																				368,
-																																				Short.MAX_VALUE)
+																																				32767)
 																																		.addComponent(
-																																				textbox_LoginId,
-																																				GroupLayout.DEFAULT_SIZE,
+																																				this.textbox_LoginId,
+																																				-1,
 																																				368,
-																																				Short.MAX_VALUE)
+																																				32767)
 																																		.addGroup(
 																																				gl_contentPane
 																																						.createSequentialGroup()
 																																						.addGroup(
 																																								gl_contentPane
 																																										.createParallelGroup(
-																																												Alignment.TRAILING,
+																																												GroupLayout.Alignment.TRAILING,
 																																												false)
 																																										.addComponent(
-																																												comboBox_Host,
-																																												Alignment.LEADING,
+																																												this.comboBox_Host,
+																																												GroupLayout.Alignment.LEADING,
 																																												0,
-																																												GroupLayout.DEFAULT_SIZE,
-																																												Short.MAX_VALUE)
+																																												-1,
+																																												32767)
 																																										.addComponent(
-																																												textField_ImageJCacheFolderPath,
-																																												Alignment.LEADING,
-																																												GroupLayout.DEFAULT_SIZE,
+																																												this.textField_ImageJCacheFolderPath,
+																																												GroupLayout.Alignment.LEADING,
+																																												-1,
 																																												251,
-																																												Short.MAX_VALUE))
+																																												32767))
 																																						.addGap(18)
 																																						.addComponent(
 																																								btnChooseFolder)))
 																														.addGap(10)))
 																						.addGap(85))))));
+
 		gl_contentPane
 				.setVerticalGroup(gl_contentPane
-						.createParallelGroup(Alignment.LEADING)
+						.createParallelGroup(GroupLayout.Alignment.LEADING)
 						.addGroup(
 								gl_contentPane
 										.createSequentialGroup()
@@ -407,73 +411,61 @@ public class MainWindow extends JFrame {
 										.addGroup(
 												gl_contentPane
 														.createParallelGroup(
-																Alignment.BASELINE,
+																GroupLayout.Alignment.BASELINE,
 																false)
 														.addComponent(
 																Label_Username)
 														.addComponent(
-																textbox_LoginId,
-																GroupLayout.PREFERRED_SIZE,
-																GroupLayout.DEFAULT_SIZE,
-																GroupLayout.PREFERRED_SIZE))
+																this.textbox_LoginId,
+																-2, -1, -2))
 										.addGap(17)
 										.addGroup(
 												gl_contentPane
 														.createParallelGroup(
-																Alignment.BASELINE)
+																GroupLayout.Alignment.BASELINE)
 														.addComponent(
 																Label_Password)
 														.addComponent(
-																textField_passwordField,
-																GroupLayout.PREFERRED_SIZE,
-																GroupLayout.DEFAULT_SIZE,
-																GroupLayout.PREFERRED_SIZE))
+																this.textField_passwordField,
+																-2, -1, -2))
 										.addGap(18)
 										.addGroup(
 												gl_contentPane
 														.createParallelGroup(
-																Alignment.BASELINE)
+																GroupLayout.Alignment.BASELINE)
 														.addComponent(
 																Label_Port)
 														.addComponent(
-																textField_Port,
-																GroupLayout.PREFERRED_SIZE,
-																GroupLayout.DEFAULT_SIZE,
-																GroupLayout.PREFERRED_SIZE))
+																this.textField_Port,
+																-2, -1, -2))
 										.addGap(18)
 										.addGroup(
 												gl_contentPane
 														.createParallelGroup(
-																Alignment.BASELINE)
+																GroupLayout.Alignment.BASELINE)
 														.addComponent(
 																label_Zone)
 														.addComponent(
-																comboBox_Zone,
-																GroupLayout.PREFERRED_SIZE,
-																GroupLayout.DEFAULT_SIZE,
-																GroupLayout.PREFERRED_SIZE))
+																this.comboBox_Zone,
+																-2, -1, -2))
 										.addGap(15)
 										.addGroup(
 												gl_contentPane
 														.createParallelGroup(
-																Alignment.BASELINE)
+																GroupLayout.Alignment.BASELINE)
 														.addComponent(
 																label_Host)
 														.addComponent(
-																comboBox_Host,
-																GroupLayout.PREFERRED_SIZE,
-																GroupLayout.DEFAULT_SIZE,
-																GroupLayout.PREFERRED_SIZE))
+																this.comboBox_Host,
+																-2, -1, -2))
 										.addGap(18)
 										.addGroup(
 												gl_contentPane
 														.createParallelGroup(
-																Alignment.BASELINE)
+																GroupLayout.Alignment.BASELINE)
 														.addComponent(
-																textField_ImageJCacheFolderPath,
-																GroupLayout.PREFERRED_SIZE,
-																GroupLayout.DEFAULT_SIZE,
-																GroupLayout.PREFERRED_SIZE)
+																this.textField_ImageJCacheFolderPath,
+																-2, -1, -2)
 														.addComponent(
 																lblImagejCacheFolder)
 														.addComponent(
@@ -482,189 +474,156 @@ public class MainWindow extends JFrame {
 										.addGroup(
 												gl_contentPane
 														.createParallelGroup(
-																Alignment.BASELINE)
+																GroupLayout.Alignment.BASELINE)
 														.addComponent(
-																HomeDirectory_CheckBox)
+																this.HomeDirectory_CheckBox)
 														.addComponent(
 																homeDirectory_Label))
 										.addGap(31)
 										.addGroup(
 												gl_contentPane
 														.createParallelGroup(
-																Alignment.BASELINE)
+																GroupLayout.Alignment.BASELINE)
 														.addComponent(
 																button_Login)
 														.addComponent(
 																button_Cancel))
 										.addGap(51)));
-		contentPanePanel.setLayout(gl_contentPane);
+
+		this.contentPanePanel.setLayout(gl_contentPane);
 	}
 
-	/**
-	 * Sets the visibility of Login panel
-	 */
 	private void setVisibilityOfForm() {
-		setContentPane(directoryContentsPane);
+		setContentPane(this.directoryContentsPane);
+		this.directoryContentsPane.setPreferredSize(getPreferredSize());
+		this.directoryContentsPane.setMinimumSize(getMinimumSize());
 		validate();
 		repaint();
 		pack();
 		setVisible(true);
 	}
 
-	/**
-	 * 
-	 */
-	private void mainWindowInit() {
-		// irodsImagejInstance = new IrodsImageJBean();
+	public Dimension getMinimumSize() {
+		return new Dimension(200, 100);
+	}
 
-		/* Setting iRODS file system */
+	public Dimension getPreferredSize() {
+		return new Dimension(800, 600);
+	}
+
+	private void mainWindowInit() {
 		try {
-			irodsFileSystem = IRODSFileSystem.instance();
-			iplugin.setIrodsFileSystem(irodsFileSystem);
+			this.irodsFileSystem = IRODSFileSystem.instance();
+			this.iplugin.setIrodsFileSystem(this.irodsFileSystem);
 		} catch (JargonException e) {
 			log.error("Error while retrieving irodsFileSystem" + e.getMessage());
 		}
-
 	}
 
-	/**
-	 * loginMethod will be invoked when Login button is clicked. irodsAccount
-	 * instantiation happens and directory contents will be pulled if
-	 * credentials are valid.
-	 */
-	@SuppressWarnings("deprecation")
-	private void loginMethod() {
-
-		String username = textbox_LoginId.getText();
-		char[] password = textField_passwordField.getPassword();
+	private void loginMethod() throws ConnectException {
+		String username = this.textbox_LoginId.getText();
+		char[] password = this.textField_passwordField.getPassword();
 		String password_full = "";
 		cacheDirectoryCreation();
-
-		for (char chars : password)
-			password_full += chars;
-		int port = Integer.parseInt(textField_Port.getText());
-		String host = comboBox_Host.getSelectedItem().toString();
-		String zone = comboBox_Zone.getSelectedItem().toString();
-		{
-			try {
-				if (HomeDirectory_CheckBox.isSelected()) {
-					iplugin.setHomeDirectoryTheRootNode(true);
-				}
-
-				IRODSAccount irodsAccount = IrodsConnection.irodsConnection(
-						username, password_full, zone, host, port);
-				iplugin.setIrodsAccount(irodsAccount);
-
-				if (iplugin.getIrodsAccount() != null) {
-					irodsFileFactoryCreation();
-				}
-				
-
-				if (null != irodsFileSystem) {
-					IRODSSession iRODSSession = irodsFileSystem
-							.getIrodsSession();
-					iplugin.setiRODSSession(iRODSSession);
-				} else {
-					log.error("iRODSSession is null");
-				}
-
-				if (iplugin.getIrodsAccount() != null
-						&& iplugin.getiRODSSession() != null) {
-					iRODSFileSystemAOImpl = new IRODSFileSystemAOImpl(
-							iplugin.getiRODSSession(),
-							iplugin.getIrodsAccount());
-					if (null != iRODSFileSystemAOImpl)
-						iplugin.setiRODSFileSystemAOImpl(iRODSFileSystemAOImpl);
-					else
-						log.error("iRODSFileSystemAOImpl is null");
-				}
-
-				/*
-				 * IRODSFileSystem irodsFileSystem= IRODSFileSystem.instance();
-				 * UserAO userAccount = irodsFileSystem
-				 * .getIRODSAccessObjectFactory().getUserAO (irodsAccount);
-				 */
-
-				List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = FileOperations
-						.setIrodsFile(null, iplugin,
-								iplugin.isHomeDirectoryTheRootNode());
-				iplugin.setCollectionsUnderGivenAbsolutePath(collectionsUnderGivenAbsolutePath);
-				directoryContentsPane = new DirectoryContentsWindow(iplugin);
-				iplugin.setDirectoryContentsPane(directoryContentsPane);
-				directoryContentsPane.init();
-				directoryContentsPane.implementation();
-				setVisibilityOfForm();
-				show();
+		for (char chars : password) {
+			password_full = password_full + chars;
+		}
+		int port = Integer.parseInt(this.textField_Port.getText());
+		String host = this.comboBox_Host.getSelectedItem().toString();
+		String zone = this.comboBox_Zone.getSelectedItem().toString();
+		try {
+			if (this.HomeDirectory_CheckBox.isSelected()) {
+				this.iplugin.setHomeDirectoryTheRootNode(true);
 			}
-			/* Exception when Username/Password is empty */
-			catch (CatalogSQLException catalogSQLException) {
-				log.error(catalogSQLException.getMessage(), catalogSQLException);
+			IRODSAccount irodsAccount = IrodsConnection.irodsConnection(
+					username, password_full, zone, host, port);
+
+			this.iplugin.setIrodsAccount(irodsAccount);
+			if (this.iplugin.getIrodsAccount() != null) {
+				irodsFileFactoryCreation();
+			}
+			if (null != this.irodsFileSystem) {
+				IRODSSession iRODSSession = this.irodsFileSystem
+						.getIrodsSession();
+
+				this.iplugin.setiRODSSession(iRODSSession);
+			} else {
+				log.error("iRODSSession is null");
+			}
+			if ((this.iplugin.getIrodsAccount() != null)
+					&& (this.iplugin.getiRODSSession() != null)) {
+				this.iRODSFileSystemAOImpl = new IRODSFileSystemAOImpl(
+						this.iplugin.getiRODSSession(),
+						this.iplugin.getIrodsAccount());
+				if (null != this.iRODSFileSystemAOImpl) {
+					this.iplugin
+							.setiRODSFileSystemAOImpl(this.iRODSFileSystemAOImpl);
+				} else {
+					log.error("iRODSFileSystemAOImpl is null");
+				}
+			}
+			List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = FileOperations
+					.setIrodsFile(null, this.iplugin,
+							this.iplugin.isHomeDirectoryTheRootNode());
+
+			this.iplugin
+					.setCollectionsUnderGivenAbsolutePath(collectionsUnderGivenAbsolutePath);
+			this.directoryContentsPane = new DirectoryContentsWindow(
+					this.iplugin);
+			this.iplugin.setDirectoryContentsPane(this.directoryContentsPane);
+			this.directoryContentsPane.init();
+			this.directoryContentsPane.implementation();
+			setVisibilityOfForm();
+			show();
+		} catch (CatalogSQLException catalogSQLException) {
+			log.error(catalogSQLException.getMessage(), catalogSQLException);
+			JOptionPane.showMessageDialog(null,
+					"Invalid Username or password!", "Error", 0);
+
+			catalogSQLException.printStackTrace();
+		} catch (InvalidUserException invalidUserException) {
+			log.error(invalidUserException.getMessage(), invalidUserException);
+
+			JOptionPane
+					.showMessageDialog(null, "Invalid Username!", "Error", 0);
+
+			getRootPane().setFocusable(false);
+			this.textbox_LoginId.requestFocusInWindow();
+			invalidUserException.printStackTrace();
+		} catch (AuthenticationException authenticationException) {
+			log.error(authenticationException.getMessage(),
+					authenticationException);
+
+			JOptionPane
+					.showMessageDialog(null, "Invalid password!", "Error", 0);
+
+			getRootPane().setFocusable(false);
+			this.textField_passwordField.requestFocusInWindow();
+			authenticationException.printStackTrace();
+		} catch (Exception unknownException) {
+			log.error(unknownException.getMessage(), unknownException);
+			if (unknownException.getLocalizedMessage().toString()
+					.contains(Constants.ERROR_STRING_CONNECTION_REFUSED)) {
 				JOptionPane.showMessageDialog(null,
-						"Invalid Username or password!", "Error",
-						JOptionPane.ERROR_MESSAGE);
-				catalogSQLException.printStackTrace();
+						"Connection Refused - Server Down!", "Error", 0);
 			}
-			/* Exception when Username is invalid */
-			catch (InvalidUserException invalidUserException) {
-				log.error(invalidUserException.getMessage(),
-						invalidUserException);
-				JOptionPane.showMessageDialog(null, "Invalid Username!",
-						"Error", JOptionPane.ERROR_MESSAGE);
-				/*
-				 * If user input wrong username the cursor will let user
-				 * re-input it.
-				 */
-				getRootPane().setFocusable(false);
-				textbox_LoginId.requestFocusInWindow();
-				invalidUserException.printStackTrace();
-			}
+			if (unknownException.getLocalizedMessage().toString()
+					.contains(Constants.ERROR_STRING_UNKNOWN_HOST)) {
+				JOptionPane.showMessageDialog(null, "Unknown Host", "Error", 0);
+			} else {
+				JOptionPane.showMessageDialog(null, "Unknown Error!", "Error",
+						0);
 
-			/* Exception when password is invalid */
-			catch (AuthenticationException authenticationException) {
-				log.error(authenticationException.getMessage(),
-						authenticationException);
-				JOptionPane.showMessageDialog(null, "Invalid password!",
-						"Error", JOptionPane.ERROR_MESSAGE);
-				/*
-				 * If user input wrong password the cursor will let user
-				 * re-input it.
-				 */
-				getRootPane().setFocusable(false);
-				textField_passwordField.requestFocusInWindow();
-				authenticationException.printStackTrace();
+				log.error("Unknown Error: "
+						+ unknownException.getLocalizedMessage());
 			}
-			/* Unknown Exception */
-			catch (Exception unknownException) {
-				log.error(unknownException.getMessage(), unknownException);
-				if (unknownException.getLocalizedMessage().toString()
-						.contains(Constants.ERROR_STRING_CONNECTION_REFUSED)) {
-					JOptionPane.showMessageDialog(null,
-							"Connection Refused - Server Down!", "Error",
-							JOptionPane.ERROR_MESSAGE);
-				}
-				if (unknownException.getLocalizedMessage().toString()
-						.contains(Constants.ERROR_STRING_UNKNOWN_HOST)) {
-					JOptionPane.showMessageDialog(null, "Unknown Host",
-							"Error", JOptionPane.ERROR_MESSAGE);
-				} else {
-					JOptionPane.showMessageDialog(null, "Unknown Error!",
-							"Error", JOptionPane.ERROR_MESSAGE);
-					log.error("Unknown Error: "
-							+ unknownException.getLocalizedMessage());
-				}
-
-			}
-
 		}
 	}
 
-	/**
-	 * 
-	 */
 	private void cacheDirectoryCreation() {
-		if (null != textField_ImageJCacheFolderPath.getText()) {
+		if (null != this.textField_ImageJCacheFolderPath.getText()) {
 			boolean isDirectoryCreated = IrodsUtilities
-					.createDirectoryIfDoesntExist(textField_ImageJCacheFolderPath
+					.createDirectoryIfDoesntExist(this.textField_ImageJCacheFolderPath
 							.getText());
 			if (!isDirectoryCreated) {
 				log.info("isDirectoryCreated: " + isDirectoryCreated);
@@ -672,84 +631,69 @@ public class MainWindow extends JFrame {
 						"Error while creating path!");
 			} else {
 				log.info("ImageJ cache folder path specified by user:"
-						+ textField_ImageJCacheFolderPath.getText());
-				iplugin.setImageJCacheFolder(textField_ImageJCacheFolderPath
-						.getText());
+						+ this.textField_ImageJCacheFolderPath.getText());
+
+				this.iplugin
+						.setImageJCacheFolder(this.textField_ImageJCacheFolderPath
+								.getText());
 			}
 		} else {
 			log.error("textField_ImageJCacheFolderPath.getText() is null");
 		}
 	}
-	
-	
-	/**
-	 * 
-	 */
+
 	private void irodsFileFactoryCreation() {
 		try {
-			iRODSFileFactory = TapasCoreFunctions
-					.getIrodsAccountFileFactory(iplugin);
-			iplugin.setiRODSFileFactory(iRODSFileFactory);
+			this.iRODSFileFactory = TapasCoreFunctions
+					.getIrodsAccountFileFactory(this.iplugin);
+
+			this.iplugin.setiRODSFileFactory(this.iRODSFileFactory);
 		} catch (JargonException jargonException) {
 			log.error("Error while creating irodsFileFactory"
 					+ jargonException.getMessage());
 		}
 	}
 
-	/**
-	 * @param tapasProperties
-	 * @return
-	 */
 	private boolean setPropertyFileDataToLoginPanel(Properties tapasProperties) {
-		Boolean isSet = false;
-
+		Boolean isSet = Boolean.valueOf(false);
 		if (null != tapasProperties) {
 			log.info("Tapas Properties: "
 					+ tapasProperties.getProperty("login.username"));
-			usernamePickedFromPropertyFiles = tapasProperties
-					.getProperty(Constants.PROPERTY_USER_NAME);
-			if (null != usernamePickedFromPropertyFiles) {
-				textbox_LoginId.setText(usernamePickedFromPropertyFiles);
-			}
-			zonePickedFromPropertyFiles = tapasProperties
-					.getProperty(Constants.PROPERTY_ZONE_NAME);
-			if (null != zonePickedFromPropertyFiles) {
-				String[] zoneNames = zonePickedFromPropertyFiles.split(",");
-				for (int j = 0; j < zoneNames.length; j++) {
-					/*
-					 * comboBox_Zone.setModel(new DefaultComboBoxModel<String>(
-					 * new String[] { zoneNames}));
-					 */
-					comboBox_Zone.addItem(zoneNames[j]);
-				}
-			}
-			hostPickedFromPropertyFiles = tapasProperties
-					.getProperty(Constants.PROPERTY_HOST_NAME);
-			if (null != hostPickedFromPropertyFiles) {
-				/*
-				 * comboBox_Host.setModel(new DefaultComboBoxModel<String>( new
-				 * String[] { hostPickedFromPropertyFiles }));
-				 */
-				String[] hostNames = hostPickedFromPropertyFiles.split(",");
-				for (int i = 0; i < hostNames.length; i++) {
-					comboBox_Host.addItem(hostNames[i]);
-				}
 
+			this.usernamePickedFromPropertyFiles = tapasProperties
+					.getProperty("login.username");
+			if (null != this.usernamePickedFromPropertyFiles) {
+				this.textbox_LoginId
+						.setText(this.usernamePickedFromPropertyFiles);
+			}
+			this.zonePickedFromPropertyFiles = tapasProperties
+					.getProperty("login.zone");
+			if (null != this.zonePickedFromPropertyFiles) {
+				String[] zoneNames = this.zonePickedFromPropertyFiles
+						.split(",");
+				for (int j = 0; j < zoneNames.length; j++) {
+					this.comboBox_Zone.addItem(zoneNames[j]);
+				}
+			}
+			this.hostPickedFromPropertyFiles = tapasProperties
+					.getProperty("login.host");
+			if (null != this.hostPickedFromPropertyFiles) {
+				String[] hostNames = this.hostPickedFromPropertyFiles
+						.split(",");
+				for (int i = 0; i < hostNames.length; i++) {
+					this.comboBox_Host.addItem(hostNames[i]);
+				}
 			} else {
 				log.error("hostPickedFromPropertyFiles is null");
 			}
 		}
-		return isSet;
+		return isSet.booleanValue();
 	}
 
-	/**
-	 * @param iplugin
-	 */
-	private void closeApplication(IPlugin iplugin) {
-		System.exit(0);
+	private void closeApplication(IPlugin iplugin) throws JargonException {
+		dispose();
 		if (null != iplugin) {
 			TapasCoreFunctions.closeIRODSConnections(iplugin);
 		}
-
 	}
 }

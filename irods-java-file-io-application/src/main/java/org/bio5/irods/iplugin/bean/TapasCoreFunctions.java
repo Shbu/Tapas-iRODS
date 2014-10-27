@@ -9,24 +9,10 @@ import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 
-/**
- * @author Sharan
- * 
- */
 public final class TapasCoreFunctions {
-
-	/* Logger instantiation */
 	static Logger log = Logger.getLogger(TapasCoreFunctions.class.getName());
 
-	/**
-	 * This method returns directoryPath (root path) for given account. Ex:
-	 * /<zone>/
-	 * 
-	 * @param iplugin
-	 * @return
-	 */
 	public static String getRootDirectoryPath(IPlugin iplugin) {
-
 		String rootPath = null;
 		if (null != iplugin.getIrodsAccount()) {
 			rootPath = IrodsUtilities.getPathSeperator()
@@ -37,15 +23,7 @@ public final class TapasCoreFunctions {
 		return rootPath;
 	}
 
-	/**
-	 * This method returns home directory path for given account Ex:
-	 * /<zone>/home
-	 * 
-	 * @param iplugin
-	 * @return
-	 */
 	public static String getHomeDirectoryPath(IPlugin iplugin) {
-
 		String homeDirectoryPath = null;
 		if (null != iplugin.getIrodsAccount()) {
 			homeDirectoryPath = IrodsUtilities.getPathSeperator()
@@ -57,13 +35,6 @@ public final class TapasCoreFunctions {
 		return homeDirectoryPath;
 	}
 
-	/**
-	 * This method will return AccountDirectoryPath for given user. Ex:
-	 * /<Zone>/home/<username>
-	 * 
-	 * @param iplugin
-	 * @return
-	 */
 	public static String getAccountDirectoryPath(IPlugin iplugin) {
 		String accountDirectoryPath = null;
 		if (null != iplugin.getIrodsAccount()) {
@@ -75,32 +46,21 @@ public final class TapasCoreFunctions {
 		} else {
 			log.error("iplugin is null");
 		}
-
 		return accountDirectoryPath;
 	}
 
-	/**
-	 * This method will close all active iRODS Connections
-	 * 
-	 * @param iplugin
-	 */
-	public static void closeIRODSConnections(IPlugin iplugin) {
+	public static void closeIRODSConnections(IPlugin iplugin)
+			throws JargonException {
 		if (iplugin.getIrodsFileSystem() != null) {
 			iplugin.getIrodsFileSystem().closeAndEatExceptions(
 					iplugin.getIrodsAccount());
+
+			iplugin.getIrodsFileSystem().close();
 		} else {
 			log.error("IrodsFileSystem is empty");
 		}
-
 	}
 
-	/**
-	 * Returns IrodsAcccountFileFactory object.
-	 * 
-	 * @param iplugin
-	 * @return
-	 * @throws JargonException
-	 */
 	public static IRODSFileFactory getIrodsAccountFileFactory(IPlugin iplugin)
 			throws JargonException {
 		IRODSFileSystem irodsFileSystem = null;
@@ -108,70 +68,53 @@ public final class TapasCoreFunctions {
 		return irodsFileSystem.getIRODSFileFactory(iplugin.getIrodsAccount());
 	}
 
-	/**
-	 * Create ConfigurationService for Tapa Transactions
-	 * 
-	 * @param iplugin
-	 * @throws IpluginException
-	 */
 	public static IPluginConfigurationServiceImpl createConfigurationServiceForTapasTransactions(
 			IPlugin iplugin) throws IpluginException {
 		if (null != iplugin) {
 			IPluginConfigurationServiceImpl iPluginConfigurationService = null;
 			iPluginConfigurationService = new IPluginConfigurationServiceImpl(
 					iplugin);
+
 			return iPluginConfigurationService;
 		}
 		return null;
 	}
-	
-	/*Code realted to Jargon Conveyor*/
 
-	/**
-	 * Validate PassPhrase in Tear off mode
-	 * 
-	 * @param iplugin
-	 */
-	/*public static void validatePassPhraseInTearOffMode(IPlugin iplugin) {
+	public static String getZoneDirectoryPath(IPlugin iplugin) {
+		String zoneDirectoryPath = null;
 		if (null != iplugin.getIrodsAccount()) {
-			try {
-				GridAccountService gridAccountService = iplugin
-						.getConveyorService().getGridAccountService();
-				//gridAccountService.validatePassPhrase("abc1d");
-				try {
-					iplugin.getConveyorService()
-							.validatePassPhraseInTearOffMode(
-									iplugin.getIrodsAccount());
-				} catch (AuthenticationException authenticationException) {
-					log.error("AuthenticationException while validatePassPhraseInTearOffMode"
-							+ authenticationException.getMessage());
+			zoneDirectoryPath = IrodsUtilities.getPathSeperator()
+					+ iplugin.getIrodsAccount().getZone();
+		} else {
+			log.error("iplugin is null");
+		}
+		return zoneDirectoryPath;
+	}
 
-				} catch (JargonException jargonException) {
-					log.error("JargonException while validatePassPhraseInTearOffMode"
-							+ jargonException.getMessage());
+	public static String getCustomDirectoryPath(IPlugin iplugin,
+			String customPath) {
+		String customDirectoryPath = null;
+		if ((customPath.contains(IrodsUtilities.getPathSeperator()))
+				|| (customPath.contains("\\")) || (customPath.contains("/"))) {
+			String[] subPath = null;
+			if (customPath.contains("\\")) {
+				subPath = customPath.split("\\");
+			}
+			if (customPath.contains("/")) {
+				subPath = customPath.split("/");
+			}
+			for (int i = 0; i < subPath.length; i++) {
+				if ((!subPath[i].equals("")) && (customDirectoryPath == null)) {
+					customDirectoryPath = IrodsUtilities.getPathSeperator()
+							+ subPath[i];
 				}
-				if (null != gridAccountService) {
-					gridAccountService
-							.addOrUpdateGridAccountBasedOnIRODSAccount(iplugin
-									.getIrodsAccount());
-					GridAccount gridAccount = gridAccountService
-							.findGridAccountByIRODSAccount(iplugin
-									.getIrodsAccount());
-					if (null != gridAccount) {
-						log.info("gaccount details" + gridAccount.getUserName());
-						iplugin.setGridAccount(gridAccount);
-					}
-				}
-
-			} catch (ConveyorExecutionException conveyorExecutionException) {
-				log.error("Conveyor execution exception while Authenticating the user"
-						+ conveyorExecutionException.getMessage());
-			} catch (PassPhraseInvalidException passPhraseInvalidException) {
-				log.error("PassPhraseInvalidException while Authenticating the user"
-						+ passPhraseInvalidException.getMessage());
 			}
 		} else {
-			log.error("iRODS account object in iPlugin is null!");
+			customDirectoryPath = IrodsUtilities.getPathSeperator()
+					+ iplugin.getIrodsAccount().getZone()
+					+ IrodsUtilities.getPathSeperator() + Constants.HOME_STRING
+					+ IrodsUtilities.getPathSeperator() + customPath;
 		}
-	}*/
+		return customDirectoryPath;
+	}
 }

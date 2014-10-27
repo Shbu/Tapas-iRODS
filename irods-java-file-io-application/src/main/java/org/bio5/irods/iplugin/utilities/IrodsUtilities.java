@@ -28,65 +28,48 @@ import org.bio5.irods.iplugin.swingworkers.ObjectDetailsLite;
 import org.irods.jargon.core.pub.domain.ObjStat;
 
 public final class IrodsUtilities {
-
-	/* Logger instantiation */
 	static Logger log = Logger.getLogger(IrodsUtilities.class.getName());
 
-	/**
-	 * Calculate MD5 CheckSum of a File.
-	 * 
-	 * @param file
-	 * @return
-	 */
 	public static String calculateMD5CheckSum(File file) {
 		try {
 			InputStream fin = new FileInputStream(file);
-			java.security.MessageDigest md5er = MessageDigest
-					.getInstance(Constants.MD5_CONSTANT);
+			MessageDigest md5er = MessageDigest.getInstance("MD5");
+
 			byte[] buffer = new byte[1024];
 			int read;
 			do {
 				read = fin.read(buffer);
-				if (read > 0)
+				if (read > 0) {
 					md5er.update(buffer, 0, read);
+				}
 			} while (read != -1);
 			fin.close();
 			byte[] digest = md5er.digest();
-			if (digest == null)
+			if (digest == null) {
 				return null;
+			}
 			String strDigest = "";
 			for (int i = 0; i < digest.length; i++) {
-				strDigest += Integer.toString((digest[i] & 0xff) + 0x100, 16)
-						.substring(1).toLowerCase();
+				strDigest = strDigest
+						+ Integer.toString((digest[i] & 0xFF) + 256, 16)
+								.substring(1).toLowerCase();
 			}
 			return strDigest;
 		} catch (Exception e) {
-			return null;
 		}
+		return null;
 	}
 
-	/* Zhong */
-	/**
-	 * Convert TreePath object to String object
-	 * 
-	 * @param treePaths
-	 * @return
-	 */
 	public static String getJtreeSelection(TreePath treePaths) {
 		String fullTreePath = "";
-		Object treepath[] = treePaths.getPath();
+		Object[] treepath = treePaths.getPath();
 		for (int j = 0; j < treepath.length; j++) {
-			fullTreePath += IrodsUtilities.getPathSeperator()
+			fullTreePath = fullTreePath + getPathSeperator()
 					+ treepath[j].toString();
 		}
 		return fullTreePath;
 	}
 
-	/**
-	 * Returns pathSeperator of the Operating System
-	 * 
-	 * @return
-	 */
 	public static String getPathSeperator() {
 		String pathSeperator = null;
 		pathSeperator = Constants.DEFAULT_PATH_SEPERATOR;
@@ -94,34 +77,21 @@ public final class IrodsUtilities {
 		return pathSeperator;
 	}
 
-	/**
-	 * Get JTree node path depending on the Mouse selection
-	 * 
-	 * @param mouseEvent
-	 * @param userDirectoryTree
-	 * @return
-	 */
 	public static String getJtreeSelection(MouseEvent mouseEvent,
 			JTree userDirectoryTree) {
 		String fullTreePath = "";
 		TreePath tp = userDirectoryTree.getPathForLocation(mouseEvent.getX(),
 				mouseEvent.getY());
 		if (tp != null) {
-			Object treepath[] = tp.getPath();
+			Object[] treepath = tp.getPath();
 			for (int i = 0; i < treepath.length; i++) {
-				fullTreePath += IrodsUtilities.getPathSeperator()
+				fullTreePath = fullTreePath + getPathSeperator()
 						+ treepath[i].toString();
 			}
 		}
 		return fullTreePath;
 	}
 
-	/**
-	 * Create file Object from given Tree Path
-	 * 
-	 * @param treePath
-	 * @return
-	 */
 	public static File createFileFromTreePath(TreePath treePath) {
 		StringBuilder sb = new StringBuilder();
 		Object[] nodes = treePath.getPath();
@@ -131,12 +101,6 @@ public final class IrodsUtilities {
 		return new File(sb.toString());
 	}
 
-	/**
-	 * Generate FilePath from given treePath
-	 * 
-	 * @param treePath
-	 * @return
-	 */
 	public static String createFilePathFromTreePath(TreePath treePath) {
 		StringBuilder sb = new StringBuilder();
 		Object[] nodes = treePath.getPath();
@@ -146,42 +110,27 @@ public final class IrodsUtilities {
 		return sb.toString();
 	}
 
-	/**
-	 * Returns JTree selection depending on the mouseEvent
-	 * 
-	 * @param iplugin
-	 * @param mouseEvent
-	 * @param jTree
-	 * @return
-	 */
 	public static String getJtreeSelectionForSingleClick(IPlugin iplugin,
 			MouseEvent mouseEvent, JTree jTree) {
 		String fullTreePath = "";
 		TreePath tp = jTree.getPathForLocation(mouseEvent.getX(),
 				mouseEvent.getY());
 		if (tp != null) {
-			/*
-			 * Get objstat details for each file and compare if it is a
-			 * collection or object
-			 */
 			ObjStat objStatValueOfObject = null;
 			if (null != iplugin) {
 				ObjectDetailsLite obj = new ObjectDetailsLite(iplugin);
 				try {
 					objStatValueOfObject = obj.getObjStatValueOfObj();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					log.error("Error while getting ObjStat values of object");
 				}
 			}
 			if (null != objStatValueOfObject) {
-				if (/*
-					 * lastPathComponentNode.isLeaf() &&
-					 */objStatValueOfObject.getObjectType().toString() == Constants.OBJECT_TYPE_DATA_OBJECT) {
+				if (objStatValueOfObject.getObjectType().toString() == "DATA_OBJECT") {
 					tp = tp.getParentPath();
 				}
 				log.info("object size: " + objStatValueOfObject.getObjSize());
-				if (objStatValueOfObject.getObjSize() == 0) {
+				if (objStatValueOfObject.getObjSize() == 0L) {
 					log.info("folder size is 0");
 					iplugin.setEmptyFolder(true);
 				} else {
@@ -189,25 +138,19 @@ public final class IrodsUtilities {
 					iplugin.setEmptyFolder(false);
 				}
 			}
-			Object treepath[] = tp.getPath();
+			Object[] treepath = tp.getPath();
 			for (int i = 0; i < treepath.length; i++) {
-				fullTreePath += IrodsUtilities.getPathSeperator()
+				fullTreePath = fullTreePath + getPathSeperator()
 						+ treepath[i].toString();
 			}
 		}
 		return fullTreePath;
 	}
 
-	/**
-	 * Creates a directory at specific path if doesn't exist
-	 * 
-	 * @param directoryPath
-	 * @return
-	 */
 	public static boolean createDirectoryIfDoesntExist(String directoryPath) {
 		boolean isDirectoryCreated = false;
 		try {
-			if (null != directoryPath && !"".equals(directoryPath)) {
+			if ((null != directoryPath) && (!"".equals(directoryPath))) {
 				File file = new File(directoryPath);
 				if (!file.exists()) {
 					log.info("Cache folder doesn't exist- Creating folder");
@@ -220,22 +163,16 @@ public final class IrodsUtilities {
 		} catch (Exception e) {
 			log.error("Error while creating ImageJ cache directory"
 					+ e.getMessage());
+
 			isDirectoryCreated = false;
 		}
 		return isDirectoryCreated;
 	}
 
-	/**
-	 * Get file name from given directory path. This returns the subString after
-	 * last slash in absolute path.
-	 * 
-	 * @param directoryPath
-	 * @return
-	 */
 	public static String getFileNameFromDirectoryPath(String directoryPath) {
 		String fileName = null;
 		try {
-			if (null != directoryPath && directoryPath != "") {
+			if ((null != directoryPath) && (directoryPath != "")) {
 				String fullPath = directoryPath;
 				int index = fullPath.lastIndexOf(getPathSeperator());
 				fileName = fullPath.substring(index + 1);
@@ -250,59 +187,29 @@ public final class IrodsUtilities {
 		return fileName;
 	}
 
-	/**
-	 * Returns user home directory folder path
-	 * 
-	 * @return
-	 */
 	public static String getUserHomeFolderFromSystemProperty() {
 		String userHomeFolderFromSystemProperty = null;
 		userHomeFolderFromSystemProperty = System.getProperty("user.home");
 		return userHomeFolderFromSystemProperty;
 	}
 
-	/**
-	 * @param dir
-	 * @return
-	 */
 	public static long getFolderSize(File dir) {
-		long size = 0;
+		long size = 0L;
 		for (File file : dir.listFiles()) {
 			if (file.isFile()) {
-				// System.out.println(file.getName() + " " + file.length());
 				size += file.length();
-			} else
+			} else {
 				size += getFolderSize(file);
+			}
 		}
 		return size;
 	}
 
-	/**
-	 * This method will load Tapas properties from either of below two files
-	 * </br>
-	 * <ol>
-	 * <li>Local Property file in cache directory</li>
-	 * <li>Property file in Jar.</li>
-	 * </ol>
-	 * If local file is not available, then property file available in jar is
-	 * loaded and then a copy is left in local path for future availability.
-	 * 
-	 * @param propertyFileName
-	 * @param localPathForPropertyFile
-	 * @return
-	 */
 	public static Properties getTapasLoginConfiguration(
 			String propertyFileName, String localPathForPropertyFile) {
-
 		Properties tapasConfigurationProperties = null;
 		if (null == propertyFileName) {
-			/* pending - change the final path */
-			propertyFileName = Constants.PROPERTY_FILE_NAME;
-			/*
-			 * propertyFileName =
-			 * "/irods-java-file-io-application/src/main/resources/" +
-			 * Constants.PROPERTY_FILE_NAME;
-			 */
+			propertyFileName = "tapas.properties";
 		}
 		if (null == localPathForPropertyFile) {
 			localPathForPropertyFile = Constants.IMAGEJ_CACHE_FOLDER;
@@ -310,78 +217,59 @@ public final class IrodsUtilities {
 		tapasConfigurationProperties = new Properties();
 
 		tapasConfigurationProperties = loadLocalTapasPropertyFiles(localPathForPropertyFile);
-
 		if (null != tapasConfigurationProperties) {
 			log.info("tapas configuration properties is not null - Returning values after first null check");
 			return tapasConfigurationProperties;
-		} else {
-			/* Pulling property file from jar */
-			Configuration propertyConfiguration = null;
-			URL propFileURL = null;
-			try {
-				propFileURL = IrodsUtilities.class.getClassLoader()
-						.getResource(propertyFileName);
-				if (null != propFileURL) {
-					propertyConfiguration = new PropertiesConfiguration(
-							propFileURL);
-				} else {
-					log.error("propFileURL is null");
-				}
-
-			} catch (ConfigurationException configurationException) {
-				log.error("Exception while loading configuration of property files"
-						+ configurationException.getMessage());
-			}
-
-			/* Getting properties file from ConfigurationProperties */
-			if (null != propertyConfiguration) {
-				log.info("propertyConfiguration is not null");
-				tapasConfigurationProperties = ConfigurationConverter
-						.getProperties(propertyConfiguration);
+		}
+		Configuration propertyConfiguration = null;
+		URL propFileURL = null;
+		try {
+			propFileURL = IrodsUtilities.class.getClassLoader().getResource(
+					propertyFileName);
+			if (null != propFileURL) {
+				propertyConfiguration = new PropertiesConfiguration(propFileURL);
 			} else {
-				log.error("propertyConfiguration is null");
+				log.error("propFileURL is null");
 			}
-
-			/* Creating outputStreamForPropertiesFile */
-			OutputStream outputStreamForPropertiesFile = null;
-			try {
-				String filePath = Constants.IMAGEJ_CACHE_FOLDER
-						+ IrodsUtilities.getPathSeperator()
-						+ Constants.PROPERTY_FILE_NAME;
-				if (null != filePath && "" != filePath) {
-					outputStreamForPropertiesFile = new FileOutputStream(
-							filePath);
-				}
-			} catch (FileNotFoundException fileNotFoundException) {
-				log.error("fileNotFound Exception while creating output stream of properties file"
-						+ fileNotFoundException.getMessage());
+		} catch (ConfigurationException configurationException) {
+			log.error("Exception while loading configuration of property files"
+					+ configurationException.getMessage());
+		}
+		if (null != propertyConfiguration) {
+			log.info("propertyConfiguration is not null");
+			tapasConfigurationProperties = ConfigurationConverter
+					.getProperties(propertyConfiguration);
+		} else {
+			log.error("propertyConfiguration is null");
+		}
+		OutputStream outputStreamForPropertiesFile = null;
+		try {
+			String filePath = Constants.IMAGEJ_CACHE_FOLDER
+					+ getPathSeperator() + "tapas.properties";
+			if ((null != filePath) && ("" != filePath)) {
+				outputStreamForPropertiesFile = new FileOutputStream(filePath);
 			}
-
-			/* Storing properties file to local disk */
-			try {
-				if (null != outputStreamForPropertiesFile
-						&& null != tapasConfigurationProperties) {
-					log.info("Copying property file to local cache folder");
-					tapasConfigurationProperties.store(
-							outputStreamForPropertiesFile,
-							"Tapas properties file - V1.1");
-				} else {
-					log.error("outputStreamForPropertiesFile OR tapasConfigurationProperties is null");
-				}
-			} catch (IOException ioException) {
-				log.error("IOException while storing properties file to local disk"
-						+ ioException.getMessage());
+		} catch (FileNotFoundException fileNotFoundException) {
+			log.error("fileNotFound Exception while creating output stream of properties file"
+					+ fileNotFoundException.getMessage());
+		}
+		try {
+			if ((null != outputStreamForPropertiesFile)
+					&& (null != tapasConfigurationProperties)) {
+				log.info("Copying property file to local cache folder");
+				tapasConfigurationProperties.store(
+						outputStreamForPropertiesFile,
+						"Tapas V1.0 - properties file");
+			} else {
+				log.error("outputStreamForPropertiesFile OR tapasConfigurationProperties is null");
 			}
+		} catch (IOException ioException) {
+			log.error("IOException while storing properties file to local disk"
+					+ ioException.getMessage());
 		}
 		return tapasConfigurationProperties;
 	}
 
-	/**
-	 * Copies a given file from one location to other
-	 * 
-	 * @param sourceFile
-	 * @param destination
-	 */
 	public static void copyFileToNewPhysicalLocation(File sourceFile,
 			String destination) {
 		File destinationFile = new File(destination);
@@ -394,17 +282,11 @@ public final class IrodsUtilities {
 		}
 	}
 
-	/**
-	 * @param filePath
-	 * @return
-	 */
 	public static Properties loadLocalTapasPropertyFiles(String filePath) {
 		Properties tapasLocalConfigurationProperties = null;
-
 		if (null != filePath) {
-			String propertyFileName = filePath
-					+ IrodsUtilities.getPathSeperator()
-					+ Constants.PROPERTY_FILE_NAME;
+			String propertyFileName = filePath + getPathSeperator()
+					+ "tapas.properties";
 			try {
 				Reader reader = new FileReader(propertyFileName);
 				tapasLocalConfigurationProperties = new Properties();
@@ -420,17 +302,9 @@ public final class IrodsUtilities {
 		return tapasLocalConfigurationProperties;
 	}
 
-	/**
-	 * Replaces multiple slashes with single slash in a given string- Applicable
-	 * for both FORWARD SLASH and BACKWARD SLASH
-	 * 
-	 * @param filepath
-	 * @return
-	 */
 	public static String refactorSlashInFilePaths(String filepath) {
 		String finalPath = null;
-
-		if (null != filepath && "" != filepath) {
+		if ((null != filepath) && ("" != filepath)) {
 			log.info("Path before refactoring: " + filepath);
 			if (filepath.contains("/")) {
 				finalPath = filepath.replaceAll("/+", "/");
@@ -440,11 +314,34 @@ public final class IrodsUtilities {
 				finalPath = filepath.replaceAll("\\+", "\\");
 				log.info("Path after refactoring: " + finalPath);
 			}
-
 		} else {
 			log.error("Given filePath is null");
 		}
 		return finalPath;
 	}
 
+	public static String[] getStringTokensForGivenURI(String path) {
+		String[] stringTokens = null;
+		if ((null != path) && (path.contains("\\"))) {
+			stringTokens = path.split("\\\\");
+		}
+		if ((null != path) && (path.contains("/"))) {
+			stringTokens = path.split("/");
+		}
+		return stringTokens;
+	}
+
+	public static String replaceBackSlashWithForwardSlash_ViceVersa(String path) {
+		String replacedPath = path;
+		log.info("Path before replacing slash: " + replacedPath);
+		if ((null != replacedPath) && ("" != replacedPath)) {
+			if (replacedPath.contains("\\")) {
+				replacedPath = replacedPath.replace("\\", "/");
+			} else {
+				replacedPath = replacedPath.replace("/", "\\");
+			}
+		}
+		log.info("New path after replacing slash: " + replacedPath);
+		return replacedPath;
+	}
 }

@@ -34,89 +34,48 @@ import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 import org.irods.jargon.core.transfer.TransferControlBlock;
 
 public class IPlugin implements Serializable {
-
 	private static final long serialVersionUID = 1L;
-
-	public IPlugin() {
-		super();
-	}
-
 	private MainWindow mainWindow = null;
-	
 	private SaveImagePanelImplementation saveImagePanelImplementation = null;
-
 	private IRODSAccount irodsAccount = null;
-
 	private IRODSFileSystem irodsFileSystem = null;
-
 	private static IRODSFile iRodsFile = null;
-
 	private TransferControlBlock transferControlBlock = null;
-
 	private TransferOptions transferOptions = null;
-
 	private IRODSSession iRODSSession = null;
-
 	private IRODSFileFactory iRODSFileFactory = null;
-
 	private JProgressBar jprogressbar = null;
-
 	private IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener = null;
-
 	private JTree userDirectoryTree = null;
-
 	private DirectoryContentsWindow directoryContentsPane = null;
-
 	private JFrame frame = null;
-
 	private JScrollPane scrollPane;
-
 	private DefaultMutableTreeNode rootNode;
-
 	private DefaultTreeModel treeModel;
-
 	private JViewport viewport;
-
 	private String pathTillHome;
-
 	private List<DefaultMutableTreeNode> childNodesListAfterLazyLoading;
-
 	private List<CollectionAndDataObjectListingEntry> collectionsUnderGivenAbsolutePath = null;
-
 	private DefaultMutableTreeNode rootTreeNodeForDirectoryContents = null;
-
 	private boolean errorWhileUsingGetOperation = false;
-
 	private String destinationPath = null;
-
 	private Properties tapasProperties = null;
-	
-	//private ConveyorService  conveyorService =null;
-	
-	private IPluginConfigurationServiceImpl iPluginConfigurationService =null;
-	
-	
+	private IPluginConfigurationServiceImpl iPluginConfigurationService = null;
 	private JButton cancelTransaction_JButton;
-	
-	private boolean cancelPutTransaction=false;
-	
-	private boolean cancelGetTransaction=false;
-	
-	
-	/*Code realted to Jargon Conveyor*/
-	/*private GridAccount gridAccount =null;
-	
-	
-	public GridAccount getGridAccount() {
-		return gridAccount;
+	private boolean cancelPutTransaction = false;
+	private boolean cancelGetTransaction = false;
+	private String customPath = null;
+
+	public String getCustomPath() {
+		return this.customPath;
 	}
 
-	public void setGridAccount(GridAccount gridAccount) {
-		this.gridAccount = gridAccount;
-	}*/
+	public void setCustomPath(String customPath) {
+		this.customPath = customPath;
+	}
 
 	public JButton getCancelTransaction_JButton() {
-		return cancelTransaction_JButton;
+		return this.cancelTransaction_JButton;
 	}
 
 	public void setCancelTransaction_JButton(JButton cancelTransaction_JButton) {
@@ -124,7 +83,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public boolean isCancelPutTransaction() {
-		return cancelPutTransaction;
+		return this.cancelPutTransaction;
 	}
 
 	public void setCancelPutTransaction(boolean cancelPutTransaction) {
@@ -132,7 +91,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public boolean isCancelGetTransaction() {
-		return cancelGetTransaction;
+		return this.cancelGetTransaction;
 	}
 
 	public void setCancelGetTransaction(boolean cancelGetTransaction) {
@@ -140,26 +99,16 @@ public class IPlugin implements Serializable {
 	}
 
 	public IPluginConfigurationServiceImpl getiPluginConfigurationService() {
-		return iPluginConfigurationService;
+		return this.iPluginConfigurationService;
 	}
 
 	public void setiPluginConfigurationService(
 			IPluginConfigurationServiceImpl iPluginConfigurationService) {
 		this.iPluginConfigurationService = iPluginConfigurationService;
 	}
-	
-	
-	/*Code realted to Jargon Conveyor*/
-	/*public ConveyorService getConveyorService() {
-		return conveyorService;
-	}
-
-	public void setConveyorService(ConveyorService conveyorService) {
-		this.conveyorService = conveyorService;
-	}*/
 
 	public Properties getTapasProperties() {
-		return tapasProperties;
+		return this.tapasProperties;
 	}
 
 	public void setTapasProperties(Properties tapasProperties) {
@@ -167,52 +116,32 @@ public class IPlugin implements Serializable {
 	}
 
 	public String getDestinationPath() {
-		return destinationPath;
+		return this.destinationPath;
 	}
 
 	public void setDestinationPath(String destinationPath) {
 		this.destinationPath = destinationPath;
 	}
 
-	/*
-	 * true - if you want to pull everything from home directory (This includes
-	 * shared files too). False- if you want to pull collections from only your
-	 * account
-	 */
 	private boolean isHomeDirectoryTheRootNode = false;
-
 	private String imageJCacheFolder = Constants.IMAGEJ_CACHE_FOLDER;
-
 	private String objSelectedUsingSingleClick;
-
 	private String selectedNodeInTreeForSingleClick;
-
 	private String selectedNodeInTreeForDoubleClick;
-
 	private IRODSFileSystemAOImpl iRODSFileSystemAOImpl;
-
 	private String currentActiveTabUnderJTabbedPane;
-
 	private ObjStat objStatForGivenAbsolutePath;
-
 	private ObjStat objStatLiteForGivenAbsolutePath;
-
 	private HashMap<String, Object> saveDetails;
-
 	private boolean isImageOpened = false;
-
 	private ImagePlus imagePlus;
-
 	boolean fileExistFlag = false;
-
 	private String pathSeperator = null;
-
 	private String singleClickPathOnlyTillParentFolderWithSizeCheck = null;
-
 	private boolean emptyFolder = false;
 
 	public boolean isEmptyFolder() {
-		return emptyFolder;
+		return this.emptyFolder;
 	}
 
 	public void setEmptyFolder(boolean emptyFolder) {
@@ -220,7 +149,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public String getSingleClickPathOnlyTillParentFolderWithSizeCheck() {
-		return singleClickPathOnlyTillParentFolderWithSizeCheck;
+		return this.singleClickPathOnlyTillParentFolderWithSizeCheck;
 	}
 
 	public void setSingleClickPathOnlyTillParentFolderWithSizeCheck(
@@ -229,7 +158,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public ObjStat getObjStatLiteForGivenAbsolutePath() {
-		return objStatLiteForGivenAbsolutePath;
+		return this.objStatLiteForGivenAbsolutePath;
 	}
 
 	public void setObjStatLiteForGivenAbsolutePath(
@@ -238,7 +167,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public String getPathSeperator() {
-		return pathSeperator;
+		return this.pathSeperator;
 	}
 
 	public void setPathSeperator(String pathSeperator) {
@@ -246,7 +175,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public boolean isFileExistFlag() {
-		return fileExistFlag;
+		return this.fileExistFlag;
 	}
 
 	public void setFileExistFlag(boolean fileExistFlag) {
@@ -254,7 +183,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public boolean isErrorWhileUsingGetOperation() {
-		return errorWhileUsingGetOperation;
+		return this.errorWhileUsingGetOperation;
 	}
 
 	public void setErrorWhileUsingGetOperation(
@@ -263,7 +192,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public ImagePlus getImagePlus() {
-		return imagePlus;
+		return this.imagePlus;
 	}
 
 	public void setImagePlus(ImagePlus imagePlus) {
@@ -271,7 +200,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public String getSelectedNodeInTreeForDoubleClick() {
-		return selectedNodeInTreeForDoubleClick;
+		return this.selectedNodeInTreeForDoubleClick;
 	}
 
 	public void setSelectedNodeInTreeForDoubleClick(
@@ -280,7 +209,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public SaveImagePanelImplementation getSaveImagePanelImplementation() {
-		return saveImagePanelImplementation;
+		return this.saveImagePanelImplementation;
 	}
 
 	public void setSaveImagePanelImplementation(
@@ -289,7 +218,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public String getSelectedNodeInTreeForSingleClick() {
-		return selectedNodeInTreeForSingleClick;
+		return this.selectedNodeInTreeForSingleClick;
 	}
 
 	public void setSelectedNodeInTreeForSingleClick(
@@ -298,7 +227,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public boolean isImageOpened() {
-		return isImageOpened;
+		return this.isImageOpened;
 	}
 
 	public void setImageOpened(boolean isImageOpened) {
@@ -306,7 +235,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public HashMap<String, Object> getSaveDetails() {
-		return saveDetails;
+		return this.saveDetails;
 	}
 
 	public void setSaveDetails(HashMap<String, Object> saveDetails) {
@@ -314,7 +243,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public ObjStat getObjStatForGivenAbsolutePath() {
-		return objStatForGivenAbsolutePath;
+		return this.objStatForGivenAbsolutePath;
 	}
 
 	public void setObjStatForGivenAbsolutePath(
@@ -323,7 +252,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public String getCurrentActiveTabUnderJTabbedPane() {
-		return currentActiveTabUnderJTabbedPane;
+		return this.currentActiveTabUnderJTabbedPane;
 	}
 
 	public void setCurrentActiveTabUnderJTabbedPane(
@@ -332,7 +261,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public IRODSFileSystemAOImpl getiRODSFileSystemAOImpl() {
-		return iRODSFileSystemAOImpl;
+		return this.iRODSFileSystemAOImpl;
 	}
 
 	public void setiRODSFileSystemAOImpl(
@@ -341,7 +270,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public String getObjSelectedUsingSingleClick() {
-		return objSelectedUsingSingleClick;
+		return this.objSelectedUsingSingleClick;
 	}
 
 	public void setObjSelectedUsingSingleClick(
@@ -350,7 +279,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public String getImageJCacheFolder() {
-		return imageJCacheFolder;
+		return this.imageJCacheFolder;
 	}
 
 	public void setImageJCacheFolder(String imageJCacheFolder) {
@@ -358,7 +287,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public boolean isHomeDirectoryTheRootNode() {
-		return isHomeDirectoryTheRootNode;
+		return this.isHomeDirectoryTheRootNode;
 	}
 
 	public void setHomeDirectoryTheRootNode(boolean isHomeDirectoryTheRootNode) {
@@ -366,7 +295,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public DefaultMutableTreeNode getRootTreeNodeForDirectoryContents() {
-		return rootTreeNodeForDirectoryContents;
+		return this.rootTreeNodeForDirectoryContents;
 	}
 
 	public void setRootTreeNodeForDirectoryContents(
@@ -375,7 +304,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public String getPathTillHome() {
-		return pathTillHome;
+		return this.pathTillHome;
 	}
 
 	public void setPathTillHome(String pathTillHome) {
@@ -383,7 +312,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public List<DefaultMutableTreeNode> getChildNodesListAfterLazyLoading() {
-		return childNodesListAfterLazyLoading;
+		return this.childNodesListAfterLazyLoading;
 	}
 
 	public void setChildNodesListAfterLazyLoading(
@@ -392,7 +321,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public List<CollectionAndDataObjectListingEntry> getCollectionsUnderGivenAbsolutePath() {
-		return collectionsUnderGivenAbsolutePath;
+		return this.collectionsUnderGivenAbsolutePath;
 	}
 
 	public void setCollectionsUnderGivenAbsolutePath(
@@ -401,7 +330,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public MainWindow getMainWindow() {
-		return mainWindow;
+		return this.mainWindow;
 	}
 
 	public void setMainWindow(MainWindow mainWindow) {
@@ -409,7 +338,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public JViewport getViewport() {
-		return viewport;
+		return this.viewport;
 	}
 
 	public void setViewport(JViewport viewport) {
@@ -417,7 +346,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public DefaultTreeModel getTreeModel() {
-		return treeModel;
+		return this.treeModel;
 	}
 
 	public void setTreeModel(DefaultTreeModel treeModel) {
@@ -425,7 +354,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public DefaultMutableTreeNode getRootNode() {
-		return rootNode;
+		return this.rootNode;
 	}
 
 	public void setRootNode(DefaultMutableTreeNode rootNode) {
@@ -433,7 +362,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public JScrollPane getScrollPane() {
-		return scrollPane;
+		return this.scrollPane;
 	}
 
 	public void setScrollPane(JScrollPane scrollPane) {
@@ -441,7 +370,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public JFrame getFrame() {
-		return frame;
+		return this.frame;
 	}
 
 	public void setFrame(JFrame frame) {
@@ -449,11 +378,11 @@ public class IPlugin implements Serializable {
 	}
 
 	public JProgressBar getJprogressbar() {
-		return jprogressbar;
+		return this.jprogressbar;
 	}
 
 	public DirectoryContentsWindow getDirectoryContentsPane() {
-		return directoryContentsPane;
+		return this.directoryContentsPane;
 	}
 
 	public void setDirectoryContentsPane(
@@ -462,7 +391,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public JTree getUserDirectoryTree() {
-		return userDirectoryTree;
+		return this.userDirectoryTree;
 	}
 
 	public void setUserDirectoryTree(JTree userDirectoryTree) {
@@ -474,7 +403,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public IRODSFileFactory getiRODSFileFactory() {
-		return iRODSFileFactory;
+		return this.iRODSFileFactory;
 	}
 
 	public void setiRODSFileFactory(IRODSFileFactory iRODSFileFactory) {
@@ -482,7 +411,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public IRODSSession getiRODSSession() {
-		return iRODSSession;
+		return this.iRODSSession;
 	}
 
 	public void setiRODSSession(IRODSSession iRODSSession) {
@@ -490,7 +419,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public TransferOptions getTransferOptions() {
-		return transferOptions;
+		return this.transferOptions;
 	}
 
 	public void setTransferOptions(TransferOptions transferOptions) {
@@ -498,7 +427,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public TransferControlBlock getTransferControlBlock() {
-		return transferControlBlock;
+		return this.transferControlBlock;
 	}
 
 	public void setTransferControlBlock(
@@ -507,7 +436,7 @@ public class IPlugin implements Serializable {
 	}
 
 	public IrodsTransferStatusCallbackListener getIrodsTransferStatusCallbackListener() {
-		return irodsTransferStatusCallbackListener;
+		return this.irodsTransferStatusCallbackListener;
 	}
 
 	public void setIrodsTransferStatusCallbackListener(
@@ -520,11 +449,11 @@ public class IPlugin implements Serializable {
 	}
 
 	public void setiRodsFile(IRODSFile iRodsFile) {
-		IPlugin.iRodsFile = iRodsFile;
+		iRodsFile = iRodsFile;
 	}
 
 	public IRODSAccount getIrodsAccount() {
-		return irodsAccount;
+		return this.irodsAccount;
 	}
 
 	public void setIrodsAccount(IRODSAccount irodsAccount) {
@@ -532,11 +461,10 @@ public class IPlugin implements Serializable {
 	}
 
 	public IRODSFileSystem getIrodsFileSystem() {
-		return irodsFileSystem;
+		return this.irodsFileSystem;
 	}
 
 	public void setIrodsFileSystem(IRODSFileSystem irodsFileSystem) {
 		this.irodsFileSystem = irodsFileSystem;
 	}
-
 }

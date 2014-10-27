@@ -1,6 +1,5 @@
 package org.bio5.irods.iplugin.swingworkers;
 
-import java.awt.BorderLayout;
 import java.io.File;
 
 import javax.swing.SwingWorker;
@@ -14,7 +13,6 @@ import org.irods.jargon.core.pub.io.IRODSFileFactory;
 
 public class ConstructDirectoryStructureSwingWorker extends
 		SwingWorker<Void, Integer> {
-
 	private IPlugin irodsImageJ;
 	private DirectoryContentsWindow direcetoryContentspane;
 	private IRODSFileFactory iRODSFileFactory;
@@ -25,7 +23,6 @@ public class ConstructDirectoryStructureSwingWorker extends
 	public ConstructDirectoryStructureSwingWorker(IPlugin irodsImageJ,
 			IRODSFileFactory iRODSFileFactory, File irodsAccountFile,
 			DefaultMutableTreeNode node, IRODSAccount irodsAccount) {
-		super();
 		this.irodsImageJ = irodsImageJ;
 		this.iRODSFileFactory = iRODSFileFactory;
 		this.irodsAccountFile = irodsAccountFile;
@@ -33,89 +30,58 @@ public class ConstructDirectoryStructureSwingWorker extends
 		this.irodsAccount = irodsAccount;
 	}
 
-	/* Logger instantiation */
 	static Logger log = Logger
 			.getLogger(ConstructDirectoryStructureSwingWorker.class.getName());
 
-	@Override
 	protected Void doInBackground() throws Exception {
-		parseDirectoryContents(iRODSFileFactory, irodsAccountFile, node,
-				irodsAccount);
+		parseDirectoryContents(this.iRODSFileFactory, this.irodsAccountFile,
+				this.node, this.irodsAccount);
+
 		return null;
 	}
 
-	public void parseDirectoryContents(final IRODSFileFactory iRODSFileFactory,
-			final File irodsAccountFile, DefaultMutableTreeNode node,
-			final IRODSAccount irodsAccount) {
-
+	public void parseDirectoryContents(IRODSFileFactory iRODSFileFactory,
+			File irodsAccountFile, DefaultMutableTreeNode node,
+			IRODSAccount irodsAccount) {
 		if (!irodsAccountFile.isDirectory()) {
-			// System.out.println("File name" +irodsAccountFile.getName() +":"
-			// +irodsAccountFile.getAbsolutePath());
 			log.info("File name:" + irodsAccountFile.getName() + ":"
 					+ irodsAccountFile.getAbsolutePath());
+
 			DefaultMutableTreeNode child = new DefaultMutableTreeNode(
 					irodsAccountFile.getName(), false);
-			node.add(child);
-			// addObject(node,child,true);
-		}
 
+			node.add(child);
+		}
 		if (irodsAccountFile.isDirectory()) {
-			// System.out.println("Direc name" + irodsAccountFile.getName());
 			log.info("Direc name:" + irodsAccountFile.getName());
 			DefaultMutableTreeNode child = new DefaultMutableTreeNode(
 					irodsAccountFile.getName(), true);
+
 			node.add(child);
-			// addObject(node,child,true);
+
 			File[] direcFiles = irodsAccountFile.listFiles();
 			for (int i = 0; i < direcFiles.length; i++) {
-				// System.out.println("File number" +i +"\n depth:"
-				// +direcFiles.length);
 				log.info("File number:" + i + "\t depth:" + direcFiles.length);
 				parseDirectoryContents(iRODSFileFactory, direcFiles[i], child,
 						irodsAccount);
 			}
 		}
-
 	}
 
-	/*
-	 * public void addObject(DefaultMutableTreeNode parent, Object child,
-	 * boolean shouldBeVisible) { DefaultMutableTreeNode childNode =null; try{
-	 * childNode = new DefaultMutableTreeNode(child, false);
-	 * 
-	 * if (parent == null && null
-	 * !=irodsImageJ.getRootTreeNodeForDirectoryContents()) { parent =
-	 * irodsImageJ.getRootTreeNodeForDirectoryContents(); }
-	 * 
-	 * if (null !=irodsImageJ.getTreeModel() && null
-	 * !=irodsImageJ.getUserDirectoryTree()) {
-	 * irodsImageJ.getTreeModel().insertNodeInto(childNode, parent,
-	 * parent.getChildCount()); irodsImageJ.getTreeModel().nodeChanged(parent);
-	 * if (shouldBeVisible) {
-	 * irodsImageJ.getUserDirectoryTree().scrollPathToVisible(new TreePath(
-	 * childNode.getPath())); } } else{ log.error(
-	 * "1. Tree Model in irodsImageJ bean is null or 2. User Directory Tree in irodsImageJ bean is null"
-	 * ); } } catch(IllegalStateException illegalStateException){
-	 * log.error(illegalStateException.getMessage());
-	 * JOptionPane.showMessageDialog(null, "node does not allow children"); }
-	 * //return childNode; }
-	 */
-
-	@Override
 	public void done() {
-		if (null != irodsImageJ.getDirectoryContentsPane()
-				&& null != irodsImageJ.getScrollPane()) {
-			direcetoryContentspane = irodsImageJ.getDirectoryContentsPane();
-			direcetoryContentspane.add(irodsImageJ.getScrollPane(),
-					BorderLayout.CENTER);
-			direcetoryContentspane.setVisible(true);
-			direcetoryContentspane.revalidate();
-			direcetoryContentspane.repaint();
-			direcetoryContentspane.repaintPanel();
+		if ((null != this.irodsImageJ.getDirectoryContentsPane())
+				&& (null != this.irodsImageJ.getScrollPane())) {
+			this.direcetoryContentspane = this.irodsImageJ
+					.getDirectoryContentsPane();
+			this.direcetoryContentspane.add(this.irodsImageJ.getScrollPane(),
+					"Center");
+
+			this.direcetoryContentspane.setVisible(true);
+			this.direcetoryContentspane.revalidate();
+			this.direcetoryContentspane.repaint();
+			this.direcetoryContentspane.repaintPanel();
 		} else {
 			log.error("1. Directory Conents in irodsImageJ bean is empty or 2. Scroll pane instance in irodsImageJ bean is empty");
 		}
-
 	}
-
 }

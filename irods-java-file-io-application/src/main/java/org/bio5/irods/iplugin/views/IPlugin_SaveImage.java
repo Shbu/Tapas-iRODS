@@ -7,12 +7,8 @@ import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
 
 public class IPlugin_SaveImage extends PlugInFrame {
-
 	private static final long serialVersionUID = -502073300497809137L;
-
-	/* Logger instantiation */
 	static Logger log = Logger.getLogger(IPlugin_SaveImage.class.getName());
-
 	public IPlugin iplugin;
 	private SaveImagePanelImplementation saveImagePanelImplementation;
 
@@ -23,26 +19,19 @@ public class IPlugin_SaveImage extends PlugInFrame {
 	}
 
 	public void init() {
-		/*if (null != IPlugin_OpenImage.getIrodsImagej()) {*/
-		if (null != IPlugin_OpenImage.getIrodsImagej() && null!=IJ.getImage()) {
-			iplugin = IPlugin_OpenImage.getIrodsImagej();
-			iplugin.setImageOpened(true);
-			if (iplugin.isImageOpened()) {
+		if ((null != IPlugin_OpenImage.getIrodsImagej())
+				&& (null != IJ.getImage())) {
+			this.iplugin = IPlugin_OpenImage.getIrodsImagej();
+			this.iplugin.setImageOpened(true);
+			if (this.iplugin.isImageOpened()) {
 				log.info("irodsImagej.isImageOpened() is true");
 
-				// setVisibility(Constants.SAVE_PANEL_VISIBILITY);
-				/*
-				 * As we don't need any panel, just use SaveImageImplementation
-				 * without panel - Requirement update 5/21/2014
-				 */
-				new SaveImageImplementation(iplugin);
-
+				new SaveImageImplementation(this.iplugin);
 			} else {
 				log.error("irodsImagej.isImageOpened() is false");
 				IJ.error("Error while saving file",
 						"No image available to save !");
 			}
-
 		} else {
 			log.error("Irods_Plugin_OpenImage.getIrodsImagej() is null");
 			IJ.error("Error while saving file",
@@ -50,21 +39,20 @@ public class IPlugin_SaveImage extends PlugInFrame {
 		}
 	}
 
-	/* Using this will lead to new panel - not required as of now */
 	private void setVisibility(boolean isVisibility) {
 		if (isVisibility) {
 			log.info("Inside setVisibility method");
-			saveImagePanelImplementation = new SaveImagePanelImplementation(
-					iplugin);
-			if (null != iplugin.getSaveImagePanelImplementation()) {
-				iplugin.setSaveImagePanelImplementation(saveImagePanelImplementation);
+			this.saveImagePanelImplementation = new SaveImagePanelImplementation(
+					this.iplugin);
+			if (null != this.iplugin.getSaveImagePanelImplementation()) {
+				this.iplugin
+						.setSaveImagePanelImplementation(this.saveImagePanelImplementation);
 			} else {
 				log.error("saveImagePanelImplementation instance is null");
 			}
-			saveImagePanelImplementation.setVisible(true);
+			this.saveImagePanelImplementation.setVisible(true);
 		} else {
 			log.error("Save Panel Visibility is set to false !");
 		}
-
 	}
 }

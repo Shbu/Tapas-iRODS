@@ -3,8 +3,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.bio5.irods.iplugin</groupId>
-	<artifactId>irods_fileIO</artifactId>
-	<version>0.0.1-Snapshot</version>
+	<artifactId>Tapas-iRODS_FileIO</artifactId>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 
 	<name>irods_java_file_io_application</name>

@@ -4,27 +4,23 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.bio5.irods.iplugin.bean.IPlugin;
-import org.bio5.irods.iplugin.views.MainWindow;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.transfer.TransferControlBlock;
 
 public class IrodsPropertiesConstruction {
-
-	/* Logger instantiation */
 	static Logger log = Logger.getLogger(IrodsPropertiesConstruction.class
 			.getName());
 
-	/* Default jargon Properties */
 	public TransferControlBlock constructTransferControlBlockFromJargonProperties(
 			IPlugin iplugin) throws JargonException {
 		TransferControlBlock defaultTransferControlBlock = null;
 		defaultTransferControlBlock = iplugin.getIrodsFileSystem()
 				.getIRODSAccessObjectFactory()
 				.buildDefaultTransferControlBlockBasedOnJargonProperties();
+
 		return defaultTransferControlBlock;
 	}
 
-	/* Enhanced jargon Properties */
 	public TransferControlBlock constructHighPerformanceTransferControlBlockFromJargonProperties(
 			IPlugin iplugin) {
 		TransferControlBlock highPerformanceTransferControlBlock = null;
@@ -42,18 +38,17 @@ public class IrodsPropertiesConstruction {
 			try {
 				highPerformanceTransferControlBlock.getTransferOptions()
 						.setIntraFileStatusCallbacks(true);
-
-				/* Setting max threads for parallel transfers */
 				if (null != tapasProperties) {
 					String maxThreadFromProperty = tapasProperties
-							.getProperty(Constants.PROPERTY_MAX_THREADS);
-					if (null != maxThreadFromProperty
-							&& "" != maxThreadFromProperty) {
+							.getProperty("tapas.parallel.transfer.max.threads");
+					if ((null != maxThreadFromProperty)
+							&& ("" != maxThreadFromProperty)) {
 						int maxThreads = Integer
 								.parseInt(maxThreadFromProperty);
-						if (maxThreads > 0 || maxThreads == 0) {
+						if ((maxThreads > 0) || (maxThreads == 0)) {
 							log.info("tapas.parallel.transfer.max.threads: "
 									+ maxThreads);
+
 							highPerformanceTransferControlBlock
 									.getTransferOptions().setMaxThreads(
 											maxThreads);
@@ -62,6 +57,7 @@ public class IrodsPropertiesConstruction {
 						highPerformanceTransferControlBlock
 								.getTransferOptions().setMaxThreads(
 										Constants.MAX_THREADS);
+
 						log.error("tapasProperties is null while constructHighPerformanceTransferControlBlockFromJargonProperties");
 						log.info("max threads set to: " + Constants.MAX_THREADS);
 					}
@@ -69,6 +65,7 @@ public class IrodsPropertiesConstruction {
 				highPerformanceTransferControlBlock.getTransferOptions()
 						.setUseParallelTransfer(
 								Constants.USE_PARALLEL_TRANSFERS_OPTION);
+
 				highPerformanceTransferControlBlock
 						.getTransferOptions()
 						.setComputeAndVerifyChecksumAfterTransfer(
@@ -84,14 +81,14 @@ public class IrodsPropertiesConstruction {
 	public IrodsTransferStatusCallbackListener constructIrodsTransferStatusCallbackListener(
 			IPlugin irodsImagej) {
 		IrodsTransferStatusCallbackListener irodsTransferStatusCallbackListener = null;
-		if (null != irodsImagej && null != irodsImagej.getiRODSFileFactory()) {
+		if ((null != irodsImagej)
+				&& (null != irodsImagej.getiRODSFileFactory())) {
 			irodsTransferStatusCallbackListener = new IrodsTransferStatusCallbackListener(
 					irodsImagej);
+
 			irodsImagej
 					.setIrodsTransferStatusCallbackListener(irodsTransferStatusCallbackListener);
 		}
 		return irodsTransferStatusCallbackListener;
-
 	}
-
 }
