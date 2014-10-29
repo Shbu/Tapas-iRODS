@@ -40,6 +40,5 @@ New Requirements - Received on 4/2/2014 | Completed on 5/6/2014
 4. If user clicks on a file and navigates to file details tab, then populate file information under "file details" tab.
 5. While file transfers are in progress, show percentage(%) of file completed including the no of bytes transferred so far. 
 6. Under plugins menu in ImageJ, change the IRODS options to "read file/open file". Add extra option to save files to irods depending on the path selected. Need to experiment with this as I'm not sure on how to trigger extra functionalities in an already running instance with a new option under ImageJ plugin (save to irods).
-7. 
 
 
