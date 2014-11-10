@@ -4,7 +4,7 @@ Open Source Project - Tapas.
 #####Code accepted by National Institutes of Health. 
 
 
-`http://wiki.irods.org/index.php/IRODS:Data_Grids,_Digital_Libraries,_Persistent_Archives,_and_Real-time_Data_Systems`
+[IRODS Wiki Page Link](http://wiki.irods.org/index.php/IRODS:Data_Grids,_Digital_Libraries,_Persistent_Archives,_and_Real-time_Data_Systems)
 
 Tapas (iRODS-FileIO) project deals with development of a Desktop Swing Application which can communicate with iRODS data servers and pull high definition image files through ImageJ application. Further more, through this plugin, users should be able to edit image files (perform analysis) and save edited files back to data servers.
 
